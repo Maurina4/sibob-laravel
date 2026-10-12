@@ -1,0 +1,604 @@
+﻿    .lokasi-page {
+        width: 100%;
+        min-height: calc(100vh - 70px);
+        padding: 4px 0 30px;
+        box-sizing: border-box;
+    }
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    .lokasi-page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .lokasi-title {
+        margin: 0;
+        color: #172b36;
+        font-size: 28px;
+        line-height: 1.25;
+        font-weight: 700;
+    }
+
+    .lokasi-subtitle {
+        margin: 7px 0 0;
+        color: #7c888d;
+        font-size: 13px;
+    }
+
+    .lokasi-add-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 44px;
+        padding: 0 18px;
+        border: 1px solid #0b5d59;
+        border-radius: 7px;
+        background: #0b5d59;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: .2s ease;
+    }
+
+    .lokasi-add-button:hover {
+        background: #084d4a;
+        border-color: #084d4a;
+        color: #ffffff;
+    }
+
+    .lokasi-add-button span {
+        font-size: 17px;
+        line-height: 1;
+    }
+
+    /* =========================================
+       ALERT
+    ========================================= */
+
+    .lokasi-alert {
+        margin-bottom: 18px;
+        padding: 12px 15px;
+        border-radius: 7px;
+        font-size: 13px;
+        line-height: 1.5;
+        box-sizing: border-box;
+    }
+
+    .lokasi-alert-success {
+        border: 1px solid #cce8d7;
+        background: #edf8f2;
+        color: #257342;
+    }
+
+    .lokasi-alert-error {
+        border: 1px solid #efcccc;
+        background: #fff3f3;
+        color: #a43838;
+    }
+
+    .lokasi-alert ul {
+        margin: 7px 0 0 18px;
+        padding: 0;
+    }
+
+    /* =========================================
+       SEARCH
+    ========================================= */
+
+    .lokasi-search-card {
+        margin-bottom: 18px;
+        padding: 16px;
+        background: #ffffff;
+        border: 1px solid #d9e1e1;
+        border-radius: 9px;
+        box-sizing: border-box;
+    }
+
+    .lokasi-search-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .lokasi-search-box {
+        position: relative;
+        flex: 1;
+    }
+
+    .lokasi-search-box input {
+        width: 100%;
+        height: 43px;
+        padding: 0 13px 0 39px;
+        border: 1px solid #d5dede;
+        border-radius: 6px;
+        outline: none;
+        background: #ffffff;
+        color: #34434a;
+        font-family: inherit;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+
+    .lokasi-search-box input::placeholder {
+        color: #9aa5a8;
+    }
+
+    .lokasi-search-box input:focus {
+        border-color: #0b6b67;
+        box-shadow: 0 0 0 3px rgba(11, 107, 103, .08);
+    }
+
+    .lokasi-search-icon {
+        position: absolute;
+        top: 50%;
+        left: 13px;
+        width: 17px;
+        height: 17px;
+        transform: translateY(-50%);
+        color: #7f8d91;
+        pointer-events: none;
+    }
+
+    .lokasi-search-icon svg {
+        width: 100%;
+        height: 100%;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .lokasi-search-button,
+    .lokasi-reset-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 43px;
+        padding: 0 17px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 13px;
+        text-decoration: none;
+        box-sizing: border-box;
+        white-space: nowrap;
+    }
+
+    .lokasi-search-button {
+        border: 1px solid #0b5d59;
+        background: #0b5d59;
+        color: #ffffff;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .lokasi-search-button:hover {
+        background: #084d4a;
+        border-color: #084d4a;
+    }
+
+    .lokasi-reset-button {
+        border: 1px solid #d5dede;
+        background: #ffffff;
+        color: #59666b;
+    }
+
+    .lokasi-reset-button:hover {
+        background: #f5f8f8;
+        color: #455257;
+    }
+
+    /* =========================================
+       TABLE
+    ========================================= */
+
+    .lokasi-table-wrapper {
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #d9e1e1;
+        border-radius: 9px;
+        overflow-x: auto;
+        box-sizing: border-box;
+    }
+
+    .lokasi-table {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    .lokasi-table thead th {
+        padding: 14px 15px;
+        background: #eef3f3;
+        border-bottom: 1px solid #d6dfdf;
+        color: #315e60;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.4;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .lokasi-table tbody td {
+        padding: 13px 15px;
+        border-bottom: 1px solid #e7eded;
+        color: #46535a;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .lokasi-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .lokasi-table tbody tr:hover {
+        background: #fafcfc;
+    }
+
+    .lokasi-col-no {
+        width: 55px;
+        text-align: center !important;
+    }
+
+    .lokasi-col-qr {
+        width: 65px;
+        text-align: center !important;
+    }
+
+    .lokasi-col-aset {
+        width: 130px;
+    }
+
+    .lokasi-col-action {
+        width: 75px;
+        text-align: center !important;
+    }
+
+    .lokasi-no {
+        color: #7b898d !important;
+        text-align: center;
+    }
+
+    /* =========================================
+       NAMA LOKASI + PENSIL
+    ========================================= */
+
+    .lokasi-inline-display {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 38px;
+    }
+
+    .lokasi-name {
+        color: #253b43;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .lokasi-edit-inline-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 1px solid #d3dddd;
+        border-radius: 5px;
+        background: #ffffff;
+        color: #0b5d59;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: .18s ease;
+    }
+
+    .lokasi-edit-inline-button:hover {
+        background: #eaf5f2;
+        border-color: #0b5d59;
+        color: #084d4a;
+    }
+
+    .lokasi-edit-inline-button svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* =========================================
+       INLINE EDIT FORM
+    ========================================= */
+
+    .lokasi-inline-form {
+        width: 100%;
+    }
+
+    .lokasi-inline-edit-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        width: 100%;
+    }
+
+    .lokasi-inline-input {
+        flex: 1;
+        min-width: 150px;
+        height: 38px;
+        padding: 0 10px;
+        border: 1px solid #b8c8c4;
+        border-radius: 6px;
+        outline: none;
+        background: #ffffff;
+        color: #17201e;
+        font-family: inherit;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+
+    .lokasi-inline-input:focus {
+        border-color: #0b5d59;
+        box-shadow: 0 0 0 3px rgba(11, 93, 89, .08);
+    }
+
+    .lokasi-inline-save,
+    .lokasi-inline-cancel {
+        height: 38px;
+        padding: 0 11px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    .lokasi-inline-save {
+        border: 1px solid #0b5d59;
+        background: #0b5d59;
+        color: #ffffff;
+    }
+
+    .lokasi-inline-save:hover {
+        background: #084d4a;
+        border-color: #084d4a;
+    }
+
+    .lokasi-inline-cancel {
+        border: 1px solid #d0dada;
+        background: #ffffff;
+        color: #566469;
+    }
+
+    .lokasi-inline-cancel:hover {
+        background: #f3f6f5;
+    }
+
+    /* =========================================
+       QR
+    ========================================= */
+
+    .lokasi-qr {
+        text-align: center;
+    }
+
+    .lokasi-qr-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #d5dede;
+        border-radius: 5px;
+        background: #ffffff;
+        color: #0b5d59;
+        cursor: pointer;
+        transition: .18s ease;
+    }
+
+    .lokasi-qr-button:hover {
+        background: #edf6f5;
+        border-color: #bcd4d4;
+    }
+
+    .lokasi-qr-button svg {
+        width: 17px;
+        height: 17px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+    }
+
+    /* =========================================
+       JUMLAH ASET
+    ========================================= */
+
+    .lokasi-asset-count {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 0 9px;
+        border-radius: 999px;
+        background: #edf5f4;
+        color: #17635f;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* =========================================
+       HAPUS
+    ========================================= */
+
+    .lokasi-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .lokasi-delete {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #edd3d3;
+        border-radius: 5px;
+        background: #ffffff;
+        color: #c14a4a;
+        cursor: pointer;
+        transition: .18s ease;
+    }
+
+    .lokasi-delete:hover {
+        background: #fff4f4;
+        border-color: #e8c1c1;
+        color: #ae3939;
+    }
+
+    .lokasi-delete svg {
+        width: 15px;
+        height: 15px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* =========================================
+       EMPTY
+    ========================================= */
+
+    .lokasi-empty {
+        padding: 55px 20px !important;
+        text-align: center;
+        color: #8b989b !important;
+    }
+
+    .lokasi-empty-icon {
+        margin-bottom: 8px;
+        font-size: 28px;
+    }
+
+    .lokasi-empty strong,
+    .lokasi-empty span {
+        display: block;
+    }
+
+    .lokasi-empty strong {
+        margin-bottom: 5px;
+        color: #526166;
+        font-size: 14px;
+    }
+
+    .lokasi-empty span {
+        margin-bottom: 15px;
+        font-size: 12px;
+    }
+
+    .lokasi-empty-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 0 14px;
+        border: 1px solid #0b5d59;
+        border-radius: 6px;
+        background: #0b5d59;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .lokasi-empty-button:hover {
+        background: #084d4a;
+        color: #ffffff;
+    }
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+
+    .lokasi-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 13px 15px;
+        border: 1px solid #d9e1e1;
+        border-top: none;
+        border-radius: 0 0 9px 9px;
+        background: #ffffff;
+        box-sizing: border-box;
+    }
+
+    .lokasi-total {
+        color: #7b898d;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .lokasi-pagination {
+        flex-shrink: 0;
+    }
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 750px) {
+
+        .lokasi-page-header {
+            flex-direction: column;
+        }
+
+        .lokasi-add-button {
+            width: 100%;
+        }
+
+        .lokasi-search-form {
+            flex-wrap: wrap;
+        }
+
+        .lokasi-search-box {
+            flex-basis: 100%;
+        }
+
+        .lokasi-search-button,
+        .lokasi-reset-button {
+            flex: 1;
+        }
+
+        .lokasi-footer {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .lokasi-inline-edit-wrapper {
+            flex-wrap: wrap;
+        }
+
+        .lokasi-inline-input {
+            flex-basis: 100%;
+            width: 100%;
+        }
+    }

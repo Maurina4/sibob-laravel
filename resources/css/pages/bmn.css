@@ -1,0 +1,199 @@
+/* =========================================================
+   BMN MODULE STYLES (INDEX & EDIT)
+   ========================================================= */
+
+/* BADGE JENIS BARANG */
+.bmn-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: #e8f1ef;
+    color: #145c58;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bmn-type-empty {
+    color: #98a19f;
+}
+
+/* FILTER */
+.bmn-filter-bar {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.bmn-search-box {
+    flex: 1 1 320px;
+    min-width: 240px;
+}
+
+.bmn-filter-select {
+    flex: 1 1 160px;
+    min-width: 145px;
+}
+
+.bmn-filter-button,
+.bmn-reset-button {
+    flex: 0 0 auto;
+}
+
+/* TABEL */
+.bmn-table-wrapper {
+    overflow-x: auto;
+}
+
+.bmn-table {
+    min-width: 1250px;
+}
+
+/* EDIT FORM & CODE INPUT */
+.bmn-code-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.bmn-code-input-wrapper input {
+    flex: 1;
+    min-width: 0;
+}
+
+.code-locked-input {
+    background: #e8eeee !important;
+    color: #34403d;
+    cursor: not-allowed;
+}
+
+.code-editable-input {
+    background: #ffffff !important;
+    color: #17201e;
+    cursor: text;
+}
+
+.code-edit-button {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border: 1px solid #cbd6d2;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #34403d;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: 0.15s ease;
+}
+
+.code-edit-button:hover {
+    border-color: #0e4f4a;
+    background: #f5faf8;
+    color: #0e4f4a;
+}
+
+.code-edit-button.active {
+    border-color: #0e4f4a;
+    background: #0e4f4a;
+    color: #ffffff;
+}
+
+.support-upload-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.support-upload-content strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.support-upload-content small {
+    display: block;
+    color: #8a9491;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.support-file-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 9px;
+    padding: 7px 11px;
+    border: 1px solid #cbd6d2;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #34403d;
+    cursor: pointer;
+    font-size: 11px;
+    transition: 0.15s ease;
+}
+
+.support-file-button:hover {
+    border-color: #0e4f4a;
+    background: #f5faf8;
+}
+
+.support-file-button input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.support-selected-file {
+    margin-top: 6px;
+    color: #0e4f4a !important;
+    font-size: 10.5px !important;
+    word-break: break-word;
+}
+
+.support-upload-box {
+    align-items: flex-start;
+}
+
+.bmn-form-success {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid #b9d8ce;
+    border-radius: 7px;
+    background: #eef9f5;
+    color: #176b59;
+    font-size: 13px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .bmn-search-box {
+        flex-basis: 100%;
+    }
+
+    .bmn-filter-select {
+        flex: 1 1 180px;
+    }
+}
+
+@media (max-width: 600px) {
+    .bmn-filter-bar {
+        flex-direction: column;
+    }
+
+    .bmn-search-box,
+    .bmn-filter-select,
+    .bmn-filter-button,
+    .bmn-reset-button {
+        width: 100%;
+        min-width: 100%;
+        flex-basis: auto;
+    }
+}

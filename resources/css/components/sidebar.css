@@ -1,0 +1,181 @@
+/* =========================================================
+   SIDEBAR GROUP & MINI MODE STYLES
+   ========================================================= */
+
+.nav-section {
+    width: 100%;
+}
+
+.nav-section .nav-grup,
+.nav-section .nav-grup-link {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    padding: 13px 20px;
+    position: relative;
+    z-index: 1000002;
+    pointer-events: auto;
+}
+
+.nav-section .nav-grup *,
+.nav-section .nav-grup-link *,
+.nav-group-icon,
+.nav-group-icon svg {
+    pointer-events: none;
+}
+
+.nav-group-icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-group-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.nav-group-title {
+    flex: 1;
+}
+
+.nav-section .nav-arrow {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform .2s ease;
+}
+
+.nav-section.open .nav-arrow,
+.nav-section.open .nav-grup .nav-arrow,
+.nav-section.open .nav-grup-link .nav-arrow,
+.nav-grup.buka .nav-arrow,
+.nav-grup-link.buka .nav-arrow {
+    transform: rotate(90deg);
+}
+
+.nav-section .nav-submenu {
+    display: none;
+}
+
+.nav-section.open .nav-submenu,
+.nav-section .nav-submenu.submenu-terbuka {
+    display: block !important;
+    animation: submenuMuncul .15s ease;
+}
+
+.nav-section .nav-submenu .nav-item {
+    padding-left: 32px;
+}
+
+@keyframes submenuMuncul {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* SIDEBAR MINI */
+.side.mini .nav-item {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.side.mini .nav-item .teks {
+    display: none;
+}
+
+.side.mini .nav-group-title {
+    display: none;
+}
+
+.side.mini .nav-group-icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+}
+
+.side.mini .nav-group-icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+.side.mini .nav-section .nav-grup {
+    justify-content: center;
+    gap: 0;
+    padding-left: 0;
+    padding-right: 0;
+    height: 48px;
+}
+
+.side.mini .nav-section .nav-arrow {
+    display: none;
+}
+
+.side.mini .nav-section .nav-submenu {
+    display: none !important;
+}
+
+.side.mini .side-logo {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.side.mini .side-logo .teks {
+    display: none;
+}
+
+.side.mini .side-user {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.side.mini .side-user-text {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .side .nav-section .nav-grup {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .side .nav-section .nav-submenu .nav-item {
+        padding-left: 32px;
+    }
+
+    .side .nav-group-title {
+        display: block;
+    }
+
+    .side .nav-group-icon {
+        display: flex;
+    }
+}

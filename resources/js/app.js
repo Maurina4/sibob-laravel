@@ -1,0 +1,1 @@
+console.log('SIBOB berhasil dimuat');

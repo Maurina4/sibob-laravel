@@ -1,0 +1,5349 @@
+/* =========================================================
+   MODULAR CSS IMPORTS
+   ========================================================= */
+@import './components/sidebar.css';
+@import './pages/bmn.css';
+@import './pages/bmn-tik.css';
+@import './pages/bmn-lab.css';
+@import './pages/lokasi.css';
+@import './pages/pengembalian.css';
+@import './pages/data-terhapus.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   SIBOB SIDEBAR - KEMBALI KE DESAIN PROTOTYPE ASLI
+   ========================================================= */
+html {
+    margin: 0;
+    padding: 0;
+}
+
+
+.app {
+    min-height: 100vh;
+    display: flex;
+}
+
+
+/* SIDEBAR */
+.side {
+    background: #0E281C;
+
+   z-index: 999999 !important;
+
+    display: flex;
+    flex-direction: column;
+
+    flex-shrink: 0;
+
+    width: 240px;
+    height: 100vh;
+
+    position: sticky;
+    top: 0;
+
+    overflow: hidden auto;
+
+    transition: width .2s;
+}
+
+
+/* LOGO */
+.side-logo {
+    border-bottom: 1px solid #ffffff1a;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 70px;
+
+    padding: 18px 20px 14px;
+}
+
+
+.side-logo .kotak {
+    color: #fff;
+
+    background: #ffffff26;
+
+    border-radius: 8px;
+
+    flex-shrink: 0;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.side-title {
+    color: #fff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    margin: 0;
+}
+
+
+.side-subtitle {
+    color: rgba(255,255,255,.6);
+
+    font-size: 10.5px;
+
+    line-height: 1.2;
+
+    margin: 0;
+}
+
+
+/* NAV */
+.side-nav {
+    padding: 12px 0;
+
+    flex: 1;
+}
+
+
+/* ITEM */
+.nav-item {
+    color: #ffffffbf;
+
+    width: 100%;
+
+    font: inherit;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    background: transparent;
+
+    border: none;
+
+    border-left: 3px solid transparent;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 2px;
+
+    padding: 9px 20px;
+
+    font-size: 13.5px;
+
+    text-decoration: none;
+}
+
+
+.nav-item:hover {
+    color: #fff;
+
+    background: #ffffff0f;
+}
+
+
+/* SUB MENU */
+.nav-item.sub {
+    padding-left: 32px;
+}
+
+
+/* MENU AKTIF */
+.nav-item.aktif {
+    background: #0a3c38;
+
+    border-left-color: #3c9d6b;
+    color: #fff;
+
+    font-weight: 600;
+}
+
+/* ICON */
+.nav-icon {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.nav-icon svg {
+    width: 17px;
+    height: 17px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.5;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* GROUP BMN */
+.nav-grup {
+    cursor: pointer;
+
+    color: #ffffff99;
+
+    width: 100%;
+
+    font: inherit;
+
+    letter-spacing: .07em;
+
+    text-transform: uppercase;
+
+    background: transparent;
+
+    border: none;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 4px;
+
+    padding: 8px 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.nav-grup svg {
+    width: 12px;
+    height: 12px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.5;
+
+    transition: transform .2s;
+}
+
+
+.nav-grup.buka svg {
+    transform: rotate(90deg);
+}
+
+
+/* USER BAWAH */
+.side-user {
+    border-top: 1px solid #ffffff1a;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: auto;
+
+    padding: 14px 20px;
+}
+
+
+.avatar {
+    background: #3c9d6b;
+
+    color: #fff;
+
+    border-radius: 50%;
+
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.side-user-text {
+    overflow: hidden;
+}
+
+
+.side-user-name {
+    color: rgba(255,255,255,.9);
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    overflow: hidden;
+
+    margin: 0;
+}
+
+
+.side-user-role {
+    color: rgba(255,255,255,.6);
+
+    font-size: 11px;
+
+    line-height: 1.3;
+
+    margin: 0;
+}
+
+
+/* AREA UTAMA */
+.main {
+    flex-direction: column;
+
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+}
+
+
+/* KONTEN */
+.konten {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 28px 28px 56px;
+}
+
+
+/* =========================================================
+   LAYOUT LARAVEL KITA
+   ========================================================= */
+
+.app-shell {
+    min-height: 100vh;
+
+    display: flex;
+}
+
+
+.main-area {
+    margin-left: 0;
+
+    min-height: 100vh;
+
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+/* Karena sidebar sekarang sticky, jangan beri margin 293px */
+.sidebar {
+    display: none;
+}
+
+
+/* Konten Laravel menggunakan page-content */
+.page-content {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 28px 28px 56px;
+
+    background: #f1f3f1;
+}
+
+
+/* MOBILE */
+@media (max-width: 900px) {
+
+    .side {
+        width: 240px;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .side {
+        position: fixed;
+
+        left: 0;
+        top: 0;
+
+        transform: translateX(-100%);
+
+        transition: transform .2s;
+    }
+
+    .side.show {
+        transform: translateX(0);
+    }
+
+    .main-area {
+        margin-left: 0;
+    }
+
+}
+
+/* =========================================================
+   SIBOB - HEADER / TOP BAR
+   Mengikuti struktur prototype HTML asli
+   ========================================================= */
+
+
+/* HEADER UTAMA */
+.top {
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #d8dfdc;
+
+    z-index: 30;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 12px;
+
+    height: 54px;
+
+    padding: 0 20px;
+
+    position: sticky;
+
+    top: 0;
+
+}
+
+
+/* =========================================================
+   BAGIAN KIRI
+   ========================================================= */
+
+.crumb {
+
+    display: flex;
+
+    flex-wrap: nowrap;
+
+    align-items: center;
+
+    gap: 6px;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+}
+
+
+/* Teks breadcrumb / judul halaman */
+.crumb span,
+.crumb button {
+
+    color: #65716e;
+
+    white-space: nowrap;
+
+    background: transparent;
+
+    border: none;
+
+    padding: 0;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+}
+
+
+/* Judul halaman terakhir */
+.crumb .akhir {
+
+    color: #1c2624;
+
+    font-weight: 500;
+
+}
+
+
+/* =========================================================
+   TOMBOL BURGER
+   ========================================================= */
+
+.burger {
+
+    border: 1px solid #d8dfdc;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    width: 36px;
+
+    height: 36px;
+
+    color: #1c2624;
+
+    border-radius: 6px;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-family: inherit;
+
+    font-size: 17px;
+
+    line-height: 1;
+
+}
+
+
+.burger:hover {
+
+    background: #e4edec;
+
+}
+
+
+/* Saat tombol ditekan */
+.burger:active {
+
+    transform: scale(.97);
+
+}
+
+
+/* =========================================================
+   BAGIAN KANAN HEADER
+   ========================================================= */
+
+.header-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    flex-shrink: 0;
+
+}
+
+
+/* Nama kantor */
+.header-office {
+
+    color: #4a5754;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   TOMBOL KELUAR
+   ========================================================= */
+
+.logout-button {
+
+    border: 1px solid #d8dfdc;
+
+    background: #ffffff;
+
+    color: #1c2624;
+
+    border-radius: 6px;
+
+    padding: 7px 12px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    line-height: 1.2;
+
+}
+
+
+.logout-button:hover {
+
+    background: #e4edec;
+
+}
+
+
+.logout-button:active {
+
+    transform: scale(.97);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .top {
+
+        height: 54px;
+
+        padding: 0 14px;
+
+    }
+
+
+    .header-office {
+
+        display: none;
+
+    }
+
+
+    .header-right {
+
+        gap: 8px;
+
+    }
+
+
+    .logout-button {
+
+        padding: 6px 10px;
+
+    }
+
+}
+/* =========================================================
+   SIBOB DASHBOARD
+   TIDAK MENGUBAH SIDEBAR
+   ========================================================= */
+
+
+/* =========================================================
+   JUDUL
+   ========================================================= */
+
+.dashboard-heading {
+    margin: 0 0 22px 0;
+}
+
+.dashboard-heading h1 {
+    margin: 0;
+
+    color: #1c2624;
+
+    font-size: 23px;
+
+    font-weight: 600;
+
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   STATISTIK
+   ========================================================= */
+
+.dashboard-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 22px;
+}
+
+
+/* KARTU */
+.stat-card {
+    min-height: 125px;
+
+    background: #ffffff;
+
+    border: 1px solid #d8dfdc;
+
+    border-radius: 9px;
+
+    padding: 18px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    box-shadow:
+        0 1px 3px rgba(28, 38, 36, 0.04);
+}
+
+
+/* =========================================================
+   ICON STATISTIK
+   ========================================================= */
+
+.stat-icon {
+    width: 40px;
+
+    height: 40px;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 18px;
+
+    font-weight: 600;
+}
+
+
+.stat-icon span {
+    line-height: 1;
+}
+
+
+/* TEAL */
+.stat-icon-teal {
+    color: #0e4f4a;
+
+    background: #e4edec;
+}
+
+
+/* HIJAU */
+.stat-icon-green {
+    color: #3c9d6b;
+
+    background: #d1f0e0;
+}
+
+
+/* ORANGE */
+.stat-icon-orange {
+    color: #c97f2a;
+
+    background: #faf0de;
+}
+
+
+/* MERAH */
+.stat-icon-red {
+    color: #b3402a;
+
+    background: #fbeae7;
+}
+
+
+/* =========================================================
+   ISI STATISTIK
+   ========================================================= */
+
+.stat-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.stat-label {
+    color: #65716e;
+
+    font-size: 12.5px;
+
+    font-weight: 500;
+
+    line-height: 1.4;
+
+    margin-bottom: 5px;
+}
+
+
+.stat-number {
+    font-size: 26px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    margin-bottom: 5px;
+}
+
+
+.stat-number.teal {
+    color: #0e4f4a;
+}
+
+
+.stat-number.green {
+    color: #3c9d6b;
+}
+
+
+.stat-number.orange {
+    color: #c97f2a;
+}
+
+
+.stat-number.red {
+    color: #b3402a;
+}
+
+
+.stat-sub {
+    color: #8a9491;
+
+    font-size: 11.5px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   AKTIVITAS TERBARU
+   ========================================================= */
+
+.activity-panel {
+    background: #ffffff;
+
+    border: 1px solid #d8dfdc;
+
+    border-radius: 9px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 1px 3px rgba(28, 38, 36, 0.04);
+}
+
+
+/* JUDUL AKTIVITAS */
+.activity-heading {
+    color: #1c2624;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    padding: 17px 19px;
+
+    border-bottom: 1px solid #d8dfdc;
+}
+
+
+/* BARIS */
+.activity-row {
+    min-height: 65px;
+
+    display: grid;
+
+    grid-template-columns:
+        36px
+        minmax(0, 1fr)
+        90px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 19px;
+
+    border-bottom: 1px solid #edf0ef;
+}
+
+
+.activity-row:last-child {
+    border-bottom: none;
+}
+
+
+/* ICON AKTIVITAS */
+.activity-icon {
+    width: 32px;
+
+    height: 32px;
+
+    border-radius: 7px;
+
+    background: #e4edec;
+
+    color: #0e4f4a;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+
+/* TEKS */
+.activity-text {
+    color: #34403d;
+
+    font-size: 12.5px;
+
+    line-height: 1.45;
+}
+
+
+/* WAKTU */
+.activity-time {
+    color: #8a9491;
+
+    font-size: 11.5px;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+
+.orange-text {
+    color: #c97f2a;
+}
+
+
+.red-text {
+    color: #b3402a;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .dashboard-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .dashboard-heading h1 {
+        font-size: 20px;
+    }
+
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+
+    .stat-card {
+        min-height: 110px;
+    }
+
+
+    .activity-row {
+        grid-template-columns:
+            34px
+            minmax(0, 1fr);
+    }
+
+
+    .activity-time {
+        grid-column: 2;
+
+        text-align: left;
+
+        margin-top: -7px;
+    }
+
+}
+/* =========================================================
+   DASHBOARD / BERANDA SIBOB
+   ========================================================= */
+
+.dashboard-page {
+    width: 100%;
+}
+
+.dashboard-welcome {
+    margin-bottom: 22px;
+}
+
+.dashboard-welcome h1 {
+    margin: 0;
+    color: #1c2624;
+    font-size: 23px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+
+/* =========================
+   KARTU STATISTIK
+   ========================= */
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.dashboard-card {
+    min-height: 125px;
+    background: #ffffff;
+    border: 1px solid #d8dfdc;
+    border-radius: 9px;
+    padding: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    box-shadow: 0 1px 3px rgba(28, 38, 36, 0.04);
+}
+
+.dashboard-card-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.icon-teal {
+    color: #0e4f4a;
+    background: #e4edec;
+}
+
+.icon-green {
+    color: #3c9d6b;
+    background: #d1f0e0;
+}
+
+.icon-orange {
+    color: #c97f2a;
+    background: #faf0de;
+}
+
+.icon-red {
+    color: #b3402a;
+    background: #fbeae7;
+}
+
+
+.dashboard-card-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.dashboard-card-label {
+    color: #65716e;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 5px;
+}
+
+.dashboard-card-number {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 5px;
+}
+
+.number-teal {
+    color: #0e4f4a;
+}
+
+.number-green {
+    color: #3c9d6b;
+}
+
+.number-orange {
+    color: #c97f2a;
+}
+
+.number-red {
+    color: #b3402a;
+}
+
+.dashboard-card-sub {
+    color: #8a9491;
+    font-size: 11.5px;
+    line-height: 1.4;
+}
+
+
+/* =========================
+   AKTIVITAS TERBARU
+   ========================= */
+
+.activity-card {
+    background: #ffffff;
+    border: 1px solid #d8dfdc;
+    border-radius: 9px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(28, 38, 36, 0.04);
+}
+
+.activity-title {
+    color: #1c2624;
+    font-size: 15px;
+    font-weight: 600;
+
+    padding: 17px 19px;
+
+    border-bottom: 1px solid #d8dfdc;
+}
+
+.activity-item {
+    min-height: 65px;
+
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 90px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 19px;
+
+    border-bottom: 1px solid #edf0ef;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+
+    border-radius: 7px;
+
+    background: #e4edec;
+    color: #0e4f4a;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+}
+
+.activity-description {
+    color: #34403d;
+
+    font-size: 12.5px;
+
+    line-height: 1.45;
+}
+
+.activity-time {
+    color: #8a9491;
+
+    font-size: 11.5px;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+.activity-orange {
+    color: #c97f2a;
+}
+
+.activity-red {
+    color: #b3402a;
+}
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 1100px) {
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .dashboard-welcome h1 {
+        font-size: 20px;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .dashboard-card {
+        min-height: 110px;
+    }
+
+    .activity-item {
+        grid-template-columns: 34px minmax(0, 1fr);
+    }
+
+    .activity-time {
+        grid-column: 2;
+        text-align: left;
+        margin-top: -7px;
+    }
+
+}
+/* =========================================================
+   HALAMAN LOGIN SIBOB
+   Tidak mengubah sidebar dan dashboard
+   ========================================================= */
+
+.login-page {
+    min-height: 100vh;
+    width: 100%;
+
+    display: flex;
+
+    background: #f1f3f1;
+}
+
+
+/* =========================================================
+   BAGIAN KIRI
+   ========================================================= */
+
+.login-left {
+    width: 42%;
+
+    min-height: 100vh;
+
+    background: #0e5954;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+}
+
+.login-brand {
+    width: 100%;
+    max-width: 520px;
+
+    text-align: center;
+
+    color: #ffffff;
+}
+
+
+/* LOGO BESAR */
+
+.login-logo {
+    width: 130px;
+    height: 130px;
+
+    margin: 0 auto 28px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, .08);
+}
+
+.login-logo svg {
+    width: 76px;
+    height: 76px;
+}
+
+.login-logo-text {
+    position: absolute;
+
+    bottom: 25px;
+
+    color: #164f9b;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    letter-spacing: .3px;
+}
+
+
+/* JUDUL */
+
+.login-brand-title {
+    margin: 0 0 10px;
+
+    font-size: 31px;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+    color: #ffffff;
+}
+
+.login-brand-subtitle {
+    margin: 0 0 6px;
+
+    color: rgba(255, 255, 255, .78);
+
+    font-size: 16px;
+
+    line-height: 1.5;
+}
+
+.login-brand-office {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+
+/* FITUR */
+
+.login-features {
+    width: 100%;
+
+    max-width: 380px;
+
+    margin: 48px auto 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 17px;
+
+    text-align: left;
+}
+
+.login-feature {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: rgba(255, 255, 255, .88);
+
+    font-size: 14px;
+
+    line-height: 1.4;
+}
+
+.login-check {
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #3c9d6b;
+
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   BAGIAN KANAN
+   ========================================================= */
+
+.login-right {
+    width: 58%;
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 48px 32px;
+
+    overflow-y: auto;
+}
+
+
+/* KARTU LOGIN */
+
+.login-card {
+    width: 100%;
+
+    max-width: 440px;
+
+    background: #ffffff;
+
+    border: 1px solid #d8dfdc;
+
+    border-radius: 12px;
+
+    padding: 30px 36px 28px;
+
+    box-shadow:
+        0 4px 32px rgba(14, 79, 74, .10);
+}
+
+
+/* BRAND KECIL */
+
+.login-small-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 24px;
+}
+
+.login-small-logo {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+
+    border: 1px solid #d8dfdc;
+
+    background: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+.login-small-logo svg {
+    width: 29px;
+    height: 29px;
+}
+
+.login-small-title {
+    color: #0e4f4a;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+.login-small-subtitle {
+    color: #65716e;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+
+/* JUDUL LOGIN */
+
+.login-title {
+    margin: 0;
+
+    color: #1c2624;
+
+    font-size: 25px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+}
+
+.login-description {
+    margin: 5px 0 25px;
+
+    color: #65716e;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* ERROR */
+
+.login-error {
+    margin-bottom: 18px;
+
+    padding: 11px 13px;
+
+    background: #fbeae7;
+
+    border: 1px solid #edc8c1;
+
+    border-radius: 7px;
+
+    color: #9f3425;
+
+    font-size: 12.5px;
+}
+
+.login-error ul {
+    margin: 5px 0 0 18px;
+
+    padding: 0;
+}
+
+
+/* FORM */
+
+.login-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 17px;
+}
+
+.login-field {
+    width: 100%;
+}
+
+.login-field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #1c2624;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.login-field input[type="email"],
+.login-field input[type="password"],
+.login-field input[type="text"] {
+    width: 100%;
+
+    height: 48px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d3dbd8;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #1c2624;
+
+    padding: 0 14px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color .15s,
+        box-shadow .15s;
+}
+
+.login-field input::placeholder {
+    color: #9aa5a1;
+}
+
+.login-field input:focus {
+    border-color: #0e5954;
+
+    box-shadow:
+        0 0 0 3px rgba(14, 89, 84, .10);
+}
+
+
+/* PASSWORD */
+
+.password-wrapper {
+    position: relative;
+
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 75px !important;
+}
+
+.password-toggle {
+    position: absolute;
+
+    right: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: #0e5954;
+
+    font-family: inherit;
+
+    font-size: 12.5px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    text-decoration: underline;
+}
+
+
+/* CAPTCHA */
+
+.captcha-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 9px;
+}
+
+.captcha-code {
+    width: 205px;
+    height: 48px;
+
+    border: 1px solid #d8dfdc;
+
+    border-radius: 7px;
+
+    background:
+        repeating-linear-gradient(
+            15deg,
+            #edf5f3 0px,
+            #edf5f3 3px,
+            #e1ece9 4px,
+            #edf5f3 7px
+        );
+
+    color: #205b58;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-family: monospace;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    letter-spacing: 8px;
+
+    text-shadow:
+        1px 1px 0 rgba(0,0,0,.05);
+
+    user-select: none;
+}
+
+.captcha-refresh {
+    height: 40px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d3dbd8;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #1c2624;
+
+    font-family: inherit;
+
+    font-size: 12.5px;
+
+    cursor: pointer;
+}
+
+.captcha-refresh:hover {
+    background: #e4edec;
+}
+
+.captcha-error {
+    min-height: 17px;
+
+    margin-top: 5px;
+
+    color: #b3402a;
+
+    font-size: 11.5px;
+}
+
+
+/* INGAT SAYA */
+
+.login-remember {
+    margin-top: -2px;
+
+    font-size: 12.5px;
+
+    color: #65716e;
+}
+
+.login-remember label {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    cursor: pointer;
+}
+
+.login-remember input {
+    width: 15px;
+    height: 15px;
+
+    accent-color: #0e5954;
+
+    cursor: pointer;
+}
+
+
+/* TOMBOL LOGIN */
+
+.login-submit {
+    width: 100%;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .15s,
+        transform .05s;
+}
+
+.login-submit:hover {
+    background: #0a4743;
+}
+
+.login-submit:active {
+    transform: scale(.99);
+}
+
+
+/* FOOTER */
+
+.login-footer {
+    margin-top: 22px;
+
+    padding-top: 17px;
+
+    border-top: 1px solid #edf0ef;
+
+    color: #9aa5a1;
+
+    text-align: center;
+
+    font-size: 10.5px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .login-left {
+        display: none;
+    }
+
+    .login-right {
+        width: 100%;
+
+        min-height: 100vh;
+
+        padding: 30px 18px;
+    }
+
+    .login-card {
+        max-width: 440px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .login-right {
+        padding: 20px 12px;
+    }
+
+    .login-card {
+        padding: 25px 20px;
+        border-radius: 9px;
+    }
+
+    .login-title {
+        font-size: 22px;
+    }
+
+    .login-small-brand {
+        margin-bottom: 20px;
+    }
+
+    .captcha-row {
+        align-items: stretch;
+    }
+
+    .captcha-code {
+        flex: 1;
+
+        width: auto;
+
+        letter-spacing: 5px;
+    }
+
+}
+
+/* =========================================================
+   DAFTAR BMN
+   ========================================================= */
+
+.bmn-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   HEADER HALAMAN
+   ========================================================= */
+
+.bmn-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+}
+
+.bmn-page-header h1 {
+    margin: 0;
+
+    color: #172321;
+
+    font-size: 25px;
+    font-weight: 600;
+
+    line-height: 1.3;
+}
+
+.bmn-add-button {
+    min-width: 165px;
+    height: 46px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 18px;
+
+    border-radius: 7px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 13.5px;
+    font-weight: 600;
+
+    transition: background .15s;
+}
+
+.bmn-add-button:hover {
+    background: #0a4743;
+}
+
+.bmn-add-button span {
+    font-size: 20px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   SEARCH + FILTER
+   ========================================================= */
+
+.bmn-filter-bar {
+    display: grid;
+
+    grid-template-columns:
+        minmax(250px, 1.6fr)
+        minmax(145px, .75fr)
+        minmax(190px, 1.05fr)
+        minmax(130px, .65fr)
+        auto
+        auto;
+
+    gap: 11px;
+
+    margin-bottom: 18px;
+}
+
+.bmn-search-box {
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+
+    padding: 0 12px;
+
+    box-sizing: border-box;
+}
+
+.bmn-search-icon {
+    width: 20px;
+    height: 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 7px;
+
+    color: #65716e;
+
+    flex-shrink: 0;
+}
+
+.bmn-search-icon svg {
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.7;
+
+    stroke-linecap: round;
+}
+
+.bmn-search-box input {
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #26322f;
+
+    font-family: inherit;
+
+    font-size: 13px;
+}
+
+.bmn-search-box input::placeholder {
+    color: #9aa5a1;
+}
+
+
+.bmn-filter-select {
+    position: relative;
+
+    height: 44px;
+}
+
+.bmn-filter-select select {
+    width: 100%;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #596662;
+
+    padding: 0 32px 0 12px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+
+    cursor: pointer;
+
+    appearance: auto;
+}
+
+.bmn-filter-select select:focus {
+    border-color: #0e5954;
+}
+
+
+.bmn-filter-button {
+    height: 44px;
+
+    border: 1px solid #0e5954;
+
+    border-radius: 7px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    padding: 0 15px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.bmn-filter-button:hover {
+    background: #0a4743;
+}
+
+
+.bmn-reset-button {
+    height: 44px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 13px;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #596662;
+
+    text-decoration: none;
+
+    font-size: 12px;
+}
+
+.bmn-reset-button:hover {
+    background: #e9efed;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.bmn-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 1px 3px rgba(28, 38, 36, .03);
+}
+
+.bmn-table {
+    width: 100%;
+
+    min-width: 1250px;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    color: #26322f;
+
+    font-size: 12.5px;
+}
+
+.bmn-table thead th {
+    height: 48px;
+
+    padding: 0 14px;
+
+    background: #e7efed;
+
+    border-bottom: 1px solid #d3ddda;
+
+    color: #164f4c;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.bmn-table thead th:first-child {
+    border-top-left-radius: 9px;
+}
+
+.bmn-table thead th:last-child {
+    border-top-right-radius: 9px;
+}
+
+
+.bmn-table tbody td {
+    min-height: 70px;
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid #dce4e1;
+
+    vertical-align: middle;
+
+    background: #ffffff;
+}
+
+.bmn-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.bmn-table tbody tr:hover td {
+    background: #f8faf9;
+}
+
+
+/* COLUMN */
+
+.col-no {
+    width: 40px;
+
+    text-align: center !important;
+}
+
+.col-qr {
+    width: 55px;
+
+    text-align: center !important;
+}
+
+.col-action {
+    width: 85px;
+
+    text-align: center !important;
+}
+
+
+/* NO */
+
+.bmn-no {
+    color: #26322f;
+
+    text-align: center;
+}
+
+
+/* KODE */
+
+.bmn-code {
+    display: inline-block;
+
+    padding: 5px 7px;
+
+    border-radius: 5px;
+
+    background: #e8f0ee;
+
+    color: #164f4c;
+
+    font-family: monospace;
+
+    font-size: 11.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* NAMA */
+
+.bmn-name {
+    display: block;
+
+    max-width: 160px;
+
+    color: #172321;
+
+    font-size: 12.5px;
+
+    line-height: 1.4;
+}
+
+
+/* MEREK */
+
+.bmn-brand {
+    display: block;
+
+    max-width: 160px;
+
+    color: #63716d;
+
+    line-height: 1.4;
+}
+
+
+/* LOKASI */
+
+.bmn-location {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    max-width: 145px;
+
+    color: #26322f;
+
+    line-height: 1.45;
+}
+
+.location-edit-icon {
+    color: #899591;
+
+    font-size: 15px;
+
+    flex-shrink: 0;
+}
+
+
+/* QR */
+
+.bmn-qr {
+    text-align: center;
+}
+
+.qr-button {
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: #66736f;
+
+    cursor: pointer;
+
+    border-radius: 5px;
+}
+
+.qr-button:hover {
+    background: #e8efed;
+
+    color: #0e5954;
+}
+
+.qr-button svg {
+    width: 19px;
+    height: 19px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.5;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* PENANGGUNG JAWAB */
+
+.bmn-person {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    min-width: 145px;
+}
+
+.bmn-person strong {
+    color: #172321;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+.bmn-person small {
+    color: #65716e;
+
+    font-size: 10.5px;
+
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   KONDISI
+   ========================================================= */
+
+.condition-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.condition-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+.condition-badge.baik {
+    background: #d4f2e3;
+
+    color: #24915d;
+}
+
+.condition-badge.rusak {
+    background: #fbe8e4;
+
+    color: #bd4937;
+}
+
+.condition-badge.lainnya {
+    background: #ecefed;
+
+    color: #65716e;
+}
+
+
+/* =========================================================
+   JADWAL
+   ========================================================= */
+
+.maintenance-date {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    color: #d78627;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+.calendar-icon {
+    font-size: 13px;
+}
+
+.no-date {
+    color: #65716e;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   AKSI
+   ========================================================= */
+
+.bmn-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+}
+
+.bmn-actions form {
+    margin: 0;
+}
+
+.action-button {
+    width: 31px;
+    height: 31px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 5px;
+
+    background: transparent;
+
+    color: #66736f;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: #e8efed;
+
+    color: #0e5954;
+}
+
+.action-button.delete-action:hover {
+    background: #fbe8e4;
+
+    color: #b3402a;
+}
+
+.action-button svg {
+    width: 17px;
+    height: 17px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.5;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* =========================================================
+   DATA KOSONG
+   ========================================================= */
+
+.bmn-empty {
+    height: 280px;
+
+    text-align: center;
+
+    color: #65716e;
+}
+
+.empty-icon {
+    margin-bottom: 10px;
+
+    font-size: 28px;
+
+    color: #9aa5a1;
+}
+
+.bmn-empty strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #26322f;
+
+    font-size: 14px;
+}
+
+.bmn-empty span {
+    display: block;
+
+    margin-bottom: 16px;
+
+    font-size: 12px;
+}
+
+.bmn-empty-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 9px 14px;
+
+    border-radius: 6px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   FOOTER TABLE
+   ========================================================= */
+
+.bmn-table-footer {
+    min-height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 8px;
+}
+
+.bmn-total {
+    color: #65716e;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .bmn-filter-bar {
+        grid-template-columns:
+            minmax(250px, 1fr)
+            minmax(150px, 1fr)
+            minmax(180px, 1fr);
+
+    }
+
+    .bmn-filter-button,
+    .bmn-reset-button {
+        width: fit-content;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .bmn-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .bmn-add-button {
+        width: 100%;
+    }
+
+    .bmn-filter-bar {
+        grid-template-columns: 1fr;
+    }
+
+    .bmn-filter-button,
+    .bmn-reset-button {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   TAMBAH DATA BMN
+   ========================================================= */
+
+.bmn-create-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   TOMBOL KEMBALI
+   ========================================================= */
+
+.bmn-create-back {
+    margin-bottom: 14px;
+}
+
+.back-button {
+    min-height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+
+    color: #172321;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.back-button:hover {
+    background: #e8efed;
+}
+
+
+/* =========================================================
+   JUDUL
+   ========================================================= */
+
+.bmn-create-heading {
+    margin-bottom: 22px;
+}
+
+.bmn-create-heading h1 {
+    margin: 0;
+
+    color: #172321;
+
+    font-size: 26px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.bmn-form-error {
+    margin-bottom: 20px;
+
+    padding: 14px 16px;
+
+    background: #fbe8e4;
+
+    border: 1px solid #edc8c1;
+
+    border-radius: 8px;
+
+    color: #9f3425;
+
+    font-size: 13px;
+}
+
+.bmn-form-error strong {
+    display: block;
+
+    margin-bottom: 6px;
+}
+
+.bmn-form-error ul {
+    margin: 0 0 0 18px;
+
+    padding: 0;
+}
+
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+
+.bmn-create-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.65fr)
+        minmax(300px, .95fr);
+
+    gap: 24px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.bmn-information-card,
+.bmn-support-card {
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 10px;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+}
+
+.bmn-form-card-title {
+    margin-bottom: 24px;
+
+    color: #172321;
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   FORM ROW
+   ========================================================= */
+
+.bmn-form-row {
+    display: grid;
+
+    grid-template-columns: 225px minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 25px;
+
+    margin-bottom: 20px;
+}
+
+.bmn-form-row > label {
+    color: #172321;
+
+    font-size: 13.5px;
+
+    font-weight: 500;
+
+    line-height: 1.4;
+}
+
+.bmn-form-row > label span {
+    color: #c33f2e;
+
+    margin-left: 2px;
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.bmn-form-control {
+    min-width: 0;
+}
+
+.bmn-form-control input,
+.bmn-form-control select,
+.bmn-form-control textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d3ddda;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #26322f;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color .15s,
+        box-shadow .15s;
+}
+
+.bmn-form-control input,
+.bmn-form-control select {
+    height: 47px;
+
+    padding: 0 14px;
+}
+
+.bmn-form-control textarea {
+    min-height: 105px;
+
+    padding: 12px 14px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+.bmn-form-control input::placeholder,
+.bmn-form-control textarea::placeholder {
+    color: #9aa5a1;
+}
+
+.bmn-form-control input:focus,
+.bmn-form-control select:focus,
+.bmn-form-control textarea:focus {
+    border-color: #0e5954;
+
+    box-shadow:
+        0 0 0 3px rgba(14, 89, 84, .09);
+}
+
+
+/* DATE */
+
+.bmn-form-control input[type="date"] {
+    color: #26322f;
+}
+
+
+/* HELP */
+
+.form-help {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #9a6660;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   KONDISI
+   ========================================================= */
+
+.bmn-condition-options {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.condition-option {
+    min-height: 42px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0 16px;
+
+    border: 1px solid #d3ddda;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #26322f;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.condition-option:has(input:checked) {
+    border-color: #0e5954;
+
+    background: #e8f1ef;
+
+    color: #123f3c;
+}
+
+.condition-option input {
+    width: 15px;
+    height: 15px;
+
+    accent-color: #0e5954;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   DOKUMEN PENDUKUNG
+   ========================================================= */
+
+.bmn-support-card {
+    min-height: 390px;
+}
+
+.support-upload-box {
+    min-height: 52px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 10px 13px;
+
+    margin-bottom: 12px;
+
+    border: 1px dashed #d3ddda;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    box-sizing: border-box;
+}
+
+.support-upload-icon {
+    width: 24px;
+    height: 24px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #5e6d68;
+
+    font-size: 17px;
+}
+
+.support-upload-box strong {
+    display: block;
+
+    color: #3d4946;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+.support-upload-box small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #9aa5a1;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+}
+
+.support-note {
+    margin: 14px 0 0;
+
+    color: #65716e;
+
+    font-size: 11.5px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   TOMBOL FORM
+   ========================================================= */
+
+.bmn-form-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 26px;
+
+    padding-bottom: 15px;
+}
+
+.bmn-cancel-button {
+    min-width: 115px;
+    height: 45px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px solid #d3ddda;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #26322f;
+
+    text-decoration: none;
+
+    font-size: 13.5px;
+
+    font-weight: 500;
+}
+
+.bmn-cancel-button:hover {
+    background: #e8efed;
+}
+
+.bmn-save-button {
+    min-width: 160px;
+    height: 45px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px solid #0e5954;
+
+    border-radius: 7px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13.5px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.bmn-save-button:hover {
+    background: #0a4743;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .bmn-create-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .bmn-support-card {
+        min-height: auto;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .bmn-information-card,
+    .bmn-support-card {
+        padding: 20px;
+    }
+
+    .bmn-form-row {
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+
+        margin-bottom: 18px;
+    }
+
+    .bmn-form-row > label {
+        font-size: 13px;
+    }
+
+    .bmn-form-actions {
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+    .bmn-cancel-button,
+    .bmn-save-button {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   HALAMAN LOKASI
+   ========================================================= */
+
+.lokasi-page {
+    width: 100%;
+}
+
+
+/* HEADER */
+
+.lokasi-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 23px;
+}
+
+.lokasi-page-header h1 {
+    margin: 0;
+
+    color: #172321;
+
+    font-size: 26px;
+
+    font-weight: 600;
+}
+
+
+/* TAMBAH */
+
+.lokasi-add-button {
+    min-height: 46px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 0 20px;
+
+    border-radius: 7px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 13.5px;
+
+    font-weight: 600;
+}
+
+.lokasi-add-button:hover {
+    background: #0a4743;
+}
+
+
+/* SEARCH */
+
+.lokasi-search-form {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+.lokasi-search-box {
+    width: 425px;
+
+    height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+}
+
+.lokasi-search-icon {
+    width: 18px;
+    height: 18px;
+
+    display: inline-flex;
+
+    flex-shrink: 0;
+
+    color: #65716e;
+}
+
+.lokasi-search-icon svg {
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.6;
+
+    stroke-linecap: round;
+}
+
+.lokasi-search-box input {
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #26322f;
+
+    font-family: inherit;
+
+    font-size: 13px;
+}
+
+.lokasi-search-box input::placeholder {
+    color: #9aa5a1;
+}
+
+
+/* SEARCH BUTTON */
+
+.lokasi-search-button {
+    height: 45px;
+
+    padding: 0 18px;
+
+    border: 1px solid #0e5954;
+
+    border-radius: 7px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.lokasi-search-button:hover {
+    background: #0a4743;
+}
+
+
+/* RESET */
+
+.lokasi-reset-button {
+    height: 45px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 0 16px;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #26322f;
+
+    text-decoration: none;
+
+    font-size: 13px;
+}
+
+
+/* TABLE */
+
+.lokasi-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 1px 2px rgba(28, 38, 36, .03);
+}
+
+.lokasi-table {
+    width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    min-width: 850px;
+}
+
+.lokasi-table thead th {
+    height: 47px;
+
+    padding: 0 16px;
+
+    background: #e5eeee;
+
+    border-bottom: 1px solid #d5dedb;
+
+    color: #0d4c48;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.lokasi-table thead th:first-child {
+    border-top-left-radius: 9px;
+}
+
+.lokasi-table thead th:last-child {
+    border-top-right-radius: 9px;
+}
+
+.lokasi-table tbody td {
+    min-height: 58px;
+
+    padding: 14px 16px;
+
+    border-bottom: 1px solid #e4e9e7;
+
+    color: #34403d;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+.lokasi-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.lokasi-table tbody tr:hover {
+    background: #f8faf9;
+}
+
+
+/* KOLOM */
+
+.lokasi-col-no {
+    width: 110px;
+}
+
+.lokasi-col-qr {
+    width: 150px;
+}
+
+.lokasi-col-aset {
+    width: 250px;
+}
+
+.lokasi-col-action {
+    width: 190px;
+}
+
+
+/* NOMOR */
+
+.lokasi-no {
+    color: #45534f;
+}
+
+
+/* NAMA */
+
+.lokasi-name {
+    color: #172321;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* QR */
+
+.lokasi-qr {
+    text-align: center !important;
+}
+
+.lokasi-qr-button {
+    width: 30px;
+    height: 30px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: #66736f;
+
+    cursor: pointer;
+}
+
+.lokasi-qr-button svg {
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.4;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+.lokasi-qr-button:hover {
+    color: #0e5954;
+}
+
+
+/* JUMLAH ASET */
+
+.lokasi-asset-count {
+    color: #65716e;
+
+    font-size: 13px;
+}
+
+
+/* ACTION */
+
+.lokasi-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.lokasi-action-button {
+    width: 28px;
+    height: 30px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+
+    color: #687571;
+
+    cursor: pointer;
+
+    text-decoration: none;
+}
+
+.lokasi-action-button svg {
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.5;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+.lokasi-action-button:hover {
+    color: #0e5954;
+}
+
+.lokasi-action-button.lokasi-delete:hover {
+    color: #b3402a;
+}
+
+
+/* EMPTY */
+
+.lokasi-empty {
+    padding: 55px 20px !important;
+
+    text-align: center;
+
+    color: #65716e;
+}
+
+.lokasi-empty-icon {
+    margin-bottom: 10px;
+
+    font-size: 30px;
+
+    color: #8a9491;
+}
+
+.lokasi-empty strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #34403d;
+
+    font-size: 14px;
+}
+
+.lokasi-empty span {
+    display: block;
+
+    margin-bottom: 15px;
+
+    font-size: 12px;
+}
+
+.lokasi-empty-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 38px;
+
+    padding: 0 14px;
+
+    border-radius: 6px;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 500;
+}
+
+
+/* FOOTER */
+
+.lokasi-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 10px;
+}
+
+.lokasi-total {
+    color: #65716e;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.lokasi-pagination {
+    display: flex;
+
+    align-items: center;
+}
+
+
+/* =========================================================
+   FORM LOKASI
+   ========================================================= */
+
+.lokasi-form-page {
+    width: 100%;
+}
+
+.lokasi-form-back {
+    margin-bottom: 15px;
+}
+
+.lokasi-back-button {
+    min-height: 44px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 0 17px;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #26322f;
+
+    text-decoration: none;
+
+    font-size: 13px;
+}
+
+.lokasi-back-button:hover {
+    background: #e8efed;
+}
+
+.lokasi-form-title {
+    margin-bottom: 20px;
+}
+
+.lokasi-form-title h1 {
+    margin: 0;
+
+    color: #172321;
+
+    font-size: 25px;
+
+    font-weight: 600;
+}
+
+.lokasi-form-card {
+    max-width: 850px;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #d5dedb;
+
+    border-radius: 10px;
+}
+
+.lokasi-form-card-title {
+    margin-bottom: 24px;
+
+    color: #172321;
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+.lokasi-form-row {
+    display: grid;
+
+    grid-template-columns: 190px minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 25px;
+}
+
+.lokasi-form-row label {
+    color: #172321;
+
+    font-size: 13.5px;
+
+    font-weight: 500;
+}
+
+.lokasi-form-row label span {
+    color: #c33f2e;
+}
+
+.lokasi-form-row input {
+    width: 100%;
+
+    height: 46px;
+
+    box-sizing: border-box;
+
+    padding: 0 14px;
+
+    border: 1px solid #d3ddda;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #26322f;
+
+    font-family: inherit;
+
+    font-size: 14px;
+}
+
+.lokasi-form-row input:focus {
+    border-color: #0e5954;
+
+    box-shadow:
+        0 0 0 3px rgba(14, 89, 84, .09);
+}
+
+.lokasi-form-help {
+    margin-top: 12px;
+
+    margin-left: 215px;
+
+    color: #65716e;
+
+    font-size: 11.5px;
+
+    line-height: 1.5;
+}
+
+.lokasi-form-actions {
+    max-width: 850px;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.lokasi-cancel-button,
+.lokasi-save-button {
+    min-height: 44px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 18px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+}
+
+.lokasi-cancel-button {
+    border: 1px solid #d3ddda;
+
+    background: #ffffff;
+
+    color: #26322f;
+}
+
+.lokasi-save-button {
+    border: 1px solid #0e5954;
+
+    background: #0e5954;
+
+    color: #ffffff;
+
+    cursor: pointer;
+}
+
+.lokasi-save-button:hover {
+    background: #0a4743;
+}
+
+
+/* ERROR */
+
+.lokasi-error {
+    max-width: 850px;
+
+    margin-bottom: 18px;
+
+    padding: 13px 15px;
+
+    border: 1px solid #edc8c1;
+
+    border-radius: 7px;
+
+    background: #fbe8e4;
+
+    color: #9f3425;
+
+    font-size: 13px;
+}
+
+.lokasi-error ul {
+    margin: 6px 0 0 18px;
+
+    padding: 0;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+    .lokasi-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .lokasi-search-form {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .lokasi-search-box {
+        width: 100%;
+    }
+
+    .lokasi-search-button,
+    .lokasi-reset-button {
+        width: 100%;
+
+        justify-content: center;
+    }
+
+    .lokasi-form-card {
+        padding: 20px;
+    }
+
+    .lokasi-form-row {
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+    }
+
+    .lokasi-form-help {
+        margin-left: 0;
+    }
+
+    .lokasi-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .lokasi-cancel-button,
+    .lokasi-save-button {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   SIBOB - SIDEBAR MINI / BURGER
+   ========================================================= */
+
+
+/*
+ * SIDEBAR MINI
+ *
+ * Saat tombol burger ditekan pada desktop,
+ * sidebar mengecil menjadi hanya ikon.
+ */
+.side.mini {
+
+    width: 72px;
+
+}
+
+
+/*
+ * LOGO MINI
+ */
+.side.mini .side-logo {
+
+    justify-content: center;
+
+    padding-left: 0;
+    padding-right: 0;
+
+}
+
+
+/*
+ * SEMBUNYIKAN TEKS LOGO
+ */
+.side.mini .side-logo .teks {
+
+    display: none;
+
+}
+
+
+/*
+ * ITEM MENU MINI
+ */
+.side.mini .nav-item {
+
+    justify-content: center;
+
+    padding-left: 0;
+    padding-right: 0;
+
+}
+
+
+/*
+ * SUB MENU MINI
+ */
+.side.mini .nav-item.sub {
+
+    padding-left: 0;
+
+}
+
+
+/*
+ * SEMBUNYIKAN TEKS MENU
+ */
+.side.mini .nav-item .teks {
+
+    display: none;
+
+}
+
+
+/*
+ * SEMBUNYIKAN JUDUL GROUP
+ *
+ * Contoh:
+ * BMN
+ */
+.side.mini .nav-grup {
+
+    display: none;
+
+}
+
+
+/*
+ * USER DI BAGIAN BAWAH
+ */
+.side.mini .side-user {
+
+    justify-content: center;
+
+    padding-left: 0;
+    padding-right: 0;
+
+}
+
+
+/*
+ * SEMBUNYIKAN NAMA DAN ROLE USER
+ */
+.side.mini .side-user-text {
+
+    display: none;
+
+}
+
+
+/* =========================================================
+   MOBILE SIDEBAR
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .side {
+
+        position: fixed;
+
+        left: 0;
+        top: 0;
+
+        width: 240px;
+        height: 100vh;
+
+        transform: translateX(-100%);
+
+        transition:
+            transform .2s ease;
+
+        z-index: 100;
+
+    }
+
+
+    /*
+     * Saat burger ditekan,
+     * sidebar muncul.
+     */
+    .side.show {
+
+        transform: translateX(0);
+
+    }
+
+
+    /*
+     * Pada HP jangan gunakan mode mini.
+     */
+    .side.mini {
+
+        width: 240px;
+
+    }
+
+
+    /*
+     * Sidebar mobile tetap menampilkan
+     * teks menu secara normal.
+     */
+    .side.mini .side-logo .teks,
+    .side.mini .nav-item .teks,
+    .side.mini .nav-grup,
+    .side.mini .side-user-text {
+
+        display: block;
+
+    }
+
+
+    /*
+     * Kembalikan posisi normal
+     * ketika berada di mobile.
+     */
+    .side.mini .side-logo {
+
+        justify-content: flex-start;
+
+        padding-left: 20px;
+        padding-right: 20px;
+
+    }
+
+
+    .side.mini .nav-item {
+
+        justify-content: flex-start;
+
+        padding-left: 20px;
+        padding-right: 20px;
+
+    }
+
+
+    .side.mini .nav-item.sub {
+
+        padding-left: 32px;
+
+    }
+
+
+    .side.mini .side-user {
+
+        justify-content: flex-start;
+
+        padding-left: 20px;
+        padding-right: 20px;
+
+    }
+
+}
+
+
+/* =========================================================
+   TRANSISI SIDEBAR DESKTOP
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+    .side {
+
+        transition:
+            width .2s ease;
+
+    }
+
+}
+/* =========================================================
+   SIBOB - ICON GROUP SAAT SIDEBAR MINI
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+    .side.mini .nav-grup-link {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: relative !important;
+    z-index: 100 !important;
+
+    width: 72px !important;
+    min-width: 72px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+
+    pointer-events: auto !important;
+
+    text-decoration: none !important;
+
+    color: rgba(255,255,255,.75) !important;
+    background: transparent !important;
+
+    cursor: pointer !important;
+}
+
+.side.mini .nav-grup-link * {
+    pointer-events: none !important;
+}
+
+.side.mini .nav-grup-link:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,.10) !important;
+}
+
+.side.mini .nav-section {
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+.side.mini .nav-group-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: relative !important;
+    z-index: 101 !important;
+
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+
+    margin: 0 !important;
+}
+
+.side.mini .nav-group-icon svg {
+    display: block !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    pointer-events: none !important;
+}
+
+    /*
+     * Pastikan setiap group tetap terlihat
+     * ketika sidebar dibuat mini.
+     */
+    .side.mini .nav-section {
+
+        display: block !important;
+
+        width: 100% !important;
+
+        visibility: visible !important;
+
+        opacity: 1 !important;
+
+    }
+
+
+    /*
+     * Tombol group tetap terlihat.
+     */
+    .side.mini .nav-section .nav-grup {
+
+        display: flex !important;
+
+        width: 100% !important;
+
+        height: 48px !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+        padding: 0 !important;
+
+        margin: 0 !important;
+
+        border: 0 !important;
+
+        background: transparent !important;
+
+        visibility: visible !important;
+
+        opacity: 1 !important;
+
+    }
+
+
+    /*
+     * ICON BMN / BA / LAPORAN / PENGATURAN
+     * tetap ditampilkan.
+     */
+    .side.mini .nav-section .nav-group-icon {
+
+        display: flex !important;
+
+        width: 24px !important;
+
+        height: 24px !important;
+
+        min-width: 24px !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+        visibility: visible !important;
+
+        opacity: 1 !important;
+
+    }
+
+
+    /*
+     * Ukuran SVG icon group.
+     */
+    .side.mini .nav-section .nav-group-icon svg {
+
+        display: block !important;
+
+        width: 21px !important;
+
+        height: 21px !important;
+
+        fill: none !important;
+
+        stroke: currentColor !important;
+
+        stroke-width: 1.7 !important;
+
+        stroke-linecap: round !important;
+
+        stroke-linejoin: round !important;
+
+    }
+
+
+    /*
+     * Judul BMN / BA / Laporan / Pengaturan
+     * disembunyikan ketika mini.
+     */
+    .side.mini .nav-section .nav-group-title {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Panah submenu disembunyikan
+     * ketika mini.
+     */
+    .side.mini .nav-section .nav-arrow {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Submenu tidak ditampilkan
+     * dalam mode mini.
+     */
+    .side.mini .nav-section .nav-submenu {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Pastikan Beranda tetap tampil
+     * seperti sekarang.
+     */
+    .side.mini .nav-item {
+
+        display: flex !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+        width: 100% !important;
+
+        padding-left: 0 !important;
+
+        padding-right: 0 !important;
+
+    }
+
+
+    /*
+     * Icon Beranda tetap di tengah.
+     */
+    .side.mini .nav-item .nav-icon {
+
+        display: flex !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+    }
+
+
+    /*
+     * Semua tulisan menu disembunyikan.
+     */
+    .side.mini .nav-item .teks {
+
+        display: none !important;
+
+    }
+
+}
+/* =========================================================
+   FONT SIBOB
+   Menyesuaikan font dengan prototype HTML
+   ========================================================= */
+
+html,
+body {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        "Noto Sans",
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.side {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        "Noto Sans",
+        Arial,
+        sans-serif;
+}
+
+
+/* Nama SIBOB */
+
+.side-title {
+    font-weight: 700;
+}
+
+
+/* Keterangan di bawah SIBOB */
+
+.side-subtitle {
+    font-weight: 400;
+}
+
+
+/* Beranda */
+
+.side .nav-item {
+    font-weight: 500;
+}
+
+
+/* Menu grup:
+   BMN
+   BA
+   Laporan
+   Pengaturan
+*/
+
+.side .nav-grup {
+    font-weight: 600;
+}
+
+
+/* Submenu */
+
+.side .nav-submenu .nav-item {
+    font-weight: 500;
+}
+
+
+/* Menu aktif */
+
+.side .nav-item.aktif {
+    font-weight: 600;
+}
+
+
+/* Nama pengguna di bawah sidebar */
+
+.side-user-name {
+    font-weight: 600;
+}
+
+
+/* Role pengguna */
+
+.side-user-role {
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.top {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        "Noto Sans",
+        Arial,
+        sans-serif;
+}
+
+
+/* Judul halaman */
+
+.top .akhir {
+    font-weight: 500;
+}
+
+
+/* Nama instansi */
+
+.header-office {
+    font-weight: 400;
+}
+
+
+/* Tombol keluar */
+
+.logout-button {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   JUDUL HALAMAN
+   ========================================================= */
+
+.konten h1,
+.konten h2,
+.konten h3 {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        "Noto Sans",
+        Arial,
+        sans-serif;
+}
+
+
+/* Judul utama */
+
+.konten h1 {
+    font-weight: 600;
+}
+
+
+/* Judul bagian */
+
+.konten h2,
+.konten h3 {
+    font-weight: 600;
+}
+/* =========================================================
+   SIBOB - FONT LEBIH TEBAL DAN MUDAH DIBACA
+   ========================================================= */
+
+/* Semua teks utama aplikasi */
+body {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+/* Semua teks sidebar */
+.side {
+    font-weight: 500;
+}
+
+
+/* Nama SIBOB */
+.side-title {
+    font-weight: 700;
+}
+
+
+/* Subjudul SIBOB */
+.side-subtitle {
+    font-weight: 500;
+}
+
+
+/* Menu sidebar */
+.side .nav-item {
+    font-weight: 600;
+}
+
+
+/* Judul kelompok menu:
+   BMN
+   BA
+   Laporan
+   Pengaturan
+*/
+.side .nav-grup {
+    font-weight: 700;
+}
+
+
+/* Submenu */
+.side .nav-submenu .nav-item {
+    font-weight: 600;
+}
+
+
+/* Menu aktif */
+.side .nav-item.aktif {
+    font-weight: 700;
+}
+
+
+/* Nama pengguna */
+.side-user-name {
+    font-weight: 700;
+}
+
+
+/* Role pengguna */
+.side-user-role {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.top {
+    font-weight: 500;
+}
+
+
+/* Judul halaman */
+.top .akhir {
+    font-weight: 600;
+}
+
+
+/* Nama instansi */
+.header-office {
+    font-weight: 600;
+}
+
+
+/* Tombol keluar */
+.logout-button {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   KONTEN
+   ========================================================= */
+
+.konten {
+    font-weight: 500;
+}
+
+
+/* Semua paragraf */
+.konten p {
+    font-weight: 500;
+}
+
+
+/* Label form */
+.konten label {
+    font-weight: 600;
+}
+
+
+/* Input */
+.konten input,
+.konten select,
+.konten textarea {
+    font-weight: 500;
+}
+
+
+/* Tombol */
+.konten button,
+.konten .btn {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   JUDUL
+   ========================================================= */
+
+.konten h1 {
+    font-weight: 700;
+}
+
+
+.konten h2 {
+    font-weight: 700;
+}
+
+
+.konten h3 {
+    font-weight: 700;
+
+
+}
+
+
+/* =========================================================
+   TABEL
+   ========================================================= */
+
+/* Isi tabel */
+.konten table {
+    font-weight: 500;
+}
+
+
+/* Kepala tabel */
+.konten table th {
+    font-weight: 700;
+}
+
+
+/* Isi sel */
+.konten table td {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   CARD / DASHBOARD
+   ========================================================= */
+
+/* Judul card */
+.konten .card-title {
+    font-weight: 700;
+}
+
+
+/* Angka statistik */
+.konten .stat-number {
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+
+.alert {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.konten .pagination {
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   LINK
+   ========================================================= */
+
+.konten a {
+    font-weight: 500;
+}
+
+
+/* Link yang sedang aktif */
+.konten a.active {
+    font-weight: 700;
+}
+/* =========================================================
+   SIDEBAR - FONT NATURAL, JELAS, TIDAK TERLALU KAKU
+   ========================================================= */
+
+.side {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+}
+
+
+/* Nama SIBOB */
+.side .side-title {
+    font-weight: 700;
+}
+
+
+/* Subjudul SIBOB */
+.side .side-subtitle {
+    font-weight: 400;
+}
+
+
+/* Semua menu sidebar */
+.side .nav-item {
+    font-weight: 500 !important;
+}
+
+
+/* Menu yang aktif */
+.side .nav-item.aktif {
+    font-weight: 600 !important;
+}
+
+
+/* Judul kelompok menu */
+.side .nav-grup {
+    font-weight: 600 !important;
+}
+
+
+/* Tulisan BMN / BA / Laporan / Pengaturan */
+.side .nav-group-title {
+    font-weight: 600 !important;
+}
+
+
+/* Submenu */
+.side .nav-submenu .nav-item {
+    font-weight: 500 !important;
+}
+
+
+/* Nama pengguna */
+.side .side-user-name {
+    font-weight: 600 !important;
+}
+
+
+/* Role pengguna */
+.side .side-user-role {
+    font-weight: 400 !important;
+}
+
+
+/* Jangan terlalu rapat */
+.side .nav-item,
+.side .nav-grup {
+    letter-spacing: 0;
+}
+
+
+/* Ikon tetap ringan */
+.side svg {
+    stroke-width: 1.7;
+}
+/* =========================================================
+   SIBOB - SIDEBAR MINI FINAL
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+    /* Sidebar normal */
+    .side {
+        width: 240px !important;
+        transition: width .2s ease !important;
+    }
+
+    /* Sidebar mini */
+    .side.mini {
+        width: 72px !important;
+    }
+
+    /* Logo ketika mini */
+    .side.mini .side-logo {
+        width: 72px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+
+    .side.mini .side-logo .teks {
+        display: none !important;
+    }
+
+    /* Beranda */
+    .side.mini .nav-item {
+        width: 72px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+
+    .side.mini .nav-item .teks {
+        display: none !important;
+    }
+
+    /* =====================================================
+       ICON GROUP BMN / BA / LAPORAN / PENGATURAN
+       ===================================================== */
+
+    .side.mini .nav-section {
+        display: block !important;
+        width: 72px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .side.mini .nav-grup-link {
+        display: flex !important;
+
+        width: 72px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        box-sizing: border-box !important;
+
+        visibility: visible !important;
+        opacity: 1 !important;
+
+        cursor: pointer !important;
+        pointer-events: auto !important;
+
+        color: rgba(255,255,255,.75) !important;
+        background: transparent !important;
+
+        text-decoration: none !important;
+    }
+
+    .side.mini .nav-grup-link:hover {
+        color: #ffffff !important;
+        background: rgba(255,255,255,.10) !important;
+    }
+
+    /* Icon BMN / BA / Laporan / Pengaturan */
+    .side.mini .nav-grup-link .nav-group-icon {
+        display: flex !important;
+
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        margin: 0 !important;
+    }
+
+    .side.mini .nav-grup-link .nav-group-icon svg {
+        display: block !important;
+
+        width: 22px !important;
+        height: 22px !important;
+
+        fill: none !important;
+        stroke: currentColor !important;
+
+        stroke-width: 1.7 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+
+        pointer-events: none !important;
+    }
+
+    /* Hilangkan tulisan group ketika mini */
+    .side.mini .nav-grup-link .nav-group-title {
+        display: none !important;
+    }
+
+    /* Hilangkan panah ketika mini */
+    .side.mini .nav-grup-link .nav-arrow {
+        display: none !important;
+    }
+
+    /* Submenu tersembunyi ketika mini */
+    .side.mini .nav-submenu {
+        display: none !important;
+    }
+
+    /* User */
+    .side.mini .side-user {
+        width: 72px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+
+    .side.mini .side-user-text {
+        display: none !important;
+    }
+}
+
+
+/* =========================================================
+   SIDEBAR TERBUKA + SUBMENU
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+    .side:not(.mini) .nav-section {
+        width: 100% !important;
+    }
+
+    .side:not(.mini) .nav-grup,
+    .side:not(.mini) .nav-grup-link {
+        display: flex !important;
+
+        width: 100% !important;
+
+        align-items: center !important;
+
+        cursor: pointer !important;
+
+        pointer-events: auto !important;
+    }
+
+    .side:not(.mini) .nav-group-title {
+        display: block !important;
+    }
+
+    .side:not(.mini) .nav-submenu {
+        display: none;
+    }
+
+    .side:not(.mini) .nav-section.open .nav-submenu,
+    .side:not(.mini) .nav-submenu.submenu-terbuka {
+        display: block !important;
+    }
+
+    .side:not(.mini) .nav-section.open .nav-grup,
+    .side:not(.mini) .nav-section.open .nav-grup-link,
+    .side:not(.mini) .nav-grup.buka,
+    .side:not(.mini) .nav-grup-link.buka {
+        color: #ffffff !important;
+        background: rgba(255,255,255,.08) !important;
+    }
+
+    .side:not(.mini) .nav-section.open .nav-arrow,
+    .side:not(.mini) .nav-grup.buka .nav-arrow,
+    .side:not(.mini) .nav-grup-link.buka .nav-arrow {
+        transform: rotate(90deg) !important;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .side {
+        width: 240px !important;
+    }
+
+    .side.mini {
+        width: 240px !important;
+    }
+
+    .side.mini .nav-grup-link {
+        display: flex !important;
+        width: 100% !important;
+
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+
+        justify-content: flex-start !important;
+    }
+
+    .side.mini .nav-group-title {
+        display: block !important;
+    }
+
+    .side.mini .nav-submenu {
+        display: block !important;
+    }
+}
+/* =========================================================
+   FIX IKON SIDEBAR MINI
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+    .side.mini .nav-grup-link {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 72px !important;
+        height: 48px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        color: #ffffff !important;
+        background: transparent !important;
+
+        cursor: pointer !important;
+        pointer-events: auto !important;
+    }
+
+    .side.mini .nav-grup-link:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.10) !important;
+    }
+
+    .side.mini .nav-group-icon {
+        display: flex !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 24px !important;
+        height: 24px !important;
+
+        color: #ffffff !important;
+
+        pointer-events: none !important;
+    }
+
+    .side.mini .nav-group-icon svg {
+        display: block !important;
+
+        width: 22px !important;
+        height: 22px !important;
+
+        fill: none !important;
+        stroke: #ffffff !important;
+
+        stroke-width: 1.8 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+
+        color: #ffffff !important;
+
+        pointer-events: none !important;
+    }
+
+    .side.mini .nav-group-icon svg path,
+    .side.mini .nav-group-icon svg rect,
+    .side.mini .nav-group-icon svg circle {
+        fill: none !important;
+        stroke: #ffffff !important;
+        color: #ffffff !important;
+    }
+
+}
+/* =========================================================
+   FIX FINAL - SIDEBAR HARUS BERADA DI ATAS SEMUA LAYER
+   ========================================================= */
+
+.side {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 999999 !important;
+}
+
+.side .side-nav {
+    position: relative !important;
+    z-index: 1000000 !important;
+}
+
+.side .nav-section {
+    position: relative !important;
+    z-index: 1000001 !important;
+}
+
+.side .nav-grup,
+.side .nav-grup-link {
+    position: relative !important;
+    z-index: 1000002 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.side .nav-grup *,
+.side .nav-grup-link *,
+.side .nav-group-icon,
+.side .nav-group-icon svg {
+    pointer-events: none !important;
+}
+
+@media (min-width: 701px) {
+
+    .side.mini {
+        z-index: 999999 !important;
+    }
+
+    .side.mini .nav-section {
+        width: 72px !important;
+        height: auto !important;
+        min-height: 48px !important;
+        position: relative !important;
+        z-index: 1000001 !important;
+    }
+
+    .side.mini .nav-grup,
+    .side.mini .nav-grup-link {
+        width: 72px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        position: relative !important;
+        z-index: 1000002 !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
+
+}
+
+
+/* UTILITY CLASSES TO REPLACE INLINE STYLES */
+.d-inline {
+    display: inline !important;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.alert-error-list {
+    margin: 6px 0 0 18px !important;
+}
+
+.side-logo-box {
+    background: #ffffff !important;
+}
