@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Bmn\UpdateBmnLokasiRequest;
 use App\Http\Requests\BmnLab\StoreBmnLabRequest;
 use App\Http\Requests\BmnLab\UpdateBmnLabRequest;
+use App\Models\Bmn;
 use App\Models\BmnLab;
 use App\Models\Lokasi;
 use App\Models\Pegawai;
@@ -22,7 +24,10 @@ class BmnLabController extends Controller
         $bmnsLab = $this->bmnLabService->getPaginated($filters);
         $filterData = $this->bmnLabService->getFilterData();
 
-        return view('bmn-lab.index', array_merge(['bmnsLab' => $bmnsLab], $filterData));
+        return view('bmn-lab.index', array_merge([
+            'bmnsLab' => $bmnsLab,
+            'items' => $bmnsLab,
+        ], $filterData));
     }
 
     public function create()
@@ -47,8 +52,15 @@ class BmnLabController extends Controller
         return view('bmn-lab.show', compact('bmnLab'));
     }
 
-    public function edit(BmnLab $bmnLab)
+    public function edit(Request $request, BmnLab $bmnLab)
     {
+        $returnQuery = array_filter(
+            $request->only(['page', 'search', 'lokasi', 'penanggungjawab', 'kondisi', 'status_kalibrasi']),
+            fn ($value) => $value !== null && $value !== ''
+        );
+
+        session()->put('bmn_lab_edit_return_query.'.$bmnLab->id, $returnQuery);
+
         $lokasis = Lokasi::orderBy('nama')->get();
         $pegawais = Pegawai::orderBy('nama')->get();
 
@@ -63,17 +75,32 @@ class BmnLabController extends Controller
     {
         $this->bmnLabService->update($bmnLab, $request->validated());
 
+        $returnQuery = session()->pull('bmn_lab_edit_return_query.'.$bmnLab->id, []);
+
         return redirect()
-            ->route('bmns-lab.index')
+            ->route('bmns-lab.index', $returnQuery)
             ->with('success', 'Data BMN Lab berhasil diperbarui.');
+    }
+
+    public function updateLokasi(UpdateBmnLokasiRequest $request, BmnLab $bmnLab)
+    {
+        abort_if($bmnLab->dihapus, 404);
+
+        $lokasiBaru = $request->validated('lokasi');
+        $bmnLab->update(['lokasi' => $lokasiBaru]);
+
+        if ($bmnLab->bmn_id) {
+            Bmn::where('id', $bmnLab->bmn_id)->update(['lokasi' => $lokasiBaru]);
+        }
+
+        return back()->with('success', 'Lokasi BMN Lab berhasil diperbarui.');
     }
 
     public function destroy(BmnLab $bmnLab)
     {
         $this->bmnLabService->delete($bmnLab, auth()->user()?->email);
 
-        return redirect()
-            ->route('bmns-lab.index')
+        return back(fallback: route('bmns-lab.index'))
             ->with('success', 'Data BMN Lab berhasil dipindahkan ke Data Terhapus.');
     }
 }

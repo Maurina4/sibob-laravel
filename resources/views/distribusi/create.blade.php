@@ -45,15 +45,14 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {{-- NOMOR DOKUMEN --}}
             <div>
-                <x-input-label for="nomor" value="Nomor Berita Acara *" />
+                <x-input-label for="nomor" value="Nomor Berita Acara" />
                 <x-text-input
                     id="nomor"
                     name="nomor"
                     type="text"
                     class="w-full font-mono text-xs"
-                    :value="old('nomor', 'BA-DIST/' . date('Ymd') . '/' . rand(100, 999))"
-                    placeholder="mis. BA-DIST/20261008/001"
-                    required
+                    :value="old('nomor')"
+                    placeholder="mis. BA-DIST/{{ date('Ymd') }}/001"
                 />
             </div>
 
@@ -66,8 +65,10 @@
                     type="date"
                     class="w-full text-xs"
                     :value="old('tanggal', date('Y-m-d'))"
+                    max="{{ date('Y-m-d') }}"
                     required
                 />
+                <x-input-error :messages="$errors->get('tanggal')" class="mt-1" />
             </div>
         </div>
 
@@ -92,8 +93,11 @@
                 <x-text-input
                     id="jumlah"
                     name="jumlah"
-                    type="number"
-                    min="1"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    data-numeric="true"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                     class="w-full text-xs"
                     :value="old('jumlah', 1)"
                     required
@@ -119,29 +123,41 @@
             {{-- LOKASI ASAL --}}
             <div>
                 <x-input-label for="lokasi_asal" value="Lokasi Asal (Gudang/Ruang) *" />
-                <x-text-input
+                <input
+                    type="text"
                     id="lokasi_asal"
                     name="lokasi_asal"
-                    type="text"
-                    class="w-full text-xs"
-                    :value="old('lokasi_asal', 'Gudang BMN')"
+                    list="lokasi_asal_list"
+                    class="w-full text-xs font-medium px-3.5 py-2 rounded-lg border border-[#E3ECE6] text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition bg-white"
+                    value="{{ old('lokasi_asal', 'Gudang BMN') }}"
                     placeholder="mis. Gudang BMN / Tata Usaha"
                     required
                 />
+                <datalist id="lokasi_asal_list">
+                    @foreach($lokasis ?? [] as $lokasi)
+                        <option value="{{ $lokasi->nama }}" label="{{ $lokasi->format_kombinasi }}">{{ $lokasi->format_kombinasi }}</option>
+                    @endforeach
+                </datalist>
             </div>
 
             {{-- LOKASI TUJUAN --}}
             <div>
                 <x-input-label for="lokasi_tujuan" value="Lokasi Tujuan *" />
-                <x-text-input
+                <input
+                    type="text"
                     id="lokasi_tujuan"
                     name="lokasi_tujuan"
-                    type="text"
-                    class="w-full text-xs"
-                    :value="old('lokasi_tujuan')"
+                    list="lokasi_tujuan_list"
+                    class="w-full text-xs font-medium px-3.5 py-2 rounded-lg border border-[#E3ECE6] text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition bg-white"
+                    value="{{ old('lokasi_tujuan') }}"
                     placeholder="mis. Lab Kimia / Ruang Informasi"
                     required
                 />
+                <datalist id="lokasi_tujuan_list">
+                    @foreach($lokasis ?? [] as $lokasi)
+                        <option value="{{ $lokasi->nama }}" label="{{ $lokasi->format_kombinasi }}">{{ $lokasi->format_kombinasi }}</option>
+                    @endforeach
+                </datalist>
             </div>
         </div>
 

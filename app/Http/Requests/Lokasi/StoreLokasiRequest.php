@@ -14,7 +14,8 @@ class StoreLokasiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => ['required', 'string', 'max:255', 'unique:lokasis,nama'],
+            'kode_ruangan' => ['nullable', 'string', 'max:50'],
+            'nama' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -22,7 +23,6 @@ class StoreLokasiRequest extends FormRequest
     {
         return [
             'nama.required' => 'Nama lokasi wajib diisi.',
-            'nama.unique' => 'Nama lokasi tersebut sudah ada.',
         ];
     }
 }

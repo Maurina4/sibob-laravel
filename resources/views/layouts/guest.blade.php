@@ -28,7 +28,7 @@
                     </div>
                     <div>
                         <span class="text-xl font-bold tracking-tight text-[#132219]">SIBOB</span>
-                        <div class="text-[10px] uppercase font-semibold tracking-wider text-[#62756A]">BBPOM di Banjarmasin</div>
+                        <div class="text-[10px] uppercase font-semibold tracking-wider text-[#62756A]">BBPOM di Banjarbaru</div>
                     </div>
                 </a>
             </div>
@@ -40,7 +40,7 @@
 
             {{-- FOOTER KEDINASAN --}}
             <div class="mt-8 text-center text-xs text-[#62756A]">
-                &copy; {{ date('Y') }} Balai Besar Pengawas Obat dan Makanan di Banjarmasin
+                &copy; {{ date('Y') }} Balai Besar Pengawas Obat dan Makanan di Banjarbaru
             </div>
         </div>
     </body>

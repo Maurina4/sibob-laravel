@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -19,15 +18,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('bmns_tik')) {
+        if (! Schema::hasTable('bmns_tik')) {
             return;
         }
 
-        if (!Schema::hasColumn('bmns_tik', 'kode_nup')) {
+        if (! Schema::hasColumn('bmns_tik', 'kode_nup')) {
             return;
         }
 
-        if (!Schema::hasColumn('bmns_tik', 'nup')) {
+        if (! Schema::hasColumn('bmns_tik', 'nup')) {
             return;
         }
 

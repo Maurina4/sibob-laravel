@@ -25,24 +25,21 @@ class PenanggungJawabController extends Controller
                     'like',
                     "%{$search}%"
                 )
-
-                ->orWhere(
-                    'nip',
-                    'like',
-                    "%{$search}%"
-                )
-
-                ->orWhere(
-                    'jabatan',
-                    'like',
-                    "%{$search}%"
-                )
-
-                ->orWhere(
-                    'unit_kerja',
-                    'like',
-                    "%{$search}%"
-                );
+                    ->orWhere(
+                        'nip',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'jabatan',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'unit_kerja',
+                        'like',
+                        "%{$search}%"
+                    );
 
             });
         }
@@ -58,7 +55,6 @@ class PenanggungJawabController extends Controller
         );
     }
 
-
     /**
      * Form tambah penanggung jawab.
      */
@@ -66,7 +62,6 @@ class PenanggungJawabController extends Controller
     {
         return view('penanggung-jawab.create');
     }
-
 
     /**
      * Simpan penanggung jawab.
@@ -109,7 +104,6 @@ class PenanggungJawabController extends Controller
             );
     }
 
-
     /**
      * Detail penanggung jawab.
      */
@@ -121,18 +115,23 @@ class PenanggungJawabController extends Controller
         );
     }
 
-
     /**
      * Form edit.
      */
-    public function edit(PenanggungJawab $penanggungJawab)
+    public function edit(Request $request, PenanggungJawab $penanggungJawab)
     {
+        $returnQuery = array_filter(
+            $request->query(),
+            fn ($value) => $value !== null && $value !== ''
+        );
+
+        session()->put('penanggung_jawab_edit_return_query.'.$penanggungJawab->id, $returnQuery);
+
         return view(
             'penanggung-jawab.edit',
             compact('penanggungJawab')
         );
     }
-
 
     /**
      * Update penanggung jawab.
@@ -169,14 +168,15 @@ class PenanggungJawabController extends Controller
 
         $penanggungJawab->update($validated);
 
+        $returnQuery = session()->pull('penanggung_jawab_edit_return_query.'.$penanggungJawab->id, []);
+
         return redirect()
-            ->route('penanggung-jawabs.index')
+            ->route('penanggung-jawabs.index', $returnQuery)
             ->with(
                 'success',
                 'Penanggung jawab berhasil diperbarui.'
             );
     }
-
 
     /**
      * Hapus penanggung jawab.
@@ -186,8 +186,7 @@ class PenanggungJawabController extends Controller
     ) {
         $penanggungJawab->delete();
 
-        return redirect()
-            ->route('penanggung-jawabs.index')
+        return back(fallback: route('penanggung-jawabs.index'))
             ->with(
                 'success',
                 'Penanggung jawab berhasil dihapus.'

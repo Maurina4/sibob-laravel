@@ -17,6 +17,7 @@ class LaporanKerusakan extends Model
         'bmn_id',
         'lokasi_id',
         'pelapor_id',
+        'pelapor_pegawai_id',
         'nama_barang',
         'lokasi',
         'tingkat',
@@ -55,6 +56,11 @@ class LaporanKerusakan extends Model
         return $this->belongsTo(User::class, 'pelapor_id');
     }
 
+    public function pelaporPegawai(): BelongsTo
+    {
+        return $this->belongsTo(Pegawai::class, 'pelapor_pegawai_id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->whereNull('deleted_at')->where('dihapus', false);
@@ -63,5 +69,22 @@ class LaporanKerusakan extends Model
     public function scopeBelumSelesai(Builder $query): Builder
     {
         return $query->where('status', '!=', 'Selesai');
+    }
+
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        if (! empty($filters['search'])) {
+            $search = trim($filters['search']);
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('nomor', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', $search);
+                } elseif (preg_match('/^LK-#?(\d+)$/i', $search, $matches)) {
+                    $q->orWhere('id', $matches[1]);
+                }
+            });
+        }
+
+        return $query;
     }
 }

@@ -17,7 +17,7 @@
                 Selamat Datang, {{ auth()->user()->name }}
             </h2>
             <p class="mt-1 text-sm text-[#62756A]">
-                Sistem Informasi Pengelolaan & Inventarisasi Barang Milik Negara — BBPOM di Banjarmasin.
+                Sistem Informasi Pengelolaan & Inventarisasi Barang Milik Negara — BBPOM di Banjarbaru.
             </p>
         </div>
 
@@ -45,8 +45,8 @@
         </div>
     </div>
 
-    {{-- BENTO GRID LEVEL 1: METRIC STATS (4 CARDS) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {{-- BENTO GRID LEVEL 1: METRIC STATS (3 CARDS) --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
 
         {{-- CARD 1: TOTAL ASET --}}
         <div class="bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#163828]/40 shadow-2xs">
@@ -60,7 +60,7 @@
             </div>
             <div class="mt-4 flex items-baseline gap-2">
                 <span class="text-3xl font-bold tracking-tight text-[#132219]">
-                    {{ $jumlahBmn + $jumlahBmnTik + $jumlahBmnLab }}
+                    {{ $jumlahBmn }}
                 </span>
                 <span class="text-xs text-[#62756A]">unit</span>
             </div>
@@ -92,29 +92,7 @@
             </div>
         </div>
 
-        {{-- CARD 3: PERLU KALIBRASI --}}
-        <div class="bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#8E5F13]/40 shadow-2xs">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-[#62756A]">Jadwal Kalibrasi</span>
-                <span class="w-7 h-7 rounded-lg bg-[#FCF5E8] text-[#8E5F13] flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </span>
-            </div>
-            <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-bold tracking-tight text-[#8E5F13]">
-                    {{ $jumlahPerluKalibrasi }}
-                </span>
-                <span class="text-xs text-[#62756A]">instrumen lab</span>
-            </div>
-            <div class="mt-3 pt-3 border-t border-[#E3ECE6]/60 flex items-center justify-between text-xs text-[#62756A]">
-                <span>Perlu Tindakan Segera</span>
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#FCF5E8] text-[#8E5F13]">Kalibrasi</span>
-            </div>
-        </div>
-
-        {{-- CARD 4: LAPORAN KERUSAKAN --}}
+        {{-- CARD 3: LAPORAN KERUSAKAN --}}
         <div class="bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#9C322C]/40 shadow-2xs">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-[#62756A]">Laporan Kerusakan</span>
@@ -166,7 +144,7 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-base font-bold text-[#132219]">{{ $jumlahBmn }}</div>
+                        <div class="text-base font-bold text-[#132219]">{{ $jumlahBmnUmum ?? $jumlahBmn }}</div>
                         <div class="text-[10px] text-[#62756A]">Aset Terdata</div>
                     </div>
                 </div>
@@ -264,59 +242,53 @@
         <div class="flex items-center justify-between pb-4 border-b border-[#E3ECE6]">
             <div>
                 <h3 class="text-sm font-semibold text-[#132219]">Aktivitas & Riwayat Terkini</h3>
-                <p class="text-xs text-[#62756A]">Pembaruan status pemeliharaan, kalibrasi, dan perpindahan aset</p>
+                <p class="text-xs text-[#62756A]">Pembaruan status perpindahan, distribusi, dan pelaporan kerusakan aset</p>
             </div>
             <span class="text-xs text-[#62756A]">Log Sistem</span>
         </div>
 
         <div class="mt-4 divide-y divide-[#E3ECE6]">
-            {{-- LOG ITEM 1 --}}
-            <div class="py-3 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-[#FCF5E8] text-[#8E5F13] flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </span>
-                    <div>
-                        <div class="text-xs font-medium text-[#132219]">Spectrophotometer UV-Vis dijadwalkan kalibrasi berkala</div>
-                        <div class="text-[11px] text-[#62756A]">Laboratorium Pengujian Kimia • Banjarbaru</div>
+            @forelse ($aktivitasTerkini ?? [] as $aktivitas)
+                <a
+                    href="{{ $aktivitas['url'] }}"
+                    class="py-3 flex items-center justify-between gap-4 hover:bg-[#F7FAF8] -mx-2 px-2 rounded-lg transition group"
+                >
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="w-8 h-8 rounded-lg {{ $aktivitas['icon_bg'] }} flex items-center justify-center shrink-0">
+                            @if ($aktivitas['icon_type'] === 'calendar')
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            @elseif ($aktivitas['icon_type'] === 'exchange')
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                            @elseif ($aktivitas['icon_type'] === 'alert')
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            @elseif ($aktivitas['icon_type'] === 'return')
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                </svg>
+                            @else
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            @endif
+                        </span>
+                        <div class="min-w-0">
+                            <div class="text-xs font-medium text-[#132219] group-hover:text-[#163828] truncate">{{ $aktivitas['judul'] }}</div>
+                            <div class="text-[11px] text-[#62756A] truncate">{{ $aktivitas['subjudul'] }}</div>
+                        </div>
                     </div>
+                    <span class="{{ $aktivitas['badge_class'] }}">{{ $aktivitas['badge'] }}</span>
+                </a>
+            @empty
+                <div class="py-8 text-center text-xs text-[#62756A]">
+                    Belum ada aktivitas atau riwayat pembaruan aset terkini.
                 </div>
-                <span class="text-[11px] font-mono text-[#8E5F13] px-2 py-0.5 rounded bg-[#FCF5E8] shrink-0">2 hari lagi</span>
-            </div>
-
-            {{-- LOG ITEM 2 --}}
-            <div class="py-3 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-[#EAF2ED] text-[#1E5E38] flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
-                    </span>
-                    <div>
-                        <div class="text-xs font-medium text-[#132219]">Distribusi UPS APC ES-525 ke Ruang Duduk diajukan</div>
-                        <div class="text-[11px] text-[#62756A]">Menunggu persetujuan kepala bagian</div>
-                    </div>
-                </div>
-                <span class="text-[11px] font-mono text-[#62756A] shrink-0">2 hari lalu</span>
-            </div>
-
-            {{-- LOG ITEM 3 --}}
-            <div class="py-3 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-[#F7FAF8] text-[#163828] border border-[#E3ECE6] flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </span>
-                    <div>
-                        <div class="text-xs font-medium text-[#132219]">Pengajuan Berita Acara Perpindahan PC Acer</div>
-                        <div class="text-[11px] text-[#62756A]">Diajukan oleh Petugas Pengaju</div>
-                    </div>
-                </div>
-                <span class="text-[11px] font-mono text-[#62756A] shrink-0">3 hari lalu</span>
-            </div>
+            @endforelse
         </div>
     </div>
 

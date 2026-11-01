@@ -13,10 +13,9 @@ class UpdateLokasiRequest extends FormRequest
 
     public function rules(): array
     {
-        $lokasiId = $this->route('lokasi') ? $this->route('lokasi')->id : null;
-
         return [
-            'nama' => ['required', 'string', 'max:255', 'unique:lokasis,nama,' . $lokasiId],
+            'kode_ruangan' => ['nullable', 'string', 'max:50'],
+            'nama' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -24,7 +23,6 @@ class UpdateLokasiRequest extends FormRequest
     {
         return [
             'nama.required' => 'Nama lokasi wajib diisi.',
-            'nama.unique' => 'Nama lokasi tersebut sudah digunakan.',
         ];
     }
 }

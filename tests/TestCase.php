@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -12,6 +13,6 @@ abstract class TestCase extends BaseTestCase
         if (config('database.default') !== 'sqlite') {
             throw new \RuntimeException('SAFETY ERROR: Tests must run on sqlite to avoid wiping development MySQL database!');
         }
-        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class);
+        $this->withoutMiddleware(PreventRequestForgery::class);
     }
 }

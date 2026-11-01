@@ -18,15 +18,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('bmns_lab')) {
+        if (! Schema::hasTable('bmns_lab')) {
             return;
         }
 
-        if (!Schema::hasColumn('bmns_lab', 'kode_barang')) {
+        if (! Schema::hasColumn('bmns_lab', 'kode_barang')) {
             return;
         }
 
-        if (!Schema::hasColumn('bmns_lab', 'nup')) {
+        if (! Schema::hasColumn('bmns_lab', 'nup')) {
             return;
         }
 

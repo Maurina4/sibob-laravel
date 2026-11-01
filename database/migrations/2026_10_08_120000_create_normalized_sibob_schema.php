@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Buat Tabel Master Kategori BMN jika belum ada
-        if (!Schema::hasTable('kategori_bmns')) {
+        if (! Schema::hasTable('kategori_bmns')) {
             Schema::create('kategori_bmns', function (Blueprint $table) {
                 $table->id();
                 $table->string('kode', 50)->unique(); // UMUM, LAB, TIK
@@ -24,25 +24,26 @@ return new class extends Migration
 
         // 2. Normalisasi Tabel bmns (Tambahkan kolom FK dan soft deletes standar Laravel)
         Schema::table('bmns', function (Blueprint $table) {
-            if (!Schema::hasColumn('bmns', 'kategori_bmn_id')) {
+            if (! Schema::hasColumn('bmns', 'kategori_bmn_id')) {
                 $table->foreignId('kategori_bmn_id')->nullable()->after('id')->constrained('kategori_bmns')->nullOnDelete();
             }
-            if (!Schema::hasColumn('bmns', 'lokasi_id')) {
+            if (! Schema::hasColumn('bmns', 'lokasi_id')) {
                 $table->foreignId('lokasi_id')->nullable()->after('lokasi')->constrained('lokasis')->nullOnDelete();
             }
-            if (!Schema::hasColumn('bmns', 'penanggung_jawab_id')) {
+            if (! Schema::hasColumn('bmns', 'penanggung_jawab_id')) {
                 $table->foreignId('penanggung_jawab_id')->nullable()->after('penanggungjawab')->constrained('pegawais')->nullOnDelete();
             }
-            if (!Schema::hasColumn('bmns', 'deleted_at')) {
+            if (! Schema::hasColumn('bmns', 'deleted_at')) {
                 $table->softDeletes()->after('updated_at');
             }
-            if (!Schema::hasColumn('bmns', 'deleted_by')) {
-                $table->foreignId('deleted_by')->nullable()->after('deleted_at')->constrained('users')->nullOnDelete();
+            if (! Schema::hasColumn('bmns', 'deleted_by')) {
+                $table->unsignedInteger('deleted_by')->nullable()->after('deleted_at');
+                $table->foreign('deleted_by')->references('id')->on('users')->nullOnDelete();
             }
         });
 
         // 3. Buat Tabel Ekstensi bmn_lab_details (1:1 untuk data khusus alat laboratorium)
-        if (!Schema::hasTable('bmn_lab_details')) {
+        if (! Schema::hasTable('bmn_lab_details')) {
             Schema::create('bmn_lab_details', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('bmn_id')->unique()->constrained('bmns')->cascadeOnDelete();
@@ -55,7 +56,7 @@ return new class extends Migration
         }
 
         // 4. Tabel Detail Transaksi Distribusi (1:N)
-        if (!Schema::hasTable('distribusi_items')) {
+        if (! Schema::hasTable('distribusi_items')) {
             Schema::create('distribusi_items', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('distribusi_id')->constrained('distribusis')->cascadeOnDelete();
@@ -70,25 +71,26 @@ return new class extends Migration
 
         // Tambah kolom FK pada distribusis
         Schema::table('distribusis', function (Blueprint $table) {
-            if (!Schema::hasColumn('distribusis', 'lokasi_asal_id')) {
+            if (! Schema::hasColumn('distribusis', 'lokasi_asal_id')) {
                 $table->foreignId('lokasi_asal_id')->nullable()->after('nomor')->constrained('lokasis')->nullOnDelete();
             }
-            if (!Schema::hasColumn('distribusis', 'lokasi_tujuan_id')) {
+            if (! Schema::hasColumn('distribusis', 'lokasi_tujuan_id')) {
                 $table->foreignId('lokasi_tujuan_id')->nullable()->after('lokasi_asal_id')->constrained('lokasis')->nullOnDelete();
             }
-            if (!Schema::hasColumn('distribusis', 'penerima_id')) {
+            if (! Schema::hasColumn('distribusis', 'penerima_id')) {
                 $table->foreignId('penerima_id')->nullable()->after('lokasi_tujuan_id')->constrained('pegawais')->nullOnDelete();
             }
-            if (!Schema::hasColumn('distribusis', 'deleted_at')) {
+            if (! Schema::hasColumn('distribusis', 'deleted_at')) {
                 $table->softDeletes()->after('updated_at');
             }
         });
 
         // 5. Tabel Detail Berita Acara Perpindahan (1:N)
-        if (!Schema::hasTable('ba_perpindahan_items')) {
+        if (! Schema::hasTable('ba_perpindahan_items')) {
             Schema::create('ba_perpindahan_items', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('ba_perpindahan_id')->constrained('ba_perpindahans')->cascadeOnDelete();
+                $table->unsignedInteger('ba_perpindahan_id');
+                $table->foreign('ba_perpindahan_id')->references('id')->on('ba_perpindahans')->cascadeOnDelete();
                 $table->foreignId('bmn_id')->nullable()->constrained('bmns')->nullOnDelete();
                 $table->string('nama_barang_snapshot')->nullable();
                 $table->text('kondisi_saat_pindah')->nullable();
@@ -98,38 +100,40 @@ return new class extends Migration
 
         // Tambah kolom FK pada ba_perpindahans
         Schema::table('ba_perpindahans', function (Blueprint $table) {
-            if (!Schema::hasColumn('ba_perpindahans', 'lokasi_asal_id')) {
+            if (! Schema::hasColumn('ba_perpindahans', 'lokasi_asal_id')) {
                 $table->foreignId('lokasi_asal_id')->nullable()->after('tanggal')->constrained('lokasis')->nullOnDelete();
             }
-            if (!Schema::hasColumn('ba_perpindahans', 'lokasi_tujuan_id')) {
+            if (! Schema::hasColumn('ba_perpindahans', 'lokasi_tujuan_id')) {
                 $table->foreignId('lokasi_tujuan_id')->nullable()->after('lokasi_asal_id')->constrained('lokasis')->nullOnDelete();
             }
-            if (!Schema::hasColumn('ba_perpindahans', 'pengaju_id')) {
-                $table->foreignId('pengaju_id')->nullable()->after('pihak_kedua')->constrained('users')->nullOnDelete();
+            if (! Schema::hasColumn('ba_perpindahans', 'pengaju_id')) {
+                $table->unsignedInteger('pengaju_id')->nullable()->after('pihak_kedua');
+                $table->foreign('pengaju_id')->references('id')->on('users')->nullOnDelete();
             }
-            if (!Schema::hasColumn('ba_perpindahans', 'deleted_at')) {
+            if (! Schema::hasColumn('ba_perpindahans', 'deleted_at')) {
                 $table->softDeletes()->after('updated_at');
             }
         });
 
         // 6. Normalisasi Laporan Kerusakan
         Schema::table('laporan_kerusakans', function (Blueprint $table) {
-            if (!Schema::hasColumn('laporan_kerusakans', 'bmn_id')) {
+            if (! Schema::hasColumn('laporan_kerusakans', 'bmn_id')) {
                 $table->foreignId('bmn_id')->nullable()->after('nomor')->constrained('bmns')->nullOnDelete();
             }
-            if (!Schema::hasColumn('laporan_kerusakans', 'lokasi_id')) {
+            if (! Schema::hasColumn('laporan_kerusakans', 'lokasi_id')) {
                 $table->foreignId('lokasi_id')->nullable()->after('bmn_id')->constrained('lokasis')->nullOnDelete();
             }
-            if (!Schema::hasColumn('laporan_kerusakans', 'pelapor_id')) {
-                $table->foreignId('pelapor_id')->nullable()->after('lokasi_id')->constrained('users')->nullOnDelete();
+            if (! Schema::hasColumn('laporan_kerusakans', 'pelapor_id')) {
+                $table->unsignedInteger('pelapor_id')->nullable()->after('lokasi_id');
+                $table->foreign('pelapor_id')->references('id')->on('users')->nullOnDelete();
             }
-            if (!Schema::hasColumn('laporan_kerusakans', 'deleted_at')) {
+            if (! Schema::hasColumn('laporan_kerusakans', 'deleted_at')) {
                 $table->softDeletes()->after('updated_at');
             }
         });
 
         // 7. Tabel Detail Pengembalian (1:N)
-        if (!Schema::hasTable('pengembalian_items')) {
+        if (! Schema::hasTable('pengembalian_items')) {
             Schema::create('pengembalian_items', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('pengembalian_id')->constrained('pengembalians')->cascadeOnDelete();
@@ -143,10 +147,10 @@ return new class extends Migration
 
         // Tambah kolom FK pada pengembalians
         Schema::table('pengembalians', function (Blueprint $table) {
-            if (!Schema::hasColumn('pengembalians', 'pengaju_id')) {
+            if (! Schema::hasColumn('pengembalians', 'pengaju_id')) {
                 $table->foreignId('pengaju_id')->nullable()->after('tanggal')->constrained('pegawais')->nullOnDelete();
             }
-            if (!Schema::hasColumn('pengembalians', 'deleted_at')) {
+            if (! Schema::hasColumn('pengembalians', 'deleted_at')) {
                 $table->softDeletes()->after('updated_at');
             }
         });

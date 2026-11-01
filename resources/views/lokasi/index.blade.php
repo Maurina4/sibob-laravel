@@ -11,7 +11,7 @@
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Sistem & Master Data</div>
             <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Daftar Lokasi & Ruangan</h1>
-            <p class="text-xs text-[#62756A] mt-0.5">Kelola penamaan ruangan dan lokasi penempatan aset inventaris BBPOM di Banjarmasin.</p>
+            <p class="text-xs text-[#62756A] mt-0.5">Kelola penamaan ruangan dan lokasi penempatan aset inventaris BBPOM di Banjarbaru.</p>
         </div>
 
         <a
@@ -38,7 +38,7 @@
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
-                    placeholder="Cari nama lokasi atau ruangan..."
+                    placeholder="Cari berdasarkan ID, kode ruangan, nama lokasi, atau kombinasi..."
                     class="w-full pl-9 pr-3 py-2 bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] placeholder-[#8D9D95] transition"
                 >
             </div>
@@ -50,14 +50,12 @@
                 <span>Cari</span>
             </button>
 
-            @if(request()->filled('search'))
-                <a
-                    href="{{ route('lokasis.index') }}"
-                    class="inline-flex items-center px-3 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-lg text-xs font-medium transition"
-                >
-                    Reset
-                </a>
-            @endif
+            <a
+                href="{{ route('lokasis.index') }}"
+                class="inline-flex items-center px-3 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-lg text-xs font-medium transition"
+            >
+                Reset
+            </a>
         </form>
     </div>
 
@@ -68,7 +66,9 @@
                 <thead>
                     <tr class="bg-[#F7FAF8] border-b border-[#E3ECE6] text-[#4D6357] text-[11px] font-semibold uppercase tracking-wider">
                         <th class="py-3.5 px-4 text-center w-12">No</th>
+                        <th class="py-3.5 px-4 w-32">Kode Ruangan</th>
                         <th class="py-3.5 px-4">Nama Lokasi / Ruangan</th>
+                        <th class="py-3.5 px-4 min-w-[240px]">Format Kombinasi (Pencarian)</th>
                         <th class="py-3.5 px-4 text-center w-36">Jumlah Aset Terdaftar</th>
                         <th class="py-3.5 px-4 text-center w-24">Aksi</th>
                     </tr>
@@ -76,12 +76,22 @@
                 <tbody class="divide-y divide-[#E3ECE6]/70 text-xs">
                     @forelse($lokasis as $index => $lokasi)
                         @php
-                            $jumlahAset = \App\Models\Bmn::where('lokasi', $lokasi->nama)->where('dihapus', false)->count();
+                            $jumlahAset = \App\Models\Bmn::where(function ($q) use ($lokasi) {
+                                $q->where('lokasi_id', $lokasi->id)
+                                  ->orWhere('lokasi', $lokasi->nama);
+                            })->where('dihapus', false)->count();
                         @endphp
                         <tr class="hover:bg-[#F9FCFA] transition">
                             {{-- NO --}}
                             <td class="py-3.5 px-4 text-center text-[#62756A] font-mono text-[11px]">
                                 {{ $lokasis->firstItem() + $index }}
+                            </td>
+
+                            {{-- KODE RUANGAN --}}
+                            <td class="py-3.5 px-4">
+                                <span class="font-mono text-xs font-semibold text-[#163828] bg-[#EAF2ED] px-2 py-0.5 rounded border border-[#D5E5DA]">
+                                    {{ $lokasi->kode_ruangan ?: '-' }}
+                                </span>
                             </td>
 
                             {{-- NAMA LOKASI (WITH INLINE EDIT) --}}
@@ -98,7 +108,7 @@
                                         type="button"
                                         onclick="mulaiEditLokasi({{ $lokasi->id }})"
                                         class="opacity-0 group-hover:opacity-100 p-1 text-[#62756A] hover:text-[#163828] hover:bg-[#EAF2ED] rounded transition cursor-pointer"
-                                        title="Ubah nama cepat"
+                                        title="Ubah data cepat"
                                     >
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -115,11 +125,20 @@
                                 >
                                     @csrf
                                     @method('PUT')
-                                    <div class="flex items-center gap-1.5">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <input
+                                            type="text"
+                                            name="kode_ruangan"
+                                            value="{{ $lokasi->kode_ruangan }}"
+                                            placeholder="Kode (mis. R.TU)"
+                                            class="w-24 border border-[#E3ECE6] rounded-md text-xs py-1 px-2 font-mono uppercase bg-white text-[#132219] focus:border-[#163828]"
+                                            maxlength="50"
+                                        >
                                         <input
                                             type="text"
                                             name="nama"
                                             value="{{ $lokasi->nama }}"
+                                            placeholder="Nama Lokasi"
                                             class="lokasi-inline-input border border-[#E3ECE6] rounded-md text-xs py-1 px-2.5 bg-white text-[#132219] focus:border-[#163828]"
                                             maxlength="255"
                                             required
@@ -139,6 +158,13 @@
                                         </button>
                                     </div>
                                 </form>
+                            </td>
+
+                            {{-- FORMAT KOMBINASI --}}
+                            <td class="py-3.5 px-4">
+                                <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-[#163828] bg-[#EAF2ED] px-2.5 py-1 rounded-lg border border-[#D5E5DA]">
+                                    <span>{{ $lokasi->format_kombinasi }}</span>
+                                </span>
                             </td>
 
                             {{-- JUMLAH ASET --}}
@@ -186,7 +212,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="py-12 text-center">
+                            <td colspan="6" class="py-12 text-center">
                                 <div class="max-w-xs mx-auto space-y-3">
                                     <div class="w-12 h-12 rounded-full bg-[#EAF2ED] text-[#163828] flex items-center justify-center mx-auto">
                                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

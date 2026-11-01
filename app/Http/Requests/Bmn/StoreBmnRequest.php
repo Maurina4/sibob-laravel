@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Bmn;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreBmnRequest extends FormRequest
 {
@@ -11,14 +12,32 @@ class StoreBmnRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if ($this->has('kode_barang') && is_string($this->kode_barang)) {
+            $merge['kode_barang'] = trim($this->kode_barang);
+        }
+        if ($this->filled('nilai_perolehan') && is_string($this->nilai_perolehan)) {
+            $cleaned = preg_replace('/[^0-9.]/', '', str_replace(',', '.', $this->nilai_perolehan));
+            $merge['nilai_perolehan'] = $cleaned !== '' ? (float) $cleaned : null;
+        }
+        if (! empty($merge)) {
+            $this->merge($merge);
+        }
+    }
+
     public function rules(): array
     {
         return [
-            'kode_barang' => ['required', 'string', 'max:255'],
+            'kode_barang' => ['required', 'string', 'max:255', Rule::unique('bmns', 'kode_barang')],
             'nup' => ['required', 'string', 'max:255'],
+            'no_seri' => ['nullable', 'string', 'max:255'],
             'nama_barang' => ['required', 'string', 'max:255'],
             'merek' => ['nullable', 'string', 'max:255'],
-            'tanggal_terima' => ['nullable', 'date'],
+            'tahun_perolehan' => ['nullable', 'integer', 'min:1900', 'max:'.date('Y')],
+            'nilai_perolehan' => ['nullable', 'numeric', 'min:0'],
+            'tanggal_terima' => ['nullable', 'date', 'before_or_equal:today'],
             'jenis' => ['required', 'string', 'in:BMN-TIK,BMN-LAB,BMN-NON TIK'],
             'satuan' => ['nullable', 'string', 'max:255'],
             'lokasi' => ['required', 'string', 'max:255'],
@@ -37,6 +56,10 @@ class StoreBmnRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'tanggal_terima.before_or_equal' => 'Tanggal terima tidak boleh melebihi tanggal hari ini (tidak bisa memilih tanggal di masa depan).',
+            'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
+            'kode_barang.required' => 'Kode Barang wajib diisi.',
+            'kode_barang.unique' => 'Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.',
             'jenis.required' => 'Jenis Barang wajib dipilih.',
             'jenis.in' => 'Jenis Barang harus BMN-TIK, BMN-LAB, atau BMN-NON TIK.',
             'manual_pengguna.max' => 'Ukuran Manual Pengguna maksimal 500 KB.',

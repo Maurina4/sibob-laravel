@@ -5347,3 +5347,17 @@ body {
 .side-logo-box {
     background: #ffffff !important;
 }
+
+/* =========================================================
+   FORM SELECT: CEGAH TEKS MENABRAK DROPDOWN ARROW / CHEVRON
+   Pastikan semua select memiliki ruang padding kanan yang cukup
+   agar teks opsi tidak pernah bertumpuk dengan ikon panah dropdown.
+   ========================================================= */
+select,
+select.form-select,
+[type='select-one'],
+.form-select {
+    padding-right: 2.5rem !important;
+    background-position: right 0.75rem center !important;
+    background-size: 16px 16px !important;
+}

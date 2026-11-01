@@ -43,17 +43,17 @@ class LokasiController extends Controller
 
     public function edit(Lokasi $lokasi)
     {
-        return redirect()->route('lokasis.index');
+        return view('lokasi.edit', compact('lokasi'));
     }
 
     public function update(UpdateLokasiRequest $request, Lokasi $lokasi)
     {
-        $updated = $this->lokasiService->update($lokasi, $request->validated('nama'));
+        $updated = $this->lokasiService->update($lokasi, $request->validated());
 
-        if (! $updated && $lokasi->nama === $request->validated('nama')) {
+        if (! $updated) {
             return redirect()
                 ->route('lokasis.index')
-                ->with('success', 'Tidak ada perubahan pada nama lokasi.');
+                ->with('success', 'Tidak ada perubahan pada data lokasi.');
         }
 
         return redirect()
@@ -66,13 +66,11 @@ class LokasiController extends Controller
         $result = $this->lokasiService->delete($lokasi);
 
         if (! $result['success']) {
-            return redirect()
-                ->route('lokasis.index')
+            return back(fallback: route('lokasis.index'))
                 ->with('error', $result['message']);
         }
 
-        return redirect()
-            ->route('lokasis.index')
+        return back(fallback: route('lokasis.index'))
             ->with('success', $result['message']);
     }
 }

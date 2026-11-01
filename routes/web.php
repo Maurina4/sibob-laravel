@@ -4,15 +4,14 @@ use App\Http\Controllers\BaPerpindahanController;
 use App\Http\Controllers\BmnController;
 use App\Http\Controllers\BmnLabController;
 use App\Http\Controllers\BmnTikController;
-use App\Http\Controllers\DataTerhapusController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataTerhapusController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\LaporanKerusakanController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PengembalianController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +20,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +50,6 @@ Route::middleware(['auth'])->group(function () {
         ]
     )->name('dashboard');
 
-
     /*
     |--------------------------------------------------------------------------
     | MODUL OPERATOR
@@ -68,11 +67,15 @@ Route::middleware(['auth'])->group(function () {
         |--------------------------------------------------------------------------
         */
 
+        Route::get(
+            '/bmns/export',
+            [BmnController::class, 'export']
+        )->name('bmns.export');
+
         Route::resource(
             'bmns',
             BmnController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -88,12 +91,16 @@ Route::middleware(['auth'])->group(function () {
             ]
         )->name('bmns.update-lokasi');
 
-
         /*
         |--------------------------------------------------------------------------
         | BMN TIK
         |--------------------------------------------------------------------------
         */
+
+        Route::patch(
+            '/bmns-tik/{bmnTik}/lokasi',
+            [BmnTikController::class, 'updateLokasi']
+        )->name('bmns-tik.update-lokasi');
 
         Route::resource(
             'bmns-tik',
@@ -102,12 +109,16 @@ Route::middleware(['auth'])->group(function () {
             'bmns-tik' => 'bmnTik',
         ]);
 
-
         /*
         |--------------------------------------------------------------------------
         | BMN LAB
         |--------------------------------------------------------------------------
         */
+
+        Route::patch(
+            '/bmns-lab/{bmnLab}/lokasi',
+            [BmnLabController::class, 'updateLokasi']
+        )->name('bmns-lab.update-lokasi');
 
         Route::resource(
             'bmns-lab',
@@ -115,7 +126,6 @@ Route::middleware(['auth'])->group(function () {
         )->parameters([
             'bmns-lab' => 'bmnLab',
         ]);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -131,12 +141,10 @@ Route::middleware(['auth'])->group(function () {
             ]
         )->name('pengembalians.print');
 
-
         Route::resource(
             'pengembalians',
             PengembalianController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -157,11 +165,15 @@ Route::middleware(['auth'])->group(function () {
         |
         */
 
+        Route::get(
+            '/distribusi/{distribusi}/print',
+            [DistribusiController::class, 'print']
+        )->name('distribusi.print');
+
         Route::resource(
             'distribusi',
             DistribusiController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -177,7 +189,6 @@ Route::middleware(['auth'])->group(function () {
             'lokasis',
             LokasiController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -199,7 +210,6 @@ Route::middleware(['auth'])->group(function () {
             ]
         )->name('data-terhapus.index');
 
-
         Route::post(
             '/data-terhapus/{dataTerhapus}/restore',
             [
@@ -208,8 +218,23 @@ Route::middleware(['auth'])->group(function () {
             ]
         )->name('data-terhapus.restore');
 
-    });
+        Route::delete(
+            '/data-terhapus/force-delete-all',
+            [
+                DataTerhapusController::class,
+                'forceDeleteAll',
+            ]
+        )->name('data-terhapus.force-delete-all');
 
+        Route::delete(
+            '/data-terhapus/{dataTerhapus}/force-delete',
+            [
+                DataTerhapusController::class,
+                'forceDelete',
+            ]
+        )->name('data-terhapus.force-delete');
+
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -228,6 +253,24 @@ Route::middleware(['auth'])->group(function () {
         ]
     )->name('ba-perpindahan.print');
 
+    /*
+    |--------------------------------------------------------------------------
+    | TENTUKAN PENERIMA BARU (PIHAK KEDUA) BA PERPINDAHAN
+    |--------------------------------------------------------------------------
+    |
+    | Hanya Operator yang boleh menentukan penerima baru.
+    |
+    */
+
+    Route::patch(
+        '/ba-perpindahan/{baPerpindahan}/assign-recipient',
+        [
+            BaPerpindahanController::class,
+            'assignRecipient',
+        ]
+    )
+        ->middleware('role:Operator')
+        ->name('ba-perpindahan.assign-recipient');
 
     /*
     |--------------------------------------------------------------------------
@@ -248,6 +291,62 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role:Operator')
         ->name('ba-perpindahan.approve');
 
+    /*
+    |--------------------------------------------------------------------------
+    | PROSES KEPUTUSAN FORM AKSI BA PERPINDAHAN
+    |--------------------------------------------------------------------------
+    |
+    | Hanya Operator yang boleh memproses keputusan (Setuju / Ditolak).
+    |
+    */
+
+    Route::patch(
+        '/ba-perpindahan/{baPerpindahan}/process-decision',
+        [
+            BaPerpindahanController::class,
+            'processDecision',
+        ]
+    )
+        ->middleware('role:Operator')
+        ->name('ba-perpindahan.process-decision');
+
+    /*
+    |--------------------------------------------------------------------------
+    | BATALKAN KEPUTUSAN (SETUJU / TOLAK) BA PERPINDAHAN
+    |--------------------------------------------------------------------------
+    |
+    | Hanya Operator yang boleh membatalkan keputusan.
+    |
+    */
+
+    Route::patch(
+        '/ba-perpindahan/{baPerpindahan}/cancel-decision',
+        [
+            BaPerpindahanController::class,
+            'cancelDecision',
+        ]
+    )
+        ->middleware('role:Operator')
+        ->name('ba-perpindahan.cancel-decision');
+
+    /*
+    |--------------------------------------------------------------------------
+    | BATALKAN PERSETUJUAN BA PERPINDAHAN
+    |--------------------------------------------------------------------------
+    |
+    | Hanya Operator yang boleh membatalkan persetujuan.
+    |
+    */
+
+    Route::patch(
+        '/ba-perpindahan/{baPerpindahan}/cancel-approval',
+        [
+            BaPerpindahanController::class,
+            'cancelApproval',
+        ]
+    )
+        ->middleware('role:Operator')
+        ->name('ba-perpindahan.cancel-approval');
 
     /*
     |--------------------------------------------------------------------------
@@ -268,7 +367,6 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role:Operator')
         ->name('ba-perpindahan.reject');
 
-
     /*
     |--------------------------------------------------------------------------
     | RESOURCE BA PERPINDAHAN
@@ -281,7 +379,6 @@ Route::middleware(['auth'])->group(function () {
     )->parameters([
         'ba-perpindahan' => 'baPerpindahan',
     ]);
-
 
     /*
     |--------------------------------------------------------------------------
@@ -302,7 +399,6 @@ Route::middleware(['auth'])->group(function () {
         'laporan-kerusakan' => 'laporanKerusakan',
     ]);
 
-
     /*
     |--------------------------------------------------------------------------
     | PROFIL PENGGUNA
@@ -315,7 +411,6 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | AUTHENTICATION
@@ -326,4 +421,4 @@ Route::middleware(['auth'])->group(function () {
 |
 */
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

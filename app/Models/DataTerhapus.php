@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DataTerhapus extends Model
 {
@@ -12,10 +13,16 @@ class DataTerhapus extends Model
     protected $fillable = [
         'jenis',
         'data_id',
+        'bmn_id',
         'nama',
         'dihapus_pada',
         'dihapus_oleh',
     ];
+
+    public function bmn(): BelongsTo
+    {
+        return $this->belongsTo(Bmn::class, 'bmn_id');
+    }
 
     protected $casts = [
         'dihapus_pada' => 'datetime',
@@ -23,7 +30,7 @@ class DataTerhapus extends Model
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function (Builder $q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
@@ -32,7 +39,7 @@ class DataTerhapus extends Model
             });
         }
 
-        if (!empty($filters['jenis'])) {
+        if (! empty($filters['jenis'])) {
             $query->where('jenis', $filters['jenis']);
         }
 

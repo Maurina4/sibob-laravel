@@ -24,7 +24,7 @@
         @include('partials.sidebar')
 
         {{-- AREA UTAMA --}}
-        <main class="main flex-1 flex flex-col min-w-0 bg-[#F7FAF8] overflow-y-auto">
+        <main id="main-content-scroll" class="main flex-1 flex flex-col min-w-0 bg-[#F7FAF8] overflow-y-auto">
 
             {{-- HEADER --}}
             @include('partials.header')
@@ -70,7 +70,7 @@
 
             {{-- FOOTER KEDINASAN MINIMALIS --}}
             <footer class="py-4 px-6 border-t border-[#E3ECE6] text-xs text-[#62756A] flex flex-col sm:flex-row items-center justify-between gap-2 bg-white/50">
-                <span>&copy; {{ date('Y') }} <strong>SIBOB</strong> — Balai Besar Pengawas Obat dan Makanan di Banjarmasin.</span>
+                <span>&copy; {{ date('Y') }} <strong>SIBOB</strong> — Balai Besar Pengawas Obat dan Makanan di Banjarbaru.</span>
                 <span class="text-[11px] font-mono tracking-tight text-[#62756A]/80">BMN Management System v2.0</span>
             </footer>
 
@@ -79,6 +79,170 @@
     </div>
 
     {{-- JAVASCRIPT TAMBAHAN --}}
+    <script src="{{ asset('js/qrcode.min.js') }}"></script>
+    <script>
+        (function() {
+            const mainContainer = document.getElementById('main-content-scroll');
+            if (!mainContainer) return;
+
+            const scrollKey = 'scroll_' + window.location.pathname + window.location.search;
+            const savedScroll = sessionStorage.getItem(scrollKey);
+            if (savedScroll) {
+                mainContainer.scrollTop = parseInt(savedScroll, 10);
+            }
+
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem(scrollKey, mainContainer.scrollTop);
+            });
+        })();
+
+        // Enforce strictly numbers on all numeric inputs
+        (function() {
+            function isNumericInput(el) {
+                if (!el || el.tagName !== 'INPUT') return false;
+                if (el.type === 'hidden' || el.type === 'radio' || el.type === 'checkbox') return false;
+
+                if (el.dataset.numeric === 'true') return true;
+                if (el.getAttribute('inputmode') === 'numeric') return true;
+                if (el.type === 'number') return true;
+
+                const name = (el.name || '').toLowerCase();
+                const id = (el.id || '').toLowerCase();
+                const numericNames = [
+                    'kode_barang',
+                    'nup',
+                    'tahun_perolehan',
+                    'nilai_perolehan',
+                    'jumlah'
+                ];
+
+                return numericNames.some(function(n) {
+                    return name === n || name.endsWith('[' + n + ']') || id === n;
+                });
+            }
+
+            function cleanNumericValue(el) {
+                if (!isNumericInput(el)) return;
+                const oldVal = el.value;
+                if (/[^0-9]/.test(oldVal)) {
+                    el.value = oldVal.replace(/[^0-9]/g, '');
+                }
+            }
+
+            // 1. Block Non-Digit Keys on Keydown
+            document.addEventListener('keydown', function(e) {
+                const el = e.target;
+                if (!isNumericInput(el)) return;
+
+                const allowed = [
+                    'Backspace', 'Delete', 'Tab', 'Enter', 'Escape',
+                    'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                    'Home', 'End'
+                ];
+                if (allowed.indexOf(e.key) !== -1) return;
+                if (e.ctrlKey || e.metaKey) return;
+
+                if (e.key < '0' || e.key > '9') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+
+            // 2. Block Non-Digits on beforeinput (virtual keyboards/IME)
+            document.addEventListener('beforeinput', function(e) {
+                const el = e.target;
+                if (!isNumericInput(el)) return;
+
+                if (e.data && /[^0-9]/.test(e.data)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+
+            // 3. Paste Event Handler
+            document.addEventListener('paste', function(e) {
+                const el = e.target;
+                if (!isNumericInput(el)) return;
+
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+                const cleanDigits = text.replace(/[^0-9]/g, '');
+                if (!cleanDigits) return;
+
+                try {
+                    const start = el.selectionStart ?? el.value.length;
+                    const end = el.selectionEnd ?? el.value.length;
+                    const val = el.value || '';
+                    el.value = val.substring(0, start) + cleanDigits + val.substring(end);
+                    const newPos = start + cleanDigits.length;
+                    if (el.setSelectionRange) {
+                        el.setSelectionRange(newPos, newPos);
+                    }
+                } catch (err) {
+                    el.value = (el.value || '') + cleanDigits;
+                }
+
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            }, true);
+
+            // 4. Input & Change Event (safeguard for drag-drop / autofill)
+            document.addEventListener('input', function(e) {
+                cleanNumericValue(e.target);
+            }, true);
+
+            document.addEventListener('change', function(e) {
+                cleanNumericValue(e.target);
+            }, true);
+        })();
+
+        // Enforce max date = today on all date inputs (tidak bisa menginput tanggal maju)
+        (function() {
+            function getTodayDateString() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function applyMaxDate(el) {
+                if (!el || el.tagName !== 'INPUT' || el.type !== 'date') return;
+                const today = getTodayDateString();
+                el.max = today;
+                if (el.value && el.value > today) {
+                    el.value = today;
+                }
+            }
+
+            function initDateInputs() {
+                document.querySelectorAll('input[type="date"]').forEach(applyMaxDate);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initDateInputs);
+            } else {
+                initDateInputs();
+            }
+
+            document.addEventListener('focusin', function(e) {
+                if (e.target && e.target.type === 'date') {
+                    applyMaxDate(e.target);
+                }
+            }, true);
+
+            document.addEventListener('input', function(e) {
+                if (e.target && e.target.type === 'date') {
+                    applyMaxDate(e.target);
+                }
+            }, true);
+
+            document.addEventListener('change', function(e) {
+                if (e.target && e.target.type === 'date') {
+                    applyMaxDate(e.target);
+                }
+            }, true);
+        })();
+    </script>
     @stack('scripts')
 
 </body>

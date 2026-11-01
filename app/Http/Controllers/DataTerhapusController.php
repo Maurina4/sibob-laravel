@@ -26,13 +26,42 @@ class DataTerhapusController extends Controller
         $result = $this->dataTerhapusService->restore($dataTerhapus);
 
         if (! $result['success']) {
-            return redirect()
-                ->route('data-terhapus.index')
+            return back(fallback: route('data-terhapus.index'))
                 ->with('error', $result['message']);
         }
 
-        return redirect()
-            ->route('data-terhapus.index')
+        return back(fallback: route('data-terhapus.index'))
+            ->with('success', $result['message']);
+    }
+
+    public function forceDelete(DataTerhapus $dataTerhapus)
+    {
+        $result = $this->dataTerhapusService->forceDelete($dataTerhapus);
+
+        if (! $result['success']) {
+            return back(fallback: route('data-terhapus.index'))
+                ->with('error', $result['message']);
+        }
+
+        return back(fallback: route('data-terhapus.index'))
+            ->with('success', $result['message']);
+    }
+
+    public function forceDeleteAll(Request $request)
+    {
+        $ids = $request->input('ids');
+        if (is_string($ids)) {
+            $ids = array_filter(array_map('trim', explode(',', $ids)));
+        }
+
+        $result = $this->dataTerhapusService->forceDeleteAll($ids);
+
+        if (! $result['success']) {
+            return back(fallback: route('data-terhapus.index'))
+                ->with('error', $result['message']);
+        }
+
+        return back(fallback: route('data-terhapus.index'))
             ->with('success', $result['message']);
     }
 }

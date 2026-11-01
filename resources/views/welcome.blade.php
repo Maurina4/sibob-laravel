@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIBOB — Sistem Inventaris BMN BPOM Banjarmasin</title>
+    <title>SIBOB — Sistem Inventaris BMN BPOM Banjarbaru</title>
 
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <span class="font-bold text-base tracking-tight text-[#132219] block leading-none">SIBOB</span>
-                    <span class="text-[10px] text-[#62756A] font-medium tracking-tight">BBPOM di Banjarmasin</span>
+                    <span class="text-[10px] text-[#62756A] font-medium tracking-tight">BBPOM di Banjarbaru</span>
                 </div>
             </div>
 
@@ -72,7 +72,7 @@
             </h1>
 
             <p class="mt-6 text-base sm:text-lg text-[#62756A] leading-relaxed max-w-2xl">
-                Platform digital resmi Balai Besar Pengawas Obat dan Makanan di Banjarmasin untuk inventarisasi terpadu, pemantauan kalibrasi instrumen pengujian, dan tertib administrasi berita acara.
+                Platform digital resmi Balai Besar Pengawas Obat dan Makanan di Banjarbaru untuk inventarisasi terpadu, pemantauan kalibrasi instrumen pengujian, dan tertib administrasi berita acara.
             </p>
 
             <div class="mt-8 flex flex-wrap items-center gap-4">
@@ -146,7 +146,7 @@
     <footer class="py-8 px-6 lg:px-12 border-t border-[#E3ECE6] bg-white">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#62756A]">
             <div>
-                &copy; {{ date('Y') }} <strong>Balai Besar Pengawas Obat dan Makanan di Banjarmasin</strong>. Hak Cipta Dilindungi.
+                &copy; {{ date('Y') }} <strong>Balai Besar Pengawas Obat dan Makanan di Banjarbaru</strong>. Hak Cipta Dilindungi.
             </div>
             <div class="flex items-center gap-4 text-xs font-mono">
                 <span>SIBOB v2.0</span>

@@ -13,6 +13,7 @@ class PengembalianItem extends Model
         'pengembalian_id',
         'bmn_id',
         'nama_barang_snapshot',
+        'kondisi_awal',
         'kondisi',
         'keterangan',
     ];
@@ -25,5 +26,24 @@ class PengembalianItem extends Model
     public function bmn(): BelongsTo
     {
         return $this->belongsTo(Bmn::class, 'bmn_id');
+    }
+
+    public function getKodeBarangAttribute(): ?string
+    {
+        return $this->bmn?->kode_barang;
+    }
+
+    public function getNupAttribute(): ?string
+    {
+        return $this->bmn?->nup !== null ? (string) $this->bmn->nup : null;
+    }
+
+    public function getKodeNupAttribute(): ?string
+    {
+        if (! $this->kode_barang) {
+            return null;
+        }
+
+        return $this->nup ? "{$this->kode_barang}-NUP.{$this->nup}" : (string) $this->kode_barang;
     }
 }

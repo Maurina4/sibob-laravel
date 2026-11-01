@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('bmns_lab', 'nup')) {
+        if (! Schema::hasColumn('bmns_lab', 'nup')) {
             Schema::table('bmns_lab', function (Blueprint $table) {
                 $table->unsignedInteger('nup')
                     ->nullable()

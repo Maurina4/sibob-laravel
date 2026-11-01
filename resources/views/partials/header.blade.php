@@ -31,7 +31,7 @@
         <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAF2ED] border border-[#D5E5DA]">
             <span class="w-2 h-2 rounded-full bg-[#1E5E38]"></span>
             <span class="text-xs font-medium text-[#1E5E38] tracking-tight">
-                BBPOM di Banjarmasin
+                BPOM Banjarbaru
             </span>
         </div>
 

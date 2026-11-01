@@ -39,7 +39,7 @@
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
-                    placeholder="Cari nomor pengajuan atau nama pengaju..."
+                    placeholder="Cari No. Pengajuan, Kode BMN, NUP, Nama Barang, atau Pengaju..."
                     class="w-full pl-9 pr-3 py-2 bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] placeholder-[#8D9D95] transition"
                 >
             </div>
@@ -49,9 +49,9 @@
                 <select
                     name="bidang"
                     onchange="this.form.submit()"
-                    class="bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] py-2 px-3 transition cursor-pointer"
+                    class="bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] py-2 pl-3 pr-9 transition cursor-pointer"
                 >
-                    <option value="">Semua Bidang</option>
+                    <option value="">Bidang</option>
                     @foreach ($bidangs ?? [] as $bidang)
                         <option value="{{ $bidang }}" @selected(request('bidang') == $bidang)>
                             {{ $bidang }}
@@ -69,14 +69,12 @@
             </button>
 
             {{-- RESET --}}
-            @if(request()->filled('search') || request()->filled('bidang'))
-                <a
-                    href="{{ route('pengembalians.index') }}"
-                    class="inline-flex items-center px-3 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-lg text-xs font-medium transition"
-                >
-                    Reset
-                </a>
-            @endif
+            <a
+                href="{{ route('pengembalians.index') }}"
+                class="inline-flex items-center px-3 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-lg text-xs font-medium transition"
+            >
+                Reset
+            </a>
         </form>
     </div>
 
@@ -89,6 +87,9 @@
                         <th class="py-3.5 px-4 text-center w-12">No</th>
                         <th class="py-3.5 px-4">Nomor Pengajuan</th>
                         <th class="py-3.5 px-4">Tanggal</th>
+                        <th class="py-3.5 px-4 whitespace-nowrap">Kode Barang</th>
+                        <th class="py-3.5 px-4 text-center whitespace-nowrap">NUP</th>
+                        <th class="py-3.5 px-4 min-w-[200px]">Barang yang Dikembalikan</th>
                         <th class="py-3.5 px-4">Nama Pengaju</th>
                         <th class="py-3.5 px-4">Bidang / Unit Kerja</th>
                         <th class="py-3.5 px-4 text-center w-28">Aksi</th>
@@ -114,6 +115,89 @@
                                 {{ $pengembalian->tanggal ? \Carbon\Carbon::parse($pengembalian->tanggal)->format('d M Y') : '—' }}
                             </td>
 
+                            {{-- KODE BARANG --}}
+                            <td class="py-3.5 px-4">
+                                @if($pengembalian->items && $pengembalian->items->isNotEmpty())
+                                    <div class="space-y-1.5">
+                                        @foreach($pengembalian->items as $item)
+                                            @php
+                                                $kodeVal = $item->kode_barang ?? $item->bmn?->kode_barang;
+                                            @endphp
+                                            <div class="pb-1.5 border-b border-[#E3ECE6]/50 last:border-0 last:pb-0 font-mono text-[11px] whitespace-nowrap">
+                                                @if($kodeVal)
+                                                    <span class="font-semibold text-[#163828] bg-[#EAF2ED] px-2 py-0.5 rounded border border-[#D5E5DA]">
+                                                        {{ $kodeVal }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-[#8D9D95] font-mono">—</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-[#8D9D95] font-mono">—</span>
+                                @endif
+                            </td>
+
+                            {{-- NUP --}}
+                            <td class="py-3.5 px-4 text-center">
+                                @if($pengembalian->items && $pengembalian->items->isNotEmpty())
+                                    <div class="space-y-1.5">
+                                        @foreach($pengembalian->items as $item)
+                                            @php
+                                                $nupVal = $item->nup ?? $item->bmn?->nup;
+                                            @endphp
+                                            <div class="pb-1.5 border-b border-[#E3ECE6]/50 last:border-0 last:pb-0 font-mono text-[11px] whitespace-nowrap">
+                                                @if($nupVal !== null && $nupVal !== '')
+                                                    <span class="font-semibold text-[#163828] bg-[#EAF2ED] px-2 py-0.5 rounded border border-[#D5E5DA]">
+                                                        {{ $nupVal }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-[#8D9D95] font-mono">—</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-[#8D9D95] font-mono">—</span>
+                                @endif
+                            </td>
+
+                            {{-- BARANG YANG DIKEMBALIKAN --}}
+                            <td class="py-3.5 px-4">
+                                @if($pengembalian->items && $pengembalian->items->isNotEmpty())
+                                    <div class="space-y-1.5">
+                                        @foreach($pengembalian->items as $item)
+                                            <div class="pb-1.5 border-b border-[#E3ECE6]/50 last:border-0 last:pb-0">
+                                                <div class="font-semibold text-[#132219]">
+                                                    {{ $item->nama_barang_snapshot ?: ($item->bmn?->nama_barang ?: 'BMN') }}
+                                                </div>
+                                                <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                                    @if($item->kondisi_awal)
+                                                        <span class="text-[10px] text-[#62756A]">
+                                                            Awal: {{ $item->kondisi_awal }}
+                                                        </span>
+                                                        <span class="text-[10px] text-[#62756A]">&rarr;</span>
+                                                    @endif
+                                                    @if($item->kondisi)
+                                                        <span class="text-[10px] font-medium text-[#163828]">
+                                                            Kembali: {{ $item->kondisi }}
+                                                        </span>
+                                                    @endif
+                                                    @if($item->keterangan)
+                                                        <span class="text-[10px] text-[#62756A] italic">
+                                                            ({{ $item->keterangan }})
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="text-[#8D9D95] font-mono">—</span>
+                                @endif
+                            </td>
+
                             {{-- NAMA PENGAJU --}}
                             <td class="py-3.5 px-4">
                                 <div class="font-semibold text-[#132219]">
@@ -129,6 +213,18 @@
                             {{-- AKSI --}}
                             <td class="py-3.5 px-4 text-center">
                                 <div class="inline-flex items-center gap-1.5 justify-center">
+                                    {{-- DETAIL --}}
+                                    <a
+                                        href="{{ route('pengembalians.show', $pengembalian) }}"
+                                        class="p-1.5 text-[#4D6357] hover:text-[#163828] hover:bg-[#EAF2ED] rounded-lg transition"
+                                        title="Detail Pengembalian"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
+
                                     {{-- CETAK --}}
                                     <a
                                         href="{{ route('pengembalians.print', $pengembalian) }}"
@@ -143,7 +239,7 @@
 
                                     {{-- EDIT --}}
                                     <a
-                                        href="{{ route('pengembalians.edit', $pengembalian) }}"
+                                        href="{{ route('pengembalians.edit', array_merge(['pengembalian' => $pengembalian->id], request()->query())) }}"
                                         class="p-1.5 text-[#4D6357] hover:text-[#163828] hover:bg-[#EAF2ED] rounded-lg transition"
                                         title="Edit Data"
                                     >
@@ -176,7 +272,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center">
+                            <td colspan="9" class="py-12 text-center">
                                 <div class="max-w-xs mx-auto space-y-3">
                                     <div class="w-12 h-12 rounded-full bg-[#EAF2ED] text-[#163828] flex items-center justify-center mx-auto">
                                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

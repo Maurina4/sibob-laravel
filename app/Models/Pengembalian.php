@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Pengembalian extends Model
 {
@@ -20,6 +21,7 @@ class Pengembalian extends Model
         'pengaju_id',
         'nama_pengaju',
         'bidang',
+        'kondisi_pengembalian',
         'status',
         'dihapus',
         'dihapus_pada',
@@ -50,16 +52,30 @@ class Pengembalian extends Model
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function (Builder $q) use ($search) {
+        if (! empty($filters['search'])) {
+            $search = trim($filters['search']);
+            $concatExpr = DB::getDriverName() === 'sqlite'
+                ? "COALESCE(kode_barang, '') || '-NUP.' || COALESCE(nup, '')"
+                : "CONCAT(COALESCE(kode_barang, ''), '-NUP.', COALESCE(nup, ''))";
+
+            $query->where(function (Builder $q) use ($search, $concatExpr) {
                 $q->where('nomor_pengajuan', 'like', "%{$search}%")
                     ->orWhere('nama_pengaju', 'like', "%{$search}%")
-                    ->orWhere('bidang', 'like', "%{$search}%");
+                    ->orWhere('bidang', 'like', "%{$search}%")
+                    ->orWhereHas('items', function (Builder $iq) use ($search, $concatExpr) {
+                        $iq->where('nama_barang_snapshot', 'like', "%{$search}%")
+                            ->orWhere('keterangan', 'like', "%{$search}%")
+                            ->orWhereHas('bmn', function (Builder $bq) use ($search, $concatExpr) {
+                                $bq->where('kode_barang', 'like', "%{$search}%")
+                                    ->orWhere('nup', 'like', "%{$search}%")
+                                    ->orWhere('nama_barang', 'like', "%{$search}%")
+                                    ->orWhereRaw("{$concatExpr} LIKE ?", ["%{$search}%"]);
+                            });
+                    });
             });
         }
 
-        if (!empty($filters['bidang'])) {
+        if (! empty($filters['bidang'])) {
             $query->where('bidang', $filters['bidang']);
         }
 

@@ -34,29 +34,82 @@
     @endif
 
     {{-- FORM CARD --}}
-    <form method="POST" action="{{ route('lokasis.store') }}" class="bg-white rounded-2xl border border-[#E3ECE6] p-6 lg:p-8 shadow-2xs space-y-6">
+    <form
+        method="POST"
+        action="{{ route('lokasis.store') }}"
+        x-data="{ kode: '{{ old('kode_ruangan', '') }}', nama: '{{ old('nama', '') }}' }"
+        class="bg-white rounded-2xl border border-[#E3ECE6] p-6 lg:p-8 shadow-2xs space-y-6"
+    >
         @csrf
 
         <div class="flex items-center gap-2 pb-3 border-b border-[#E3ECE6]">
             <span class="w-2 h-2 rounded-full bg-[#163828]"></span>
-            <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Nama Ruangan / Lokasi</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Data Ruangan / Lokasi</h2>
         </div>
 
-        <div>
-            <x-input-label for="nama" value="Nama Lokasi *" />
-            <x-text-input
-                id="nama"
-                name="nama"
-                type="text"
-                class="w-full text-xs font-medium"
-                :value="old('nama')"
-                placeholder="mis. Ruang Pengujian Mikrobiologi / Gedung Arsip"
-                required
-                autofocus
-            />
-            <p class="text-[11px] text-[#62756A] mt-1.5">
-                Gunakan penamaan yang konsisten dan mudah dikenali saat pengisian formulir BMN.
-            </p>
+        <div class="space-y-4">
+            <div>
+                <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                    <x-input-label for="kode_ruangan" value="Kode Ruangan (Opsional)" />
+                    <div class="flex items-center gap-1 flex-wrap">
+                        <span class="text-[10px] text-[#62756A] mr-0.5">Pilih Kelompok:</span>
+                        <div class="inline-flex rounded-md shadow-2xs border border-[#D5E5DA] overflow-hidden text-[10px]">
+                            <button type="button" @click="kode = 'A1.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA]" title="Gedung A Lantai 1">A1</button>
+                            <button type="button" @click="kode = 'A2.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA] border-l border-[#D5E5DA]" title="Gedung A Lantai 2">A2</button>
+                        </div>
+                        <div class="inline-flex rounded-md shadow-2xs border border-[#D5E5DA] overflow-hidden text-[10px]">
+                            <button type="button" @click="kode = 'B1.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA]" title="Gedung B Lantai 1">B1</button>
+                            <button type="button" @click="kode = 'B2.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA] border-l border-[#D5E5DA]" title="Gedung B Lantai 2">B2</button>
+                            <button type="button" @click="kode = 'B.BS.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA] border-l border-[#D5E5DA]" title="Gedung B Basement">B.BS</button>
+                        </div>
+                        <div class="inline-flex rounded-md shadow-2xs border border-[#D5E5DA] overflow-hidden text-[10px]">
+                            <button type="button" @click="kode = 'C1.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA]" title="Gedung C Lantai 1">C1</button>
+                            <button type="button" @click="kode = 'C2.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA] border-l border-[#D5E5DA]" title="Gedung C Lantai 2">C2</button>
+                            <button type="button" @click="kode = 'C.Bs.'" class="px-1.5 py-0.5 font-semibold bg-[#EAF2ED] text-[#163828] hover:bg-[#D5E5DA] border-l border-[#D5E5DA]" title="Gedung C Basement">C.Bs</button>
+                        </div>
+                    </div>
+                </div>
+                <x-text-input
+                    id="kode_ruangan"
+                    name="kode_ruangan"
+                    type="text"
+                    class="w-full text-xs font-medium uppercase font-mono"
+                    x-model="kode"
+                    placeholder="mis. A1.36 / B1.14 / C1.18"
+                    autofocus
+                />
+                <p class="text-[11px] text-[#62756A] mt-1.5">
+                    Ruangan berkode <strong>A1</strong> akan otomatis masuk urutan A1, <strong>A2</strong> di urutan A2, <strong>B1/B2</strong> di urutan B1/B2, <strong>C1/C2</strong> di urutan C1/C2, dan <strong>Basement</strong> di urutan Basement.
+                </p>
+            </div>
+
+            <div>
+                <x-input-label for="nama" value="Nama Lokasi *" />
+                <x-text-input
+                    id="nama"
+                    name="nama"
+                    type="text"
+                    class="w-full text-xs font-medium"
+                    x-model="nama"
+                    placeholder="mis. Ruang Tata Usaha / Laboratorium Pengujian Kimia"
+                    required
+                />
+                <p class="text-[11px] text-[#62756A] mt-1.5">
+                    Gunakan penamaan yang konsisten dan mudah dikenali saat pengisian formulir BMN.
+                </p>
+            </div>
+
+            {{-- FORMAT KOMBINASI PREVIEW --}}
+            <div class="p-3.5 bg-[#F2F6F3] rounded-xl border border-[#D1E0D7] space-y-1.5">
+                <span class="text-[11px] font-semibold text-[#62756A] block">Format Kombinasi (Pencarian):</span>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-white border border-[#D1E0D7] text-[#163828] shadow-2xs">
+                    <span x-text="kode.trim() !== '' ? (kode.trim() + ' - ') : ''"></span>
+                    <span x-text="nama.trim() !== '' ? nama.trim() : '-'">-</span>
+                </div>
+                <p class="text-[10px] text-[#62756A]">
+                    Format kombinasi <strong>Kode Ruangan - Nama Lokasi</strong> akan otomatis dibentuk dan diurutkan sesuai kelompok gedung.
+                </p>
+            </div>
         </div>
 
         {{-- BUTTONS --}}

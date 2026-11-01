@@ -2,7 +2,7 @@
     <div class="mb-6">
         <h2 class="text-xl font-bold tracking-tight text-[#132219]">Daftar Akun Aparatur</h2>
         <p class="mt-1 text-xs text-[#62756A]">
-            Registrasi akun pegawai untuk sistem inventaris BMN BBPOM di Banjarmasin.
+            Registrasi akun pegawai untuk sistem inventaris BMN BBPOM di Banjarbaru.
         </p>
     </div>
 

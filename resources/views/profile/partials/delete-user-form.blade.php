@@ -1,6 +1,6 @@
 <section class="space-y-4">
     <p class="text-xs text-[#62756A] leading-relaxed max-w-xl">
-        Setelah akun Anda dihapus, semua data dan hak akses akun akan dihapus secara permanen. Pastikan Anda telah mengonfirmasi dengan koordinator atau administrator BMN BBPOM di Banjarmasin sebelum melanjutkan.
+        Setelah akun Anda dihapus, semua data dan hak akses akun akan dihapus secara permanen. Pastikan Anda telah mengonfirmasi dengan koordinator atau administrator BMN BBPOM di Banjarbaru sebelum melanjutkan.
     </p>
 
     <div class="pt-2">

@@ -19,16 +19,32 @@ class BmnController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['search', 'jenis', 'kondisi', 'lokasi', 'penanggungjawab']);
+        $filters = $request->only(['search', 'jenis', 'kondisi', 'lokasi', 'penanggungjawab', 'tahun', 'tahun_perolehan']);
         $bmns = $this->bmnService->getPaginated($filters);
         $filterData = $this->bmnService->getFilterData();
 
         return view('bmn.index', array_merge(['bmns' => $bmns], $filterData));
     }
 
+    public function export(Request $request)
+    {
+        $filters = $request->only([
+            'search',
+            'jenis',
+            'kondisi',
+            'lokasi',
+            'penanggungjawab',
+            'tahun',
+            'tahun_perolehan',
+            'format',
+        ]);
+
+        return $this->bmnService->export($filters);
+    }
+
     public function create()
     {
-        $lokasis = Lokasi::orderBy('nama')->get();
+        $lokasis = Lokasi::orderedByGedung()->get();
         $pegawais = Pegawai::orderBy('nama')->get();
         $jenisBarang = ['BMN-TIK', 'BMN-LAB', 'BMN-NON TIK'];
 
@@ -58,13 +74,13 @@ class BmnController extends Controller
         abort_if($bmn->dihapus, 404);
 
         $returnQuery = array_filter(
-            $request->only(['search', 'jenis', 'lokasi', 'penanggungjawab', 'kondisi']),
+            $request->only(['page', 'search', 'jenis', 'lokasi', 'penanggungjawab', 'kondisi']),
             fn ($value) => $value !== null && $value !== ''
         );
 
-        session()->put('bmn_edit_return_query.' . $bmn->id, $returnQuery);
+        session()->put('bmn_edit_return_query.'.$bmn->id, $returnQuery);
 
-        $lokasis = Lokasi::orderBy('nama')->get();
+        $lokasis = Lokasi::orderedByGedung()->get();
         $pegawais = Pegawai::orderBy('nama')->get();
         $jenisBarang = ['BMN-TIK', 'BMN-LAB', 'BMN-NON TIK'];
 
@@ -77,7 +93,7 @@ class BmnController extends Controller
 
         $this->bmnService->update($bmn, $request->validated());
 
-        $returnQuery = session()->pull('bmn_edit_return_query.' . $bmn->id, []);
+        $returnQuery = session()->pull('bmn_edit_return_query.'.$bmn->id, []);
 
         return redirect()
             ->route('bmns.index', $returnQuery)
@@ -95,12 +111,13 @@ class BmnController extends Controller
         $this->bmnService->updateLokasi($bmn, $request->validated('lokasi'));
 
         $query = array_filter([
+            'page' => $request->input('page'),
             'search' => $request->input('search'),
             'jenis' => $request->input('jenis') ?: $request->input('old_filter_jenis'),
             'lokasi' => $request->input('old_filter_lokasi'),
             'penanggungjawab' => $request->input('penanggungjawab'),
             'kondisi' => $request->input('kondisi'),
-        ], fn ($val) => !empty($val));
+        ], fn ($val) => ! empty($val));
 
         return redirect()
             ->route('bmns.index', $query)
@@ -117,8 +134,7 @@ class BmnController extends Controller
 
         $this->bmnService->delete($bmn, auth()->user()?->email);
 
-        return redirect()
-            ->route('bmns.index')
+        return back(fallback: route('bmns.index'))
             ->with('success', 'Data BMN berhasil dihapus dan dipindahkan ke Data Terhapus.');
     }
 }

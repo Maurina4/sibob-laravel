@@ -39,7 +39,7 @@
                     </div>
                     <div>
                         <div class="font-bold text-base tracking-wider text-white">SIBOB</div>
-                        <div class="text-[10px] text-emerald-200/70 font-medium tracking-tight">BBPOM di Banjarmasin</div>
+                        <div class="text-[10px] text-emerald-200/70 font-medium tracking-tight">BBPOM di Banjarbaru</div>
                     </div>
                 </div>
 
@@ -51,7 +51,7 @@
                         Pengelolaan Aset BMN yang Akuntabel & Presisi
                     </h1>
                     <p class="mt-4 text-emerald-100/70 text-sm leading-relaxed max-w-md">
-                        Sistem terintegrasi untuk pencatatan, mutasi, kalibrasi instrumen laboratorium, dan berita acara Barang Milik Negara.
+                        Sistem terintegrasi untuk pencatatan, mutasi, pelaporan kerusakan, dan berita acara Barang Milik Negara.
                     </p>
                 </div>
             </div>
@@ -68,13 +68,13 @@
                 </div>
                 <div class="flex items-center gap-3 text-xs text-emerald-100/80">
                     <span class="w-5 h-5 rounded-full bg-white/10 text-emerald-300 flex items-center justify-center shrink-0 font-bold text-[10px]">✓</span>
-                    <span>Monitoring kepatuhan jadwal kalibrasi alat uji BPOM</span>
+                    <span>Pencatatan distribusi dan pelaporan kerusakan BMN</span>
                 </div>
             </div>
 
             {{-- FOOTER INSTITUSI --}}
             <div class="pt-6 border-t border-white/10 text-xs text-emerald-200/60 relative z-10">
-                Balai Besar Pengawas Obat dan Makanan di Banjarmasin &copy; {{ date('Y') }}
+                Balai Besar Pengawas Obat dan Makanan di Banjarbaru &copy; {{ date('Y') }}
             </div>
 
         </section>
@@ -202,13 +202,6 @@
                     </div>
 
                 </form>
-
-                {{-- INFO DEMO LOGIN --}}
-                <div class="mt-8 pt-5 border-t border-[#E3ECE6] text-center">
-                    <p class="text-[11px] text-[#62756A]">
-                        Akun standar: <code class="px-1.5 py-0.5 rounded bg-[#F7FAF8] text-[#132219] font-mono">admin@pom.go.id</code> (Password: <code class="px-1.5 py-0.5 rounded bg-[#F7FAF8] text-[#132219] font-mono">password</code>)
-                    </p>
-                </div>
 
             </div>
 

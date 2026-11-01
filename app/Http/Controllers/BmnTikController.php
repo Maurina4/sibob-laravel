@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Bmn\UpdateBmnLokasiRequest;
 use App\Http\Requests\BmnTik\StoreBmnTikRequest;
 use App\Http\Requests\BmnTik\UpdateBmnTikRequest;
+use App\Models\Bmn;
 use App\Models\BmnTik;
 use App\Models\Lokasi;
 use App\Models\Pegawai;
@@ -18,7 +20,7 @@ class BmnTikController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['q', 'jenis', 'lokasi', 'penanggungjawab']);
+        $filters = $request->only(['q', 'jenis', 'lokasi', 'penanggungjawab', 'kondisi']);
         $bmnsTik = $this->bmnTikService->getPaginated($filters);
         $filterData = $this->bmnTikService->getFilterData();
 
@@ -49,9 +51,16 @@ class BmnTikController extends Controller
         return view('bmn-tik.show', compact('bmnTik'));
     }
 
-    public function edit(BmnTik $bmnTik)
+    public function edit(Request $request, BmnTik $bmnTik)
     {
         abort_if($bmnTik->dihapus, 404);
+
+        $returnQuery = array_filter(
+            $request->only(['page', 'q', 'jenis', 'lokasi', 'penanggungjawab', 'kondisi']),
+            fn ($value) => $value !== null && $value !== ''
+        );
+
+        session()->put('bmn_tik_edit_return_query.'.$bmnTik->id, $returnQuery);
 
         $lokasis = Lokasi::orderBy('nama')->get();
         $pegawais = Pegawai::orderBy('nama')->get();
@@ -65,9 +74,25 @@ class BmnTikController extends Controller
 
         $this->bmnTikService->update($bmnTik, $request->validated());
 
+        $returnQuery = session()->pull('bmn_tik_edit_return_query.'.$bmnTik->id, []);
+
         return redirect()
-            ->route('bmns-tik.index')
+            ->route('bmns-tik.index', $returnQuery)
             ->with('success', 'Data BMN TIK berhasil diperbarui.');
+    }
+
+    public function updateLokasi(UpdateBmnLokasiRequest $request, BmnTik $bmnTik)
+    {
+        abort_if($bmnTik->dihapus, 404);
+
+        $lokasiBaru = $request->validated('lokasi');
+        $bmnTik->update(['lokasi' => $lokasiBaru]);
+
+        if ($bmnTik->bmn_id) {
+            Bmn::where('id', $bmnTik->bmn_id)->update(['lokasi' => $lokasiBaru]);
+        }
+
+        return back()->with('success', 'Lokasi BMN TIK berhasil diperbarui.');
     }
 
     public function destroy(BmnTik $bmnTik)
@@ -76,8 +101,7 @@ class BmnTikController extends Controller
 
         $this->bmnTikService->delete($bmnTik, auth()->user()?->email);
 
-        return redirect()
-            ->route('bmns-tik.index')
+        return back(fallback: route('bmns-tik.index'))
             ->with('success', 'Data BMN TIK dipindahkan ke Data Terhapus.');
     }
 }

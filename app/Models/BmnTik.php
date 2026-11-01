@@ -5,25 +5,40 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BmnTik extends Model
 {
     protected $table = 'bmns_tik';
 
     protected $fillable = [
+        'bmn_id',
         'kode_barang',
         'nup',
+        'no_seri',
         'nama_barang',
+        'tahun_perolehan',
+        'nilai_perolehan',
         'jenis',
         'lokasi',
         'penanggungjawab',
+        'kondisi',
+        'is_dikembalikan',
         'dihapus',
         'dihapus_pada',
         'dihapus_oleh',
     ];
 
+    public function bmn(): BelongsTo
+    {
+        return $this->belongsTo(Bmn::class, 'bmn_id');
+    }
+
     protected $casts = [
         'nup' => 'integer',
+        'tahun_perolehan' => 'integer',
+        'nilai_perolehan' => 'float',
+        'is_dikembalikan' => 'boolean',
         'dihapus' => 'boolean',
         'dihapus_pada' => 'datetime',
     ];
@@ -43,7 +58,7 @@ class BmnTik extends Model
                     return $kodeBarang;
                 }
 
-                return $kodeBarang . '-NUP.' . str_pad(
+                return $kodeBarang.'-NUP.'.str_pad(
                     (string) $nup,
                     2,
                     '0',
@@ -60,28 +75,34 @@ class BmnTik extends Model
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {
-        if (!empty($filters['q'])) {
+        if (! empty($filters['q'])) {
             $search = trim($filters['q']);
             $query->where(function (Builder $q) use ($search) {
                 $q->where('kode_barang', 'like', "%{$search}%")
                     ->orWhere('nup', 'like', "%{$search}%")
+                    ->orWhere('no_seri', 'like', "%{$search}%")
                     ->orWhere('nama_barang', 'like', "%{$search}%")
                     ->orWhere('jenis', 'like', "%{$search}%")
                     ->orWhere('lokasi', 'like', "%{$search}%")
-                    ->orWhere('penanggungjawab', 'like', "%{$search}%");
+                    ->orWhere('penanggungjawab', 'like', "%{$search}%")
+                    ->orWhere('kondisi', 'like', "%{$search}%");
             });
         }
 
-        if (!empty($filters['jenis'])) {
+        if (! empty($filters['jenis'])) {
             $query->where('jenis', $filters['jenis']);
         }
 
-        if (!empty($filters['lokasi'])) {
+        if (! empty($filters['lokasi'])) {
             $query->where('lokasi', $filters['lokasi']);
         }
 
-        if (!empty($filters['penanggungjawab'])) {
+        if (! empty($filters['penanggungjawab'])) {
             $query->where('penanggungjawab', $filters['penanggungjawab']);
+        }
+
+        if (! empty($filters['kondisi'])) {
+            $query->where('kondisi', $filters['kondisi']);
         }
 
         return $query;

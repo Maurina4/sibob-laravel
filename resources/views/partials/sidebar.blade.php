@@ -53,16 +53,16 @@
                 </button>
 
                 <div id="submenu-bmn" class="pl-7 pr-1 pt-1 space-y-1 {{ request()->routeIs('bmns.*', 'pengembalians.*', 'bmns-tik.*', 'bmns-lab.*') ? 'block' : 'hidden' }}">
-                    <a href="{{ route('bmns.index') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                    <a href="{{ session('nav_last_url.bmns', route('bmns.index')) }}" data-nav-key="bmns" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>Daftar BMN</span>
                     </a>
-                    <a href="{{ route('pengembalians.index') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('pengembalians.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                    <a href="{{ session('nav_last_url.pengembalians', route('pengembalians.index')) }}" data-nav-key="pengembalians" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('pengembalians.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>Pengembalian</span>
                     </a>
-                    <a href="{{ route('bmns-tik.index') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-tik.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                    <a href="{{ session('nav_last_url.bmns-tik', route('bmns-tik.index')) }}" data-nav-key="bmns-tik" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-tik.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>BMN TIK</span>
                     </a>
-                    <a href="{{ route('bmns-lab.index') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-lab.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                    <a href="{{ session('nav_last_url.bmns-lab', route('bmns-lab.index')) }}" data-nav-key="bmns-lab" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-lab.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>BMN Laboratorium</span>
                     </a>
                 </div>
@@ -88,12 +88,12 @@
             </button>
 
             <div id="submenu-ba" class="pl-7 pr-1 pt-1 space-y-1 {{ request()->routeIs('ba-perpindahan.*', 'distribusi.*') ? 'block' : 'hidden' }}">
-                <a href="{{ route('ba-perpindahan.index') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('ba-perpindahan.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                <a href="{{ session('nav_last_url.ba-perpindahan', route('ba-perpindahan.index')) }}" data-nav-key="ba-perpindahan" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('ba-perpindahan.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                     <span>BA Perpindahan</span>
                 </a>
                 @if(auth()->user()->role === 'Operator')
-                    <a href="{{ route('distribusi.index') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('distribusi.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
-                        <span>Distribusi BMN</span>
+                    <a href="{{ session('nav_last_url.distribusi', route('distribusi.index')) }}" data-nav-key="distribusi" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('distribusi.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                        <span>BA Distribusi</span>
                     </a>
                 @endif
             </div>
@@ -102,7 +102,8 @@
         {{-- LAPORAN KERUSAKAN --}}
         <div class="pt-2">
             <a
-                href="{{ route('laporan-kerusakan.index') }}"
+                href="{{ session('nav_last_url.laporan-kerusakan', route('laporan-kerusakan.index')) }}"
+                data-nav-key="laporan-kerusakan"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('laporan-kerusakan.*') ? 'bg-white/12 text-white font-semibold' : 'text-emerald-100/70 hover:bg-white/6 hover:text-white' }}"
             >
                 <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -119,7 +120,8 @@
                     Sistem & Master
                 </div>
                 <a
-                    href="{{ route('lokasis.index') }}"
+                    href="{{ session('nav_last_url.lokasis', route('lokasis.index')) }}"
+                    data-nav-key="lokasis"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('lokasis.*') ? 'bg-white/12 text-white font-semibold' : 'text-emerald-100/70 hover:bg-white/6 hover:text-white' }}"
                 >
                     <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -129,7 +131,8 @@
                     <span>Master Lokasi</span>
                 </a>
                 <a
-                    href="{{ route('data-terhapus.index') }}"
+                    href="{{ session('nav_last_url.data-terhapus', route('data-terhapus.index')) }}"
+                    data-nav-key="data-terhapus"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('data-terhapus.*') ? 'bg-white/12 text-white font-semibold' : 'text-emerald-100/70 hover:bg-white/6 hover:text-white' }}"
                 >
                     <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -152,7 +155,7 @@
 
 </aside>
 
-{{-- SCRIPT TOGGLE SUBMENU --}}
+{{-- SCRIPT TOGGLE SUBMENU & SYNC STATE --}}
 <script>
     function toggleSubmenu(id, button) {
         const submenu = document.getElementById(id);
@@ -164,4 +167,51 @@
             arrow.classList.toggle('rotate-90', isHidden);
         }
     }
+
+    (function() {
+        const modulePrefixes = {
+            '/bmns': 'bmns',
+            '/pengembalians': 'pengembalians',
+            '/bmns-tik': 'bmns-tik',
+            '/bmns-lab': 'bmns-lab',
+            '/ba-perpindahan': 'ba-perpindahan',
+            '/distribusi': 'distribusi',
+            '/laporan-kerusakan': 'laporan-kerusakan',
+            '/lokasis': 'lokasis',
+            '/data-terhapus': 'data-terhapus'
+        };
+
+        const path = window.location.pathname;
+
+        // Simpan URL index aktif ke sessionStorage
+        for (const [prefix, key] of Object.entries(modulePrefixes)) {
+            if (path === prefix || path === prefix + '/') {
+                sessionStorage.setItem('sibob_nav_' + key, window.location.href);
+                break;
+            }
+        }
+
+        // Terapkan URL tersimpan ke link sidebar jika ada
+        document.querySelectorAll('a[data-nav-key]').forEach(function(link) {
+            const key = link.getAttribute('data-nav-key');
+            const saved = sessionStorage.getItem('sibob_nav_' + key);
+            if (saved) {
+                link.href = saved;
+            }
+        });
+
+        // Tangani tombol Reset untuk membersihkan state tersimpan
+        document.querySelectorAll('a').forEach(function(el) {
+            const txt = (el.textContent || '').trim().toLowerCase();
+            if (txt === 'reset') {
+                el.addEventListener('click', function() {
+                    for (const [prefix, key] of Object.entries(modulePrefixes)) {
+                        if (path === prefix || path === prefix + '/') {
+                            sessionStorage.removeItem('sibob_nav_' + key);
+                        }
+                    }
+                });
+            }
+        });
+    })();
 </script>

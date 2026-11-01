@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\BmnTik;
 
+use App\Models\BmnTik;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBmnTikRequest extends FormRequest
 {
@@ -11,15 +13,54 @@ class UpdateBmnTikRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if ($this->has('kode_barang') && is_string($this->kode_barang)) {
+            $merge['kode_barang'] = trim($this->kode_barang);
+        }
+        if ($this->filled('nilai_perolehan') && is_string($this->nilai_perolehan)) {
+            $cleaned = preg_replace('/[^0-9.]/', '', str_replace(',', '.', $this->nilai_perolehan));
+            $merge['nilai_perolehan'] = $cleaned !== '' ? (float) $cleaned : null;
+        }
+        if (! empty($merge)) {
+            $this->merge($merge);
+        }
+    }
+
     public function rules(): array
     {
+        $bmnTik = $this->route('bmnTik');
+        $tik = $bmnTik instanceof BmnTik ? $bmnTik : BmnTik::find($bmnTik);
+        $tikId = $tik?->id ?? $bmnTik;
+        $bmnId = $tik?->bmn_id ?? $tik?->bmn?->id;
+
         return [
-            'kode_barang' => ['required', 'string', 'max:100'],
+            'kode_barang' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('bmns', 'kode_barang')->ignore($bmnId),
+                Rule::unique('bmns_tik', 'kode_barang')->ignore($tikId),
+            ],
             'nup' => ['required', 'integer', 'min:1'],
+            'no_seri' => ['nullable', 'string', 'max:255'],
             'nama_barang' => ['required', 'string', 'max:255'],
+            'tahun_perolehan' => ['nullable', 'integer', 'min:1900', 'max:'.date('Y')],
+            'nilai_perolehan' => ['nullable', 'numeric', 'min:0'],
             'jenis' => ['nullable', 'string', 'max:100'],
             'lokasi' => ['required', 'string', 'max:255'],
             'penanggungjawab' => ['required', 'string', 'max:255'],
+            'kondisi' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
+            'kode_barang.required' => 'Kode Barang wajib diisi.',
+            'kode_barang.unique' => 'Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.',
         ];
     }
 }

@@ -10,7 +10,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <a
-                href="{{ route('bmns.index') }}"
+                href="{{ session('nav_last_url.bmns', route('bmns.index')) }}"
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#62756A] hover:text-[#163828] transition mb-2"
             >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -21,7 +21,10 @@
             <h1 class="text-2xl font-bold tracking-tight text-[#132219]">{{ $bmn->nama_barang }}</h1>
             <div class="flex items-center gap-2 mt-1">
                 <span class="font-mono text-xs font-semibold text-[#163828] bg-[#EAF2ED] px-2.5 py-0.5 rounded-md border border-[#D5E5DA]">
-                    {{ $bmn->kode_barang }}@if($bmn->nup)-NUP.{{ $bmn->nup }}@endif
+                    {{ $bmn->kode_barang ?: '—' }}
+                </span>
+                <span class="font-mono text-xs font-semibold text-[#132219] bg-[#F4F8F6] px-2.5 py-0.5 rounded-md border border-[#E3ECE6]" title="NUP">
+                    NUP {{ $bmn->nup ?? '—' }}
                 </span>
                 <x-bmn-badge :type="$bmn->jenis" />
             </div>
@@ -52,12 +55,26 @@
 
             <dl class="space-y-3 text-xs">
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
+                    <dt class="text-[#62756A]">Nomor Seri</dt>
+                    <dd class="font-mono font-semibold text-[#132219]">{{ $bmn->no_seri ?: '—' }}</dd>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Merek / Tipe</dt>
                     <dd class="font-semibold text-[#132219]">{{ $bmn->merek ?: '—' }}</dd>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Satuan</dt>
                     <dd class="font-medium text-[#132219]">{{ $bmn->satuan ?: 'unit' }}</dd>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
+                    <dt class="text-[#62756A]">Tahun Perolehan</dt>
+                    <dd class="font-mono text-[#132219]">{{ $bmn->tahun_perolehan ?: '—' }}</dd>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
+                    <dt class="text-[#62756A]">Nilai Perolehan</dt>
+                    <dd class="font-mono font-semibold text-[#132219]">
+                        {{ $bmn->nilai_perolehan !== null ? 'Rp ' . number_format($bmn->nilai_perolehan, 0, ',', '.') : '—' }}
+                    </dd>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Tanggal Terima</dt>
@@ -70,19 +87,25 @@
                     <dd>
                         @php
                             $kondisi = $bmn->kondisi ?: 'Baik';
-                            $kondisiStyle = strtolower($kondisi) === 'baik'
-                                ? 'bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]'
-                                : 'bg-[#FDF0EE] text-[#9C322C] border-[#F8D4D0]';
+                            $kondisiLower = strtolower($kondisi);
+                            $kondisiStyle = match($kondisiLower) {
+                                'baik' => 'bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]',
+                                'rusak sedang' => 'bg-[#FFF4E5] text-[#B25E00] border-[#FFE2BF]',
+                                'rusak ringan' => 'bg-[#FEF7E0] text-[#B06000] border-[#FEEFC3]',
+                                'rusak', 'rusak berat' => 'bg-[#FDF0EE] text-[#9C322C] border-[#F8D4D0]',
+                                default => 'bg-[#F2F5F3] text-[#4A5D52] border-[#D9E2DC]',
+                            };
+                            $dotColor = match($kondisiLower) {
+                                'baik' => 'bg-[#137333]',
+                                'rusak sedang', 'rusak ringan' => 'bg-[#B06000]',
+                                'rusak', 'rusak berat' => 'bg-[#9C322C]',
+                                default => 'bg-[#4A5D52]',
+                            };
                         @endphp
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border {{ $kondisiStyle }}">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold border {{ $kondisiStyle }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }}"></span>
                             <span>{{ $kondisi }}</span>
                         </span>
-                    </dd>
-                </div>
-                <div class="flex justify-between py-1.5">
-                    <dt class="text-[#62756A]">Jadwal Pemeliharaan</dt>
-                    <dd class="font-mono text-[#132219]">
-                        {{ $bmn->jadwal_pemeliharaan ? \Carbon\Carbon::parse($bmn->jadwal_pemeliharaan)->format('d M Y') : '—' }}
                     </dd>
                 </div>
             </dl>
@@ -107,7 +130,16 @@
             <dl class="space-y-3 text-xs">
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Lokasi Ruangan</dt>
-                    <dd class="font-semibold text-[#132219]">{{ $bmn->lokasi ?: '—' }}</dd>
+                    <dd class="font-semibold text-[#132219]">
+                        @if($bmn->lokasiRef?->kode_ruangan)
+                            <span class="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] mr-1">
+                                {{ $bmn->lokasiRef->kode_ruangan }}
+                            </span>
+                            <span>{{ $bmn->lokasiRef->nama }}</span>
+                        @else
+                            {{ $bmn->lokasi ?: '—' }}
+                        @endif
+                    </dd>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Penanggung Jawab</dt>
@@ -127,7 +159,7 @@
             <div class="p-3.5 rounded-xl bg-[#EAF2ED]/60 border border-[#D5E5DA] text-xs text-[#163828] space-y-1">
                 <div class="font-bold text-[11px] uppercase tracking-wider">Aset Resmi Satuan Kerja</div>
                 <p class="text-[11px] text-[#2C4A38] leading-relaxed">
-                    Balai Besar Pengawas Obat dan Makanan di Banjarmasin — Bagian Tata Usaha & Pengelolaan BMN.
+                    Balai Besar Pengawas Obat dan Makanan di Banjarbaru — Bagian Tata Usaha & Pengelolaan BMN.
                 </p>
             </div>
         </div>

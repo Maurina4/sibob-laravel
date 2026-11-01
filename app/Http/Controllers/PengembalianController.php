@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Pengembalian\StorePengembalianRequest;
 use App\Http\Requests\Pengembalian\UpdatePengembalianRequest;
+use App\Models\Bmn;
 use App\Models\Pegawai;
 use App\Models\Pengembalian;
 use App\Services\PengembalianService;
@@ -33,8 +34,9 @@ class PengembalianController extends Controller
             'Pemeriksaan',
             'Tata Usaha',
         ];
+        $bmns = Bmn::active()->orderBy('nama_barang')->get(['id', 'nama_barang', 'merek', 'nup', 'kode_barang', 'kondisi']);
 
-        return view('pengembalian.create', compact('pegawais', 'bidangs'));
+        return view('pengembalian.create', compact('pegawais', 'bidangs', 'bmns'));
     }
 
     public function store(StorePengembalianRequest $request)
@@ -50,6 +52,8 @@ class PengembalianController extends Controller
     {
         abort_if($pengembalian->dihapus, 404);
 
+        $pengembalian->load(['items.bmn', 'pengajuPegawai']);
+
         return view('pengembalian.show', compact('pengembalian'));
     }
 
@@ -58,12 +62,13 @@ class PengembalianController extends Controller
         abort_if($pengembalian->dihapus, 404);
 
         $returnQuery = array_filter(
-            $request->only(['search', 'bidang']),
+            $request->only(['page', 'search', 'bidang']),
             fn ($value) => $value !== null && $value !== ''
         );
 
-        session()->put('pengembalian_edit_return_query.' . $pengembalian->id, $returnQuery);
+        session()->put('pengembalian_edit_return_query.'.$pengembalian->id, $returnQuery);
 
+        $pengembalian->load('items.bmn');
         $pegawais = Pegawai::orderBy('nama')->get();
         $bidangs = [
             'Informasi dan Komunikasi',
@@ -71,8 +76,9 @@ class PengembalianController extends Controller
             'Pemeriksaan',
             'Tata Usaha',
         ];
+        $bmns = Bmn::active()->orderBy('nama_barang')->get(['id', 'nama_barang', 'merek', 'nup', 'kode_barang', 'kondisi']);
 
-        return view('pengembalian.edit', compact('pengembalian', 'pegawais', 'bidangs'));
+        return view('pengembalian.edit', compact('pengembalian', 'pegawais', 'bidangs', 'bmns'));
     }
 
     public function update(UpdatePengembalianRequest $request, Pengembalian $pengembalian)
@@ -81,7 +87,7 @@ class PengembalianController extends Controller
 
         $this->pengembalianService->update($pengembalian, $request->validated());
 
-        $returnQuery = session()->pull('pengembalian_edit_return_query.' . $pengembalian->id, []);
+        $returnQuery = session()->pull('pengembalian_edit_return_query.'.$pengembalian->id, []);
 
         return redirect()
             ->route('pengembalians.index', $returnQuery)
@@ -94,8 +100,7 @@ class PengembalianController extends Controller
 
         $this->pengembalianService->delete($pengembalian, auth()->user()?->email);
 
-        return redirect()
-            ->route('pengembalians.index')
+        return back(fallback: route('pengembalians.index'))
             ->with('success', 'Pengajuan pengembalian BMN berhasil dipindahkan ke Data Terhapus.');
     }
 
@@ -103,6 +108,55 @@ class PengembalianController extends Controller
     {
         abort_if($pengembalian->dihapus, 404);
 
-        return view('pengembalian.print', compact('pengembalian'));
+        $pengembalian->loadMissing(['items.bmn', 'pengajuPegawai']);
+
+        // Resolusi Pihak Pertama (Pegawai Pengembali)
+        $p1 = $pengembalian->pengajuPegawai;
+        $pihakPertama = [
+            'nama' => $p1?->nama ?: ($pengembalian->nama_pengaju ?: '....................................................'),
+            'nip' => $p1?->nip ?: '-',
+            'jabatan' => $p1?->jabatan ?: 'Pegawai Pemakai BMN',
+            'unit_kerja' => $p1?->unit_kerja ?: ($pengembalian->bidang ?: 'Balai Besar POM di Banjarbaru'),
+        ];
+
+        // Resolusi Pihak Kedua (Pengelola BMN / Penerima)
+        $pengelolaBmn = Pegawai::where('jabatan', 'like', '%Operator BMN%')
+            ->orWhere('jabatan', 'like', '%Pengelola BMN%')
+            ->orWhere('jabatan', 'like', '%Gudang%')
+            ->first();
+
+        $pihakKedua = [
+            'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno',
+            'nip' => $pengelolaBmn?->nip ?: '198001012005011001',
+            'jabatan' => $pengelolaBmn?->jabatan ?: 'Operator / Pengelola BMN',
+            'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Subbag Tata Usaha',
+        ];
+
+        // Resolusi Kepala Balai (Mengetahui)
+        $kabalai = Pegawai::where('jabatan', 'like', '%Kepala Balai%')->first();
+        $kabalaiNama = request('kabalai_nama') ?: ($kabalai?->nama ?: 'Ary Yustantiningsih,S.Si.,Apt.');
+        $kabalaiNip = request('kabalai_nip') ?: ($kabalai?->nip ?: '-');
+
+        // Resolusi Kasubag TU (Mengetahui)
+        $kasubag = Pegawai::where('jabatan', 'like', '%Kepala Tata Usaha%')
+            ->orWhere('jabatan', 'like', '%Kasubag TU%')
+            ->first();
+
+        $kasubagNama = $kasubag?->nama ?: 'Kepala Sub Bagian Tata Usaha';
+        $kasubagNip = $kasubag?->nip ?: '-';
+
+        // Resolusi Kondisi Pengembalian BMN
+        $kondisiGeneral = $pengembalian->kondisi_pengembalian;
+        if (empty($kondisiGeneral) && $pengembalian->items && $pengembalian->items->isNotEmpty()) {
+            $uniqueConditions = $pengembalian->items->pluck('kondisi')->filter()->unique();
+            if ($uniqueConditions->isNotEmpty()) {
+                $kondisiGeneral = $uniqueConditions->implode(' / ');
+            }
+        }
+        if (empty($kondisiGeneral)) {
+            $kondisiGeneral = 'Baik';
+        }
+
+        return view('pengembalian.print', compact('pengembalian', 'pihakPertama', 'pihakKedua', 'kabalaiNama', 'kabalaiNip', 'kasubagNama', 'kasubagNip', 'kondisiGeneral'));
     }
 }

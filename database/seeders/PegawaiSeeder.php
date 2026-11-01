@@ -14,25 +14,25 @@ class PegawaiSeeder extends Seeder
                 'nama' => 'Yuli Supriyatno',
                 'nip' => '198001012005011001',
                 'jabatan' => 'Operator',
-                'unit_kerja' => 'BPOM Banjarmasin',
+                'unit_kerja' => 'BPOM Banjarbaru',
             ],
             [
                 'nama' => 'Ade Rahma Yanti',
                 'nip' => '198502152010012002',
                 'jabatan' => 'Pengelola BMN',
-                'unit_kerja' => 'BPOM Banjarmasin',
+                'unit_kerja' => 'BPOM Banjarbaru',
             ],
             [
                 'nama' => 'Petugas Pengaju',
                 'nip' => '198703202012031003',
                 'jabatan' => 'Petugas',
-                'unit_kerja' => 'BPOM Banjarmasin',
+                'unit_kerja' => 'BPOM Banjarbaru',
             ],
             [
                 'nama' => 'Kepala Tata Usaha',
                 'nip' => '197905102003121004',
                 'jabatan' => 'Kepala Tata Usaha',
-                'unit_kerja' => 'BPOM Banjarmasin',
+                'unit_kerja' => 'BPOM Banjarbaru',
             ],
         ];
 
