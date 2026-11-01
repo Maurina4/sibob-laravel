@@ -20,6 +20,12 @@ return new class extends Migration
                 $table->text('deskripsi')->nullable();
                 $table->timestamps();
             });
+
+            DB::table('kategori_bmns')->insert([
+                ['id' => 1, 'kode' => 'UMUM', 'nama' => 'BMN Umum & Perkantoran', 'deskripsi' => 'Fasilitas kerja kantor, perlengkapan ruang, dan mebeler.', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 2, 'kode' => 'LAB', 'nama' => 'BMN Laboratorium', 'deskripsi' => 'Instrumen analitik dan instrumen pengujian mutu obat & makanan.', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 3, 'kode' => 'TIK', 'nama' => 'BMN Perangkat TIK', 'deskripsi' => 'Komputer, server, perangkat jaringan, scanner, dan printer.', 'created_at' => now(), 'updated_at' => now()],
+            ]);
         }
 
         // 2. Normalisasi Tabel bmns (Tambahkan kolom FK dan soft deletes standar Laravel)

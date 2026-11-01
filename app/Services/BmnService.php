@@ -120,65 +120,7 @@ class BmnService
     public function store(array $validated, Request $request): Bmn
     {
         return DB::transaction(function () use ($validated, $request) {
-            $lokasiName = trim($validated['lokasi'] ?? '');
-            $lokasiModel = $lokasiName !== '' ? Lokasi::findOrCreateByName($lokasiName) : null;
-
-            $dataBmn = [
-                'kode_barang' => $validated['kode_barang'],
-                'nup' => $validated['nup'],
-                'no_seri' => $validated['no_seri'] ?? null,
-                'nama_barang' => $validated['nama_barang'],
-                'merek' => $validated['merek'] ?? null,
-                'tahun_perolehan' => $validated['tahun_perolehan'] ?? null,
-                'nilai_perolehan' => $validated['nilai_perolehan'] ?? null,
-                'tanggal_terima' => $validated['tanggal_terima'] ?? null,
-                'jenis' => $validated['jenis'],
-                'satuan' => $validated['satuan'] ?? null,
-                'lokasi' => $lokasiModel ? $lokasiModel->nama : $validated['lokasi'],
-                'lokasi_id' => $lokasiModel?->id,
-                'penanggungjawab' => $validated['penanggungjawab'],
-                'penanggungjawab_nip' => $validated['penanggungjawab_nip'] ?? null,
-                'kondisi' => $validated['kondisi'],
-                'jadwal_pemeliharaan' => $validated['jadwal_pemeliharaan'] ?? null,
-                'spesifikasi' => $validated['spesifikasi'] ?? null,
-                'dihapus' => false,
-                'dihapus_pada' => null,
-                'dihapus_oleh' => null,
-            ];
-
-            $bmn = Bmn::create($dataBmn);
-
-            if ($bmn->jenis === 'BMN-TIK') {
-                BmnTik::create([
-                    'bmn_id' => $bmn->id,
-                    'kode_barang' => $bmn->kode_barang,
-                    'nup' => (int) $bmn->nup,
-                    'no_seri' => $bmn->no_seri,
-                    'nama_barang' => $bmn->nama_barang,
-                    'tahun_perolehan' => $bmn->tahun_perolehan,
-                    'nilai_perolehan' => $bmn->nilai_perolehan,
-                    'jenis' => 'BMN-TIK',
-                    'lokasi' => $bmn->lokasi,
-                    'penanggungjawab' => $bmn->penanggungjawab,
-                    'dihapus' => false,
-                ]);
-            } elseif ($bmn->jenis === 'BMN-LAB') {
-                BmnLab::create([
-                    'bmn_id' => $bmn->id,
-                    'kode_barang' => $bmn->kode_barang,
-                    'nup' => (int) $bmn->nup,
-                    'no_seri' => $bmn->no_seri,
-                    'nama_barang' => $bmn->nama_barang,
-                    'merek' => $bmn->merek,
-                    'tahun_perolehan' => $bmn->tahun_perolehan,
-                    'nilai_perolehan' => $bmn->nilai_perolehan,
-                    'lokasi' => $bmn->lokasi,
-                    'penanggungjawab' => $bmn->penanggungjawab,
-                    'kondisi' => $bmn->kondisi,
-                    'status_kalibrasi' => 'Belum Dikalibrasi',
-                    'dihapus' => false,
-                ]);
-            }
+            $bmn = $this->storeRecord($validated);
 
             foreach (['manual_pengguna', 'panduan_perbaikan', 'instruksi_kerja', 'foto_barang'] as $jenisDoc) {
                 if ($request->file($jenisDoc)) {
@@ -186,10 +128,108 @@ class BmnService
                 }
             }
 
-            $this->createAutomaticDistribusiIfNeeded($bmn);
-
             return $bmn;
         });
+    }
+
+    /**
+     * Menyimpan satu data BMN beserta sinkronisasi tabel relasi & Berita Acara Distribusi Gudang.
+     * Dapat digunakan bersama baik oleh input manual maupun import Excel massal.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    public function storeRecord(array $validated): Bmn
+    {
+        $lokasiName = trim($validated['lokasi'] ?? '');
+        $lokasiModel = $lokasiName !== '' ? Lokasi::findOrCreateByName($lokasiName) : null;
+
+        // Resolve kategori_bmn_id
+        $kategoriId = match (strtoupper(trim($validated['jenis'] ?? ''))) {
+            'BMN-TIK' => 3,
+            'BMN-LAB' => 2,
+            default => 1,
+        };
+
+        // Resolve penanggung_jawab_id jika belum di-set eksplisit
+        $penanggungJawabId = $validated['penanggung_jawab_id'] ?? null;
+        $pjName = trim($validated['penanggungjawab'] ?? '');
+        $pjNip = trim($validated['penanggungjawab_nip'] ?? '');
+
+        if (! $penanggungJawabId && $pjName !== '') {
+            $pegawai = Pegawai::where('nama', $pjName)
+                ->orWhere('nip', $pjNip !== '-' ? $pjNip : '___not_found___')
+                ->orWhereRaw("CONCAT(nama, ' (', nip, ')') = ?", [$pjName])
+                ->first();
+
+            if (! $pegawai && str_contains(strtolower($pjName), 'pengelola bmn')) {
+                $pegawai = Pegawai::where('jabatan', 'Pengelola BMN')->first();
+            }
+
+            $penanggungJawabId = $pegawai?->id;
+        }
+
+        $dataBmn = [
+            'kategori_bmn_id' => $kategoriId,
+            'kode_barang' => $validated['kode_barang'],
+            'nup' => $validated['nup'],
+            'no_seri' => $validated['no_seri'] ?? null,
+            'nama_barang' => $validated['nama_barang'],
+            'merek' => $validated['merek'] ?? null,
+            'tahun_perolehan' => $validated['tahun_perolehan'] ?? null,
+            'nilai_perolehan' => $validated['nilai_perolehan'] ?? null,
+            'tanggal_terima' => $validated['tanggal_terima'] ?? null,
+            'jenis' => $validated['jenis'],
+            'satuan' => $validated['satuan'] ?? null,
+            'lokasi' => $lokasiModel ? $lokasiModel->nama : ($validated['lokasi'] ?? 'Gudang BMN'),
+            'lokasi_id' => $lokasiModel?->id,
+            'penanggungjawab' => $validated['penanggungjawab'] ?? 'Pengelola BMN',
+            'penanggung_jawab_id' => $penanggungJawabId,
+            'penanggungjawab_nip' => $validated['penanggungjawab_nip'] ?? ($pjNip ?: '-'),
+            'kondisi' => $validated['kondisi'] ?? 'Baik',
+            'jadwal_pemeliharaan' => $validated['jadwal_pemeliharaan'] ?? null,
+            'spesifikasi' => $validated['spesifikasi'] ?? null,
+            'dihapus' => false,
+            'dihapus_pada' => null,
+            'dihapus_oleh' => null,
+        ];
+
+        $bmn = Bmn::create($dataBmn);
+
+        if ($bmn->jenis === 'BMN-TIK') {
+            BmnTik::create([
+                'bmn_id' => $bmn->id,
+                'kode_barang' => $bmn->kode_barang,
+                'nup' => (int) $bmn->nup,
+                'no_seri' => $bmn->no_seri,
+                'nama_barang' => $bmn->nama_barang,
+                'tahun_perolehan' => $bmn->tahun_perolehan,
+                'nilai_perolehan' => $bmn->nilai_perolehan,
+                'jenis' => 'BMN-TIK',
+                'lokasi' => $bmn->lokasi,
+                'penanggungjawab' => $bmn->penanggungjawab,
+                'dihapus' => false,
+            ]);
+        } elseif ($bmn->jenis === 'BMN-LAB') {
+            BmnLab::create([
+                'bmn_id' => $bmn->id,
+                'kode_barang' => $bmn->kode_barang,
+                'nup' => (int) $bmn->nup,
+                'no_seri' => $bmn->no_seri,
+                'nama_barang' => $bmn->nama_barang,
+                'merek' => $bmn->merek,
+                'tahun_perolehan' => $bmn->tahun_perolehan,
+                'nilai_perolehan' => $bmn->nilai_perolehan,
+                'lokasi' => $bmn->lokasi,
+                'penanggungjawab' => $bmn->penanggungjawab,
+                'kondisi' => $bmn->kondisi,
+                'status_kalibrasi' => 'Belum Dikalibrasi',
+                'dihapus' => false,
+            ]);
+        }
+
+        $this->createAutomaticDistribusiIfNeeded($bmn);
+
+        return $bmn;
     }
 
     public function update(Bmn $bmn, array $validated): bool

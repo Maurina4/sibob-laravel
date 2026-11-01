@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BaPerpindahanController;
 use App\Http\Controllers\BmnController;
+use App\Http\Controllers\BmnImportController;
 use App\Http\Controllers\BmnLabController;
 use App\Http\Controllers\BmnTikController;
 use App\Http\Controllers\DashboardController;
@@ -66,6 +67,20 @@ Route::middleware(['auth'])->group(function () {
         | DAFTAR BMN
         |--------------------------------------------------------------------------
         */
+
+        /*
+        |--------------------------------------------------------------------------
+        | IMPORT EXCEL BMN
+        |--------------------------------------------------------------------------
+        */
+
+        Route::prefix('bmns/import')->name('bmns.import.')->group(function () {
+            Route::get('/', [BmnImportController::class, 'index'])->name('index');
+            Route::get('/template', [BmnImportController::class, 'downloadTemplate'])->name('template');
+            Route::post('/preview', [BmnImportController::class, 'preview'])->name('preview');
+            Route::post('/confirm', [BmnImportController::class, 'confirm'])->name('confirm');
+            Route::get('/error-report/{importLog}', [BmnImportController::class, 'downloadErrorReport'])->name('error-report');
+        });
 
         Route::get(
             '/bmns/export',

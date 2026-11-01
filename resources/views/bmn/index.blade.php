@@ -99,6 +99,18 @@
                 </div>
             </div>
 
+            {{-- TOMBOL IMPORT EXCEL --}}
+            <a
+                href="{{ route('bmns.import.index') }}"
+                class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-[#F2F6F3] text-[#163828] border border-[#CDE1D4] hover:border-[#163828] rounded-xl text-xs font-semibold tracking-wide shadow-2xs transition shrink-0"
+                title="Pendaftaran barang masuk massal melalui berkas Microsoft Excel (.xlsx)"
+            >
+                <svg class="w-4 h-4 text-[#107C41]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0L8 8m4-4l4 4" />
+                </svg>
+                <span>Import Excel</span>
+            </a>
+
             <a
                 href="{{ route('bmns.create') }}"
                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#163828] hover:bg-[#1E4834] active:bg-[#0E281C] text-white rounded-xl text-xs font-semibold tracking-wide shadow-2xs transition shrink-0"

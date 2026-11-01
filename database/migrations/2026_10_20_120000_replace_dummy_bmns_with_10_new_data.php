@@ -17,62 +17,140 @@ return new class extends Migration
             return;
         }
 
-        $driver = DB::getDriverName();
-        if ($driver === 'mysql') {
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        }
+        Schema::disableForeignKeyConstraints();
 
-        // 1. Clean existing dummy BMNs and their dependent records
-        if (Schema::hasTable('bmn_dokumens')) {
-            DB::table('bmn_dokumens')->truncate();
-        }
-        if (Schema::hasTable('pengembalian_items')) {
-            DB::table('pengembalian_items')->truncate();
-        }
-        if (Schema::hasTable('pengembalians')) {
-            DB::table('pengembalians')->truncate();
-        }
-        if (Schema::hasTable('distribusi_items')) {
-            DB::table('distribusi_items')->truncate();
-        }
-        if (Schema::hasTable('distribusis')) {
-            DB::table('distribusis')->truncate();
-        }
-        if (Schema::hasTable('ba_perpindahans')) {
-            DB::table('ba_perpindahans')->truncate();
-        }
-        if (Schema::hasTable('laporan_kerusakans')) {
-            DB::table('laporan_kerusakans')->truncate();
-        }
-        if (Schema::hasTable('data_terhapus')) {
-            DB::table('data_terhapus')->truncate();
-        }
-        if (Schema::hasTable('bmns_tik')) {
-            DB::table('bmns_tik')->truncate();
-        }
-        if (Schema::hasTable('bmns_lab')) {
-            DB::table('bmns_lab')->truncate();
-        }
-        DB::table('bmns')->truncate();
+        try {
+            // 1. Clean existing dummy BMNs and their dependent records
+            if (Schema::hasTable('bmn_dokumens')) {
+                DB::table('bmn_dokumens')->truncate();
+            }
+            if (Schema::hasTable('pengembalian_items')) {
+                DB::table('pengembalian_items')->truncate();
+            }
+            if (Schema::hasTable('pengembalians')) {
+                DB::table('pengembalians')->truncate();
+            }
+            if (Schema::hasTable('distribusi_items')) {
+                DB::table('distribusi_items')->truncate();
+            }
+            if (Schema::hasTable('distribusis')) {
+                DB::table('distribusis')->truncate();
+            }
+            if (Schema::hasTable('ba_perpindahan_items')) {
+                DB::table('ba_perpindahan_items')->truncate();
+            }
+            if (Schema::hasTable('ba_perpindahans')) {
+                DB::table('ba_perpindahans')->truncate();
+            }
+            if (Schema::hasTable('laporan_kerusakans')) {
+                DB::table('laporan_kerusakans')->truncate();
+            }
+            if (Schema::hasTable('data_terhapus')) {
+                DB::table('data_terhapus')->truncate();
+            }
+            if (Schema::hasTable('bmns_tik')) {
+                DB::table('bmns_tik')->truncate();
+            }
+            if (Schema::hasTable('bmns_lab')) {
+                DB::table('bmns_lab')->truncate();
+            }
+            if (Schema::hasTable('bmn_lab_details')) {
+                DB::table('bmn_lab_details')->truncate();
+            }
+            DB::table('bmns')->truncate();
 
-        // 2. Resolve Master Lokasi & Pegawai IDs
-        $lokasiMap = [];
-        if (Schema::hasTable('lokasis')) {
-            $allLokasi = DB::table('lokasis')->get();
-            foreach ($allLokasi as $lok) {
-                $lokasiMap[$lok->nama] = $lok->id;
-                if (! empty($lok->kode_ruangan)) {
-                    $lokasiMap[$lok->kode_ruangan] = $lok->id;
-                    $lokasiMap[$lok->kode_ruangan.' '.$lok->nama] = $lok->id;
-                    $lokasiMap[$lok->kode_ruangan.' - '.$lok->nama] = $lok->id;
+            // 2. Resolve Master Lokasi, Kategori & Pegawai IDs
+            if (Schema::hasTable('kategori_bmns')) {
+                $defaultKategoris = [
+                    ['id' => 1, 'kode' => 'UMUM', 'nama' => 'BMN Umum & Perkantoran', 'deskripsi' => 'Fasilitas kerja kantor, perlengkapan ruang, dan mebeler.'],
+                    ['id' => 2, 'kode' => 'LAB', 'nama' => 'BMN Laboratorium', 'deskripsi' => 'Instrumen analitik dan instrumen pengujian mutu obat & makanan.'],
+                    ['id' => 3, 'kode' => 'TIK', 'nama' => 'BMN Perangkat TIK', 'deskripsi' => 'Komputer, server, perangkat jaringan, scanner, dan printer.'],
+                ];
+                foreach ($defaultKategoris as $kategori) {
+                    if (! DB::table('kategori_bmns')->where('id', $kategori['id'])->exists()) {
+                        DB::table('kategori_bmns')->insert(array_merge($kategori, [
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]));
+                    }
                 }
             }
-        }
 
-        $pegawaiMap = [];
-        if (Schema::hasTable('pegawais')) {
-            $pegawaiMap = DB::table('pegawais')->pluck('id', 'nip')->toArray();
-        }
+            $lokasiMap = [];
+            if (Schema::hasTable('lokasis')) {
+                $allLokasi = DB::table('lokasis')->get();
+                foreach ($allLokasi as $lok) {
+                    $lokasiMap[$lok->nama] = $lok->id;
+                    if (! empty($lok->kode_ruangan)) {
+                        $lokasiMap[$lok->kode_ruangan] = $lok->id;
+                        $lokasiMap[$lok->kode_ruangan.' '.$lok->nama] = $lok->id;
+                        $lokasiMap[$lok->kode_ruangan.' - '.$lok->nama] = $lok->id;
+                    }
+                }
+            }
+
+            $pegawaiMap = [];
+            if (Schema::hasTable('pegawais')) {
+                $defaultPegawais = [
+                    [
+                        'nama' => 'Yuli Supriyatno',
+                        'nip' => '198001012005011001',
+                        'jabatan' => 'Operator BMN',
+                        'unit_kerja' => 'Subbag Tata Usaha',
+                    ],
+                    [
+                        'nama' => 'Ade Rahma Yanti, S.Farm., Apt.',
+                        'nip' => '198502152010012002',
+                        'jabatan' => 'Pengelola BMN Lab',
+                        'unit_kerja' => 'Laboratorium Pengujian Kimia',
+                    ],
+                    [
+                        'nama' => 'Ahmad Fauzi, S.Kom.',
+                        'nip' => '198804122014021001',
+                        'jabatan' => 'Pranata Komputer / Pengelola TIK',
+                        'unit_kerja' => 'Subbag Tata Usaha',
+                    ],
+                    [
+                        'nama' => 'Dr. apt. Siti Nurhaliza',
+                        'nip' => '199208142018012002',
+                        'jabatan' => 'Penguji Kimia Ahli Muda',
+                        'unit_kerja' => 'Laboratorium Pengujian Kimia',
+                    ],
+                    [
+                        'nama' => 'M. Ridwan Prasetyo, S.E.',
+                        'nip' => '198703202012031003',
+                        'jabatan' => 'Petugas Distribusi & Perlengkapan',
+                        'unit_kerja' => 'Subbag Tata Usaha',
+                    ],
+                    [
+                        'nama' => 'Dra. Hj. Wahyuni, Apt.',
+                        'nip' => '197505102000032001',
+                        'jabatan' => 'Kepala Bagian Tata Usaha',
+                        'unit_kerja' => 'BBPOM di Banjarbaru',
+                    ],
+                    [
+                        'nama' => 'Bambang Haryanto, S.Si.',
+                        'nip' => '198311252008121001',
+                        'jabatan' => 'Penguji Mikrobiologi Ahli Madya',
+                        'unit_kerja' => 'Laboratorium Pengujian Mikrobiologi',
+                    ],
+                    [
+                        'nama' => 'Dewi Lestari, A.Md.AK.',
+                        'nip' => '199006182015032001',
+                        'jabatan' => 'Pranata Laboratorium Pengujian',
+                        'unit_kerja' => 'Laboratorium Pengujian Kimia',
+                    ],
+                ];
+                foreach ($defaultPegawais as $p) {
+                    if (! DB::table('pegawais')->where('nip', $p['nip'])->exists()) {
+                        DB::table('pegawais')->insert(array_merge($p, [
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]));
+                    }
+                }
+                $pegawaiMap = DB::table('pegawais')->pluck('id', 'nip')->toArray();
+            }
 
         // 3. Define the 10 New BMN Items (Distributed across Gedung A, B, C)
         $items = [
@@ -468,9 +546,8 @@ return new class extends Migration
                 ],
             ]);
         }
-
-        if ($driver === 'mysql') {
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } finally {
+            Schema::enableForeignKeyConstraints();
         }
     }
 
