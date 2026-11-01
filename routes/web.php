@@ -424,6 +424,13 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    /*
+    |--------------------------------------------------------------------------
+    | MODUL PENGAJUAN PENGEMBALIAN BMN (FITUR BARU)
+    |--------------------------------------------------------------------------
+    */
+    require __DIR__.'/pengajuan_pengembalian.php';
+
 });
 
 /*

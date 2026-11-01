@@ -25,6 +25,8 @@ class LaporanKerusakan extends Model
         'pelapor_email',
         'pelapor_nama',
         'status',
+        'sumber',
+        'pengajuan_id',
         'tanggapan',
         'tanggal_update',
         'ditanggapi_oleh',
@@ -59,6 +61,11 @@ class LaporanKerusakan extends Model
     public function pelaporPegawai(): BelongsTo
     {
         return $this->belongsTo(Pegawai::class, 'pelapor_pegawai_id');
+    }
+
+    public function pengajuan(): BelongsTo
+    {
+        return $this->belongsTo(PengajuanPengembalian::class, 'pengajuan_id');
     }
 
     public function scopeActive(Builder $query): Builder
