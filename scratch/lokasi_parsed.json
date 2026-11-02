@@ -1,0 +1,770 @@
+[
+  {
+    "id": 1,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.01",
+    "nama": "RUANG TAMU UTAMA"
+  },
+  {
+    "id": 2,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.02",
+    "nama": "RUANG PELAYANAN/LOBBY"
+  },
+  {
+    "id": 3,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.03",
+    "nama": "RUANG TENANG UTAMA"
+  },
+  {
+    "id": 4,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.05",
+    "nama": "RUANG MEDIA CENTER"
+  },
+  {
+    "id": 5,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.06",
+    "nama": "RUANG STAFF INFOKOM"
+  },
+  {
+    "id": 6,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.07",
+    "nama": "RUANG KONSULTASI DAN PENGADUAN"
+  },
+  {
+    "id": 7,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.09",
+    "nama": "RUANG LAYANAN INFORMASI DAN PPID"
+  },
+  {
+    "id": 8,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.10",
+    "nama": "RUANG KA TIM INFOKOM"
+  },
+  {
+    "id": 9,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.11",
+    "nama": "RUANG LAKTASI"
+  },
+  {
+    "id": 10,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.12",
+    "nama": "RUANG PENGASUH ANAK"
+  },
+  {
+    "id": 11,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B1.13",
+    "nama": "GUDANG GIMMICK"
+  },
+  {
+    "id": 12,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.01",
+    "nama": "RUANG TENANG 1"
+  },
+  {
+    "id": 13,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.02",
+    "nama": "RUANG TENANG 2"
+  },
+  {
+    "id": 14,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.03",
+    "nama": "RUANG RAPAT BESAR"
+  },
+  {
+    "id": 15,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.04",
+    "nama": "RUANG PERLENGKAPAN"
+  },
+  {
+    "id": 16,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.05",
+    "nama": "RUANG UMUM"
+  },
+  {
+    "id": 17,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.06",
+    "nama": "RUANG SEKRETARIS"
+  },
+  {
+    "id": 18,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.07",
+    "nama": "RUANG KEPALA BAGAIN TATA USAHA"
+  },
+  {
+    "id": 19,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.08",
+    "nama": "RUANG RAPAT KECIL"
+  },
+  {
+    "id": 20,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.09",
+    "nama": "RUANG RAPAT KEPALA BALAI"
+  },
+  {
+    "id": 21,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B2.10",
+    "nama": "RUANG KEPALA BALAI"
+  },
+  {
+    "id": 22,
+    "gedung": "Gedung B",
+    "kode_ruangan": "B.BS.01",
+    "nama": "RUANG MUSHOLA UTAMA"
+  },
+  {
+    "id": 23,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.01",
+    "nama": "RUANG GUDANG SEAMPEL"
+  },
+  {
+    "id": 24,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.02",
+    "nama": "RUANG MONITOR CCTV GEDUNG C"
+  },
+  {
+    "id": 25,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.03",
+    "nama": "RUANG GUDANG PEMERIKSAAN"
+  },
+  {
+    "id": 26,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.04",
+    "nama": "RUANG KA TIM PENINDAKAN"
+  },
+  {
+    "id": 27,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.05",
+    "nama": "RUANG STAFF PENINDAKAN"
+  },
+  {
+    "id": 28,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.06",
+    "nama": "RUANG TRANSIT ARSIP"
+  },
+  {
+    "id": 29,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.07",
+    "nama": "RUANG ARSIP AKTIF"
+  },
+  {
+    "id": 30,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.08",
+    "nama": "RUANG RECORD CENTER ARSIP"
+  },
+  {
+    "id": 31,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.09",
+    "nama": "RUANG KA TIM SERTIFIKASI"
+  },
+  {
+    "id": 32,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.10",
+    "nama": "RUANG KA TIM INSPEKSI"
+  },
+  {
+    "id": 33,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.11",
+    "nama": "RUANG STAFF PEMERIKSAAN"
+  },
+  {
+    "id": 34,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.12",
+    "nama": "RUANG KA TIM PEMERIKSAAN"
+  },
+  {
+    "id": 35,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.13",
+    "nama": "RUANG STAFF TATA USAHA"
+  },
+  {
+    "id": 36,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.14",
+    "nama": "RUANG BENDAHARA"
+  },
+  {
+    "id": 37,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.15",
+    "nama": "RUANG KORIDOOR"
+  },
+  {
+    "id": 38,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.16",
+    "nama": "RUANG BAP PENINDAKAN"
+  },
+  {
+    "id": 39,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C1.17",
+    "nama": "RUANG PANTRY"
+  },
+  {
+    "id": 40,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.01",
+    "nama": "RUANG ARSIF AKTIF PENGUJIAN"
+  },
+  {
+    "id": 41,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.02",
+    "nama": "RUANG STAFF PENGUJIAN 1"
+  },
+  {
+    "id": 42,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.03",
+    "nama": "RUANG KATIM PENGUJIAN"
+  },
+  {
+    "id": 43,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.04",
+    "nama": "RUANG AOC DAN PODCAST"
+  },
+  {
+    "id": 44,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.05",
+    "nama": "RUANG TAMU VIP"
+  },
+  {
+    "id": 45,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.06",
+    "nama": "RUANG KONTROL AUDIO AULA"
+  },
+  {
+    "id": 46,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.07",
+    "nama": "RUANG AULA UTAMA"
+  },
+  {
+    "id": 47,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.08",
+    "nama": "RUANG MUTU"
+  },
+  {
+    "id": 48,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C2.09",
+    "nama": "PANTRY"
+  },
+  {
+    "id": 49,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.01",
+    "nama": "GUDANG ATK"
+  },
+  {
+    "id": 50,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.02",
+    "nama": "RUANG DRIVER"
+  },
+  {
+    "id": 51,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.03",
+    "nama": "PANTRY"
+  },
+  {
+    "id": 52,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.04",
+    "nama": "GUDANG RAEGENT"
+  },
+  {
+    "id": 53,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.05",
+    "nama": "GUDANG RUSAK BERAT"
+  },
+  {
+    "id": 54,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.06",
+    "nama": "GUDANG BB PENINDAKAN"
+  },
+  {
+    "id": 55,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.BS.07",
+    "nama": "RUANG UJI MOLEKULER"
+  },
+  {
+    "id": 56,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.08",
+    "nama": "RUANG STORAGE"
+  },
+  {
+    "id": 57,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.09",
+    "nama": "RUANG PENAMBAHAN TEMPLET"
+  },
+  {
+    "id": 58,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.10",
+    "nama": "RUANG MASTER MIX"
+  },
+  {
+    "id": 59,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.11",
+    "nama": "RUANG LOKER"
+  },
+  {
+    "id": 60,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.12",
+    "nama": "PANTRY"
+  },
+  {
+    "id": 61,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.13",
+    "nama": "RUANG SETRIKA"
+  },
+  {
+    "id": 62,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.14",
+    "nama": "RUANG CUCI DAN REDUKSI"
+  },
+  {
+    "id": 63,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.15",
+    "nama": "RUANG GANTI"
+  },
+  {
+    "id": 64,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.16",
+    "nama": "RUANG SHOWER"
+  },
+  {
+    "id": 65,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.17",
+    "nama": "RUANG EKSTRAKSI"
+  },
+  {
+    "id": 66,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.18",
+    "nama": "RUANG PENERIMA SAMPEL"
+  },
+  {
+    "id": 67,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.19",
+    "nama": "RUANG PCR"
+  },
+  {
+    "id": 68,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.20",
+    "nama": "RUANG KOORIDOR"
+  },
+  {
+    "id": 69,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.21",
+    "nama": "RUANG CUCI PCR"
+  },
+  {
+    "id": 70,
+    "gedung": "Gedung C",
+    "kode_ruangan": "C.Bs.22",
+    "nama": "RUANG DISKUSI"
+  },
+  {
+    "id": 71,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.01",
+    "nama": "RUANG DISKUSI LAB KIMIA"
+  },
+  {
+    "id": 72,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.02",
+    "nama": "RUANG OLAH DATA OT KOS"
+  },
+  {
+    "id": 73,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.03",
+    "nama": "RUANG KERJA KECIL 1"
+  },
+  {
+    "id": 74,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.04",
+    "nama": "RUANG KERJA KECIL 2"
+  },
+  {
+    "id": 75,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.05",
+    "nama": "RUANG MUSHOLA PENGUJIA"
+  },
+  {
+    "id": 76,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.06",
+    "nama": "RUANG ANTARA"
+  },
+  {
+    "id": 77,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.07",
+    "nama": "RUANG GANTI WANITA"
+  },
+  {
+    "id": 78,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.08",
+    "nama": "RUANG GANTI PRIA"
+  },
+  {
+    "id": 79,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.09",
+    "nama": "KORIDOOR"
+  },
+  {
+    "id": 80,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.10",
+    "nama": "RUANG INSTRUMEN 1.1"
+  },
+  {
+    "id": 81,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.11",
+    "nama": "RUANG INSTRUMENT 1.2"
+  },
+  {
+    "id": 82,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.12",
+    "nama": "RUANG FOOD SECURTY"
+  },
+  {
+    "id": 83,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.13",
+    "nama": "RUANG INSTRUMEN 1.3"
+  },
+  {
+    "id": 84,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.14",
+    "nama": "RUANG INSTRUMEN 1.4"
+  },
+  {
+    "id": 85,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.15",
+    "nama": "RUANG PREPARASI 1.3"
+  },
+  {
+    "id": 86,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.16",
+    "nama": "RUANG INSTRUMEN 1.5"
+  },
+  {
+    "id": 87,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.17",
+    "nama": "RUANG ICPMS"
+  },
+  {
+    "id": 88,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.18",
+    "nama": "RUANG MONITORING CCTV GEDUNG A"
+  },
+  {
+    "id": 89,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.19",
+    "nama": "PANTRY"
+  },
+  {
+    "id": 90,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.20",
+    "nama": "RUANG CUCI GELAS OT KOS"
+  },
+  {
+    "id": 91,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.22",
+    "nama": "RUANG PREPARASI 1.1"
+  },
+  {
+    "id": 92,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.23",
+    "nama": "RUANG LEMARI ASAM 1.1"
+  },
+  {
+    "id": 93,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.24",
+    "nama": "RUANG PENYIMPANAN SAMPLE OT KOS"
+  },
+  {
+    "id": 94,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.25",
+    "nama": "RUANG TIMBANG 1.1"
+  },
+  {
+    "id": 95,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.26",
+    "nama": "RUANG TIMBANG 1.2"
+  },
+  {
+    "id": 96,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.27",
+    "nama": "GUDANG LAB GEDUNG A"
+  },
+  {
+    "id": 97,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.28",
+    "nama": "RUANG PREPARASI 1.2"
+  },
+  {
+    "id": 98,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.29",
+    "nama": "RUANG LEMARI ASAM 1.2"
+  },
+  {
+    "id": 99,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.30",
+    "nama": "RUANG SAMPEL PANGAN"
+  },
+  {
+    "id": 100,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.31",
+    "nama": "RUANG CUCI LAB PANGAN"
+  },
+  {
+    "id": 101,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.32",
+    "nama": "RUANG TABUNG GAS"
+  },
+  {
+    "id": 102,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.33",
+    "nama": "TOILET WANITA"
+  },
+  {
+    "id": 103,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.34",
+    "nama": "TOILET PRIA"
+  },
+  {
+    "id": 104,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A1.35",
+    "nama": "PANTRY"
+  },
+  {
+    "id": 105,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.01",
+    "nama": "RUANG OLAH DATA MIKRO 1"
+  },
+  {
+    "id": 106,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.02",
+    "nama": "RUANG OLAH DATA MIKRO 2"
+  },
+  {
+    "id": 107,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.03",
+    "nama": "RUANG SAMPEL MIKRO"
+  },
+  {
+    "id": 108,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.04",
+    "nama": "RUANG OLAH DATA UTAMA MIKRO"
+  },
+  {
+    "id": 109,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.05",
+    "nama": "RUANG ANTARA"
+  },
+  {
+    "id": 110,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.06",
+    "nama": "RUANG GANTI WANITA"
+  },
+  {
+    "id": 111,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.07",
+    "nama": "RUANG GANTI PRIA"
+  },
+  {
+    "id": 112,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.08",
+    "nama": "KOORIDOR"
+  },
+  {
+    "id": 113,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.10",
+    "nama": "RUANG UJI STERIL"
+  },
+  {
+    "id": 114,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.11",
+    "nama": "RUANG CUCI LAB MIKRO"
+  },
+  {
+    "id": 115,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.12",
+    "nama": "RUANG UJI POTENSI ANTIBIOTIK/PEMBUATAN MEDIA"
+  },
+  {
+    "id": 116,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.13",
+    "nama": "RUANG TIMBANG OBAT NAPZA"
+  },
+  {
+    "id": 117,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.14",
+    "nama": "RUANG PREPARASI II.1"
+  },
+  {
+    "id": 118,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.15",
+    "nama": "RUANG PREPARASI II.2"
+  },
+  {
+    "id": 119,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.16",
+    "nama": "RUANG OLAH DATA LAB NAPZA"
+  },
+  {
+    "id": 120,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.17",
+    "nama": "RUANG SAMPEL NAPZA"
+  },
+  {
+    "id": 121,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.18",
+    "nama": "RUANG AKK"
+  },
+  {
+    "id": 122,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.19",
+    "nama": "RUANG ALT"
+  },
+  {
+    "id": 123,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.20",
+    "nama": "RUANG INKUBASI"
+  },
+  {
+    "id": 124,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.21",
+    "nama": "RUANG INSTRUMEN 2 NAPZA"
+  },
+  {
+    "id": 125,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.22",
+    "nama": "RUANG PREPARASI SAMPEL NAPZA"
+  },
+  {
+    "id": 126,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.23",
+    "nama": "RUANG DISOLASI OBAT NAPZA"
+  },
+  {
+    "id": 127,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.24",
+    "nama": "RUANG CUCI OBAT NAPZA"
+  },
+  {
+    "id": 128,
+    "gedung": "Gedung A",
+    "kode_ruangan": "A2.25",
+    "nama": "PANTRY"
+  }
+]
