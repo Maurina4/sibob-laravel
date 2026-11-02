@@ -269,56 +269,346 @@
                 />
             </div>
 
-            {{-- KE --}}
+                        {{-- KE (LOKASI TUJUAN) --}}
+            @php
+                $initKeVal = old('ke', $baPerpindahan->ke);
+                $initKeId = old('lokasi_tujuan_id', $baPerpindahan->lokasi_tujuan_id);
+                $initKeKode = '';
+                $initKeNama = '';
+                if ($initKeVal || $initKeId) {
+                    $foundKe = $lokasis->first(fn($l) =>
+                        ($initKeId && (string)$l->id === (string)$initKeId)
+                        || ($initKeVal && strtolower($l->nama) === strtolower($initKeVal))
+                        || ($initKeVal && strtolower($l->format_kombinasi) === strtolower($initKeVal))
+                    );
+                    if ($foundKe) {
+                        $initKeId = (string)$foundKe->id;
+                        $initKeKode = $foundKe->kode_ruangan ?? '';
+                        $initKeNama = $foundKe->nama;
+                        $initKeVal = $foundKe->nama;
+                    } else {
+                        $initKeNama = $initKeVal;
+                    }
+                }
+            @endphp
             <div>
                 <x-input-label for="ke" value="Lokasi Tujuan (Ke) *" />
-                <select
-                    id="ke"
-                    name="ke"
-                    required
-                    class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
+                <div
+                    x-data="{
+                        open: false,
+                        search: '',
+                        selected: @js($initKeVal),
+                        selectedId: @js($initKeId),
+                        selectedKode: @js($initKeKode),
+                        selectedNama: @js($initKeNama ?: 'Pilih atau cari ruangan tujuan...'),
+                        options: @js(($lokasis ?? collect())->map(fn($l) => [
+                            'id' => (string)$l->id,
+                            'nama' => $l->nama,
+                            'kode' => $l->kode_ruangan ?? '',
+                            'label' => $l->format_kombinasi ?: $l->nama,
+                        ])->values()),
+                        get filtered() {
+                            if (!this.search.trim()) return this.options;
+                            const q = this.search.toLowerCase().trim();
+                            return this.options.filter(o =>
+                                (o.kode && o.kode.toLowerCase().includes(q)) ||
+                                (o.nama && o.nama.toLowerCase().includes(q)) ||
+                                (o.label && o.label.toLowerCase().includes(q))
+                            );
+                        },
+                        select(opt) {
+                            this.selected = opt.nama;
+                            this.selectedId = opt.id;
+                            this.selectedKode = opt.kode;
+                            this.selectedNama = opt.nama;
+                            this.open = false;
+                            this.search = '';
+                        },
+                        reset() {
+                            this.selected = '';
+                            this.selectedId = '';
+                            this.selectedKode = '';
+                            this.selectedNama = 'Pilih atau cari ruangan tujuan...';
+                            this.open = false;
+                            this.search = '';
+                        }
+                    }"
+                    @click.outside="open = false"
+                    @keydown.escape="open = false"
+                    class="relative mt-1"
                 >
-                    <option value="" data-id="">-- Pilih Lokasi Tujuan dari Master Lokasi --</option>
-                    @foreach ($lokasis as $lok)
-                        <option
-                            value="{{ $lok->nama }}"
-                            data-id="{{ $lok->id }}"
-                            @selected(old('ke', $baPerpindahan->ke) === $lok->nama || (string)old('lokasi_tujuan_id', $baPerpindahan->lokasi_tujuan_id) === (string)$lok->id)
-                        >
-                            {{ $lok->format_kombinasi ?? ($lok->id . ' - ' . $lok->nama) }}
-                        </option>
-                    @endforeach
-                </select>
-                <input type="hidden" name="lokasi_tujuan_id" id="lokasi_tujuan_id" value="{{ old('lokasi_tujuan_id', $baPerpindahan->lokasi_tujuan_id) }}" />
+                    <input type="hidden" id="ke" name="ke" :value="selected" required>
+                    <input type="hidden" id="lokasi_tujuan_id" name="lokasi_tujuan_id" :value="selectedId">
+
+                    {{-- Trigger Button --}}
+                    <button
+                        type="button"
+                        @click="open = !open; if(open) { $nextTick(() => $refs.searchKeInput.focus()); }"
+                        class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-xs text-[#132219] transition cursor-pointer shadow-2xs font-medium text-left"
+                        :class="open ? 'border-[#163828] ring-2 ring-[#163828]/20' : ''"
+                    >
+                        <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                            <svg class="w-3.5 h-3.5 text-[#8D9D95] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            </svg>
+                            <template x-if="selectedKode">
+                                <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="selectedKode"></span>
+                            </template>
+                            <span class="truncate" :class="selected ? 'text-[#132219]' : 'text-[#8D9D95]'" x-text="selectedNama"></span>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <template x-if="selected">
+                                <span
+                                    @click.stop="reset()"
+                                    class="p-0.5 text-[#8D9D95] hover:text-[#B22222] transition cursor-pointer"
+                                    title="Hapus pilihan"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </span>
+                            </template>
+                            <svg class="w-3.5 h-3.5 text-[#8D9D95] transition-transform duration-150" :class="open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </button>
+
+                    {{-- Floating Searchable Panel --}}
+                    <div
+                        x-show="open"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-xl border border-[#D5E5DA] p-2 z-50 text-xs"
+                        style="display: none;"
+                    >
+                        {{-- Search Input --}}
+                        <div class="relative mb-1.5">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input
+                                type="text"
+                                x-ref="searchKeInput"
+                                x-model="search"
+                                placeholder="Ketik kode (A1, B1..) atau nama ruangan..."
+                                class="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] focus:bg-white text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                                @keydown.escape="open = false"
+                                @keydown.enter.prevent="if(filtered.length > 0) select(filtered[0])"
+                            >
+                            <button
+                                type="button"
+                                x-show="search"
+                                @click="search = ''; $refs.searchKeInput.focus()"
+                                class="absolute inset-y-0 right-0 pr-2 flex items-center text-[#8D9D95] hover:text-[#132219] cursor-pointer"
+                            >
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {{-- Option List --}}
+                        <div class="max-h-56 overflow-y-auto space-y-0.5 divide-y divide-[#E3ECE6]/40" style="max-height: 220px; overflow-y: auto; overscroll-behavior: contain;">
+                            <template x-for="opt in filtered" :key="opt.label">
+                                <button
+                                    type="button"
+                                    @click="select(opt)"
+                                    class="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition hover:bg-[#EAF2ED] cursor-pointer group"
+                                    :class="(selected === opt.nama || selected === opt.label) ? 'bg-[#EAF2ED] text-[#163828] font-semibold' : 'text-[#132219]'"
+                                >
+                                    <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                        <template x-if="opt.kode">
+                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="opt.kode"></span>
+                                        </template>
+                                        <span class="truncate text-xs" x-text="opt.nama"></span>
+                                    </div>
+                                    <span x-show="selected === opt.nama || selected === opt.label" class="text-[#163828] font-bold shrink-0 ml-1">✓</span>
+                                </button>
+                            </template>
+                            <div x-show="filtered.length === 0" class="py-4 text-center text-[#8D9D95]">
+                                <p class="text-xs">Tidak ada ruangan cocok</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <x-input-error :messages="$errors->get('ke')" class="mt-1" />
             </div>
         </div>
 
         @php
-            $selectedPengajuId = old('pengaju_pegawai_id', old('pegawai_id', $baPerpindahan->pengaju_pegawai_id ?? $baPerpindahan->pegawai_id));
+            $userMatch = $pegawais->firstWhere('email', auth()->user()->email) ?? $pegawais->firstWhere('nama', auth()->user()->name);
+            $selectedPengajuId = (string)old('pengaju_pegawai_id', old('pegawai_id', $baPerpindahan->pengaju_pegawai_id ?? $baPerpindahan->pegawai_id));
+            $foundPengaju = $pegawais->firstWhere('id', $selectedPengajuId);
             $selectedPengajuNama = old('pengaju_nama', $baPerpindahan->pengaju_nama);
+            $selectedPengajuNip = $foundPengaju?->nip ?? ($userMatch?->nip ?? '');
         @endphp
 
         {{-- PEGAWAI PENGAJU --}}
         <div>
             <x-input-label for="pengaju_pegawai_id" value="Pegawai Pengaju (Pemohon Perpindahan) *" />
-            <select
-                id="pengaju_pegawai_id"
-                name="pengaju_pegawai_id"
-                required
-                class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2.5 pl-3 pr-10 transition cursor-pointer"
+            <div
+                x-data="{
+                    open: false,
+                    search: '',
+                    selectedId: @js($selectedPengajuId),
+                    selectedNip: @js($selectedPengajuNip),
+                    selectedNama: @js($selectedPengajuNama ?: 'Pilih atau cari pegawai pengaju...'),
+                    options: @js(($pegawais ?? collect())->map(fn($p) => [
+                        'id' => (string)$p->id,
+                        'nama' => $p->nama,
+                        'nip' => $p->nip ?? '',
+                        'jabatan' => $p->jabatan ?? '',
+                        'unit_kerja' => $p->unit_kerja ?? '',
+                        'label' => $p->nip ? "{$p->nama} ({$p->nip})" : $p->nama,
+                    ])->values()),
+                    get filtered() {
+                        if (!this.search.trim()) return this.options;
+                        const q = this.search.toLowerCase().trim();
+                        return this.options.filter(o =>
+                            (o.nip && o.nip.toLowerCase().includes(q)) ||
+                            (o.nama && o.nama.toLowerCase().includes(q)) ||
+                            (o.jabatan && o.jabatan.toLowerCase().includes(q)) ||
+                            (o.unit_kerja && o.unit_kerja.toLowerCase().includes(q)) ||
+                            (o.label && o.label.toLowerCase().includes(q))
+                        );
+                    },
+                    select(opt) {
+                        this.selectedId = opt.id;
+                        this.selectedNip = opt.nip;
+                        this.selectedNama = opt.nama;
+                        this.open = false;
+                        this.search = '';
+                        $nextTick(() => {
+                            if (typeof syncPihakKeduaList === 'function') {
+                                syncPihakKeduaList();
+                            }
+                        });
+                    },
+                    reset() {
+                        this.selectedId = '';
+                        this.selectedNip = '';
+                        this.selectedNama = 'Pilih atau cari pegawai pengaju...';
+                        this.open = false;
+                        this.search = '';
+                    }
+                }"
+                @click.outside="open = false"
+                @keydown.escape="open = false"
+                class="relative mt-1"
             >
-                <option value="">-- Pilih Pegawai Pengaju dari Database Pegawai --</option>
-                @foreach ($pegawais as $p)
-                    <option
-                        value="{{ $p->id }}"
-                        data-nama="{{ $p->nama }}"
-                        @selected((string)$selectedPengajuId === (string)$p->id)
-                    >
-                        {{ $p->nama }}{{ $p->nip ? " (NIP. {$p->nip})" : '' }}{{ $p->unit_kerja ? " — {$p->unit_kerja}" : ($p->jabatan ? " — {$p->jabatan}" : '') }}
-                    </option>
-                @endforeach
-            </select>
-            <input type="hidden" name="pengaju_nama" id="pengaju_nama" value="{{ $selectedPengajuNama }}" />
+                <input type="hidden" id="pengaju_pegawai_id" name="pengaju_pegawai_id" :value="selectedId" required>
+                <input type="hidden" id="pengaju_nama" name="pengaju_nama" :value="selectedNama">
+
+                {{-- Trigger Button --}}
+                <button
+                    type="button"
+                    @click="open = !open; if(open) { $nextTick(() => $refs.searchPengajuInput.focus()); }"
+                    class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-xs text-[#132219] transition cursor-pointer shadow-2xs font-medium text-left"
+                    :class="open ? 'border-[#163828] ring-2 ring-[#163828]/20' : ''"
+                >
+                    <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                        <svg class="w-3.5 h-3.5 text-[#8D9D95] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <template x-if="selectedNip">
+                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="selectedNip"></span>
+                        </template>
+                        <span class="truncate" :class="selectedId ? 'text-[#132219]' : 'text-[#8D9D95]'" x-text="selectedNama"></span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <template x-if="selectedId">
+                            <span
+                                @click.stop="reset()"
+                                class="p-0.5 text-[#8D9D95] hover:text-[#B22222] transition cursor-pointer"
+                                title="Hapus pilihan"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </span>
+                        </template>
+                        <svg class="w-3.5 h-3.5 text-[#8D9D95] transition-transform duration-150" :class="open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </button>
+
+                {{-- Floating Searchable Panel --}}
+                <div
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-xl border border-[#D5E5DA] p-2 z-50 text-xs"
+                    style="display: none;"
+                >
+                    {{-- Search Input --}}
+                    <div class="relative mb-1.5">
+                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            x-ref="searchPengajuInput"
+                            x-model="search"
+                            placeholder="Ketik nama atau NIP pegawai pengaju..."
+                            class="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] focus:bg-white text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                            @keydown.escape="open = false"
+                            @keydown.enter.prevent="if(filtered.length > 0) select(filtered[0])"
+                        >
+                        <button
+                            type="button"
+                            x-show="search"
+                            @click="search = ''; $refs.searchPengajuInput.focus()"
+                            class="absolute inset-y-0 right-0 pr-2 flex items-center text-[#8D9D95] hover:text-[#132219] cursor-pointer"
+                        >
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Option List --}}
+                    <div class="max-h-56 overflow-y-auto space-y-0.5 divide-y divide-[#E3ECE6]/40" style="max-height: 220px; overflow-y: auto; overscroll-behavior: contain;">
+                        <template x-for="opt in filtered" :key="opt.id">
+                            <button
+                                type="button"
+                                @click="select(opt)"
+                                class="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition hover:bg-[#EAF2ED] cursor-pointer group"
+                                :class="selectedId === opt.id ? 'bg-[#EAF2ED] text-[#163828] font-semibold' : 'text-[#132219]'"
+                            >
+                                <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                    <template x-if="opt.nip">
+                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="opt.nip"></span>
+                                    </template>
+                                    <div class="truncate">
+                                        <div class="truncate text-xs font-medium" x-text="opt.nama"></div>
+                                        <template x-if="opt.unit_kerja || opt.jabatan">
+                                            <div class="truncate text-[10px] text-[#62756A]" x-text="opt.unit_kerja || opt.jabatan"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                                <span x-show="selectedId === opt.id" class="text-[#163828] font-bold shrink-0 ml-1">✓</span>
+                            </button>
+                        </template>
+                        <div x-show="filtered.length === 0" class="py-4 text-center text-[#8D9D95]">
+                            <p class="text-xs">Tidak ada pegawai cocok</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <x-input-error :messages="$errors->get('pengaju_pegawai_id')" />
         </div>
 
@@ -351,31 +641,199 @@
             {{-- PIHAK KEDUA (PEGAWAI PENERIMA BARU) --}}
             <div>
                 @if(auth()->user()->role === 'Operator')
+                    @php
+                        $initP2Val = old('pihak_kedua', $baPerpindahan->pihak_kedua);
+                        $initP2Nip = '';
+                        $initP2Nama = '';
+                        if ($initP2Val && isset($pegawais)) {
+                            $foundP2 = $pegawais->first(fn($p) =>
+                                (strtolower("{$p->nama} ({$p->nip})") === strtolower($initP2Val))
+                                || (strtolower($p->nama) === strtolower($initP2Val))
+                                || ($p->nip && strtolower($p->nip) === strtolower($initP2Val))
+                            );
+                            if ($foundP2) {
+                                $initP2Nip = $foundP2->nip ?? '';
+                                $initP2Nama = $foundP2->nama;
+                            } else {
+                                $initP2Nama = $initP2Val;
+                            }
+                        }
+                    @endphp
                     <x-input-label for="pihak_kedua" value="Pihak Kedua (Pegawai Penerima Baru) *" />
-                    <input
-                        id="pihak_kedua"
-                        name="pihak_kedua"
-                        type="text"
-                        list="pegawai_pihak_kedua_list_edit"
-                        class="w-full text-xs font-medium px-3.5 py-2.5 rounded-lg border border-[#E3ECE6] text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition bg-white"
-                        value="{{ old('pihak_kedua', $baPerpindahan->pihak_kedua) }}"
-                        placeholder="Pilih atau ketik: Nama (NIP Pegawai)"
-                        required
-                    />
-                    <datalist id="pegawai_pihak_kedua_list_edit">
-                        @foreach($pegawais as $p)
-                            @php
-                                $isPengaju = ((string)$p->id === (string)$selectedPengajuId) || ($selectedPengajuNama && \App\Models\BaPerpindahan::isSamePerson($selectedPengajuNama, $p->nama, null, $p->id));
-                                $penyerahNamaInit = old('pihak_pertama', $baPerpindahan->pihak_pertama);
-                                $penyerahIdInit = old('pihak_pertama_id', $baPerpindahan->pihak_pertama_id);
-                                $isPenyerah = ($penyerahIdInit && (string)$p->id === (string)$penyerahIdInit) || ($penyerahNamaInit && \App\Models\BaPerpindahan::isSamePerson($penyerahNamaInit, $p->nama, $penyerahIdInit, $p->id));
-                            @endphp
-                            @if(!$isPengaju && !$isPenyerah)
-                                <option value="{{ $p->nip ? "{$p->nama} ({$p->nip})" : $p->nama }}"></option>
-                            @endif
-                        @endforeach
-                    </datalist>
-                    <p class="text-[11px] text-[#62756A] mt-1">Ditentukan oleh Operator: Pegawai penerima aset baru.</p>
+                    <div
+                        x-data="{
+                            open: false,
+                            search: '',
+                            selected: @js($initP2Val),
+                            selectedNip: @js($initP2Nip),
+                            selectedNama: @js($initP2Nama ?: 'Pilih atau cari pegawai penerima...'),
+                            options: @js(($pegawais ?? collect())->map(fn($p) => [
+                                'id' => (string)$p->id,
+                                'nama' => $p->nama,
+                                'nip' => $p->nip ?? '',
+                                'jabatan' => $p->jabatan ?? '',
+                                'unit_kerja' => $p->unit_kerja ?? '',
+                                'label' => $p->nip ? "{$p->nama} ({$p->nip})" : $p->nama,
+                            ])->values()),
+                            get filtered() {
+                                const penyerahStr = (document.getElementById('pihak_pertama')?.value || '').trim().toLowerCase();
+                                const penyerahId = (document.getElementById('pihak_pertama_id')?.value || '').trim();
+                                const pengajuId = (document.getElementById('pengaju_pegawai_id')?.value || '').trim();
+                                const pengajuStr = (document.getElementById('pengaju_nama')?.value || '').trim().toLowerCase();
+
+                                let list = this.options.filter(o => {
+                                    if (penyerahId && o.id === penyerahId) return false;
+                                    if (pengajuId && o.id === pengajuId) return false;
+                                    if (penyerahStr) {
+                                        const pNama = o.nama.toLowerCase();
+                                        const pLabel = o.label.toLowerCase();
+                                        if (pNama === penyerahStr || pLabel === penyerahStr || penyerahStr.includes(pNama)) return false;
+                                    }
+                                    if (pengajuStr) {
+                                        const pNama = o.nama.toLowerCase();
+                                        const pLabel = o.label.toLowerCase();
+                                        if (pNama === pengajuStr || pLabel === pengajuStr || pengajuStr.includes(pNama)) return false;
+                                    }
+                                    return true;
+                                });
+
+                                if (!this.search.trim()) return list;
+                                const q = this.search.toLowerCase().trim();
+                                return list.filter(o =>
+                                    (o.nip && o.nip.toLowerCase().includes(q)) ||
+                                    (o.nama && o.nama.toLowerCase().includes(q)) ||
+                                    (o.jabatan && o.jabatan.toLowerCase().includes(q)) ||
+                                    (o.unit_kerja && o.unit_kerja.toLowerCase().includes(q)) ||
+                                    (o.label && o.label.toLowerCase().includes(q))
+                                );
+                            },
+                            select(opt) {
+                                this.selected = opt.label;
+                                this.selectedNip = opt.nip;
+                                this.selectedNama = opt.nama;
+                                this.open = false;
+                                this.search = '';
+                                const warningEl = document.getElementById('pihak_kedua_warning');
+                                if (warningEl) warningEl.classList.add('hidden');
+                            },
+                            reset() {
+                                this.selected = '';
+                                this.selectedNip = '';
+                                this.selectedNama = 'Pilih atau cari pegawai penerima...';
+                                this.open = false;
+                                this.search = '';
+                            }
+                        }"
+                        @click.outside="open = false"
+                        @keydown.escape="open = false"
+                        class="relative mt-1"
+                    >
+                        <input type="hidden" id="pihak_kedua" name="pihak_kedua" :value="selected" required>
+
+                        {{-- Trigger Button --}}
+                        <button
+                            type="button"
+                            @click="open = !open; if(open) { $nextTick(() => $refs.searchP2Input.focus()); }"
+                            class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-xs text-[#132219] transition cursor-pointer shadow-2xs font-medium text-left"
+                            :class="open ? 'border-[#163828] ring-2 ring-[#163828]/20' : ''"
+                        >
+                            <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                <svg class="w-3.5 h-3.5 text-[#8D9D95] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <template x-if="selectedNip">
+                                    <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="selectedNip"></span>
+                                </template>
+                                <span class="truncate" :class="selected ? 'text-[#132219]' : 'text-[#8D9D95]'" x-text="selectedNama"></span>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <template x-if="selected">
+                                    <span
+                                        @click.stop="reset()"
+                                        class="p-0.5 text-[#8D9D95] hover:text-[#B22222] transition cursor-pointer"
+                                        title="Hapus pilihan"
+                                    >
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </span>
+                                </template>
+                                <svg class="w-3.5 h-3.5 text-[#8D9D95] transition-transform duration-150" :class="open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </button>
+
+                        {{-- Floating Searchable Panel --}}
+                        <div
+                            x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-xl border border-[#D5E5DA] p-2 z-50 text-xs"
+                            style="display: none;"
+                        >
+                            {{-- Search Input --}}
+                            <div class="relative mb-1.5">
+                                <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </span>
+                                <input
+                                    type="text"
+                                    x-ref="searchP2Input"
+                                    x-model="search"
+                                    placeholder="Ketik nama atau NIP pegawai..."
+                                    class="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] focus:bg-white text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                                    @keydown.escape="open = false"
+                                    @keydown.enter.prevent="if(filtered.length > 0) select(filtered[0])"
+                                >
+                                <button
+                                    type="button"
+                                    x-show="search"
+                                    @click="search = ''; $refs.searchP2Input.focus()"
+                                    class="absolute inset-y-0 right-0 pr-2 flex items-center text-[#8D9D95] hover:text-[#132219] cursor-pointer"
+                                >
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {{-- Option List --}}
+                            <div class="max-h-56 overflow-y-auto space-y-0.5 divide-y divide-[#E3ECE6]/40" style="max-height: 220px; overflow-y: auto; overscroll-behavior: contain;">
+                                <template x-for="opt in filtered" :key="opt.id">
+                                    <button
+                                        type="button"
+                                        @click="select(opt)"
+                                        class="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition hover:bg-[#EAF2ED] cursor-pointer group"
+                                        :class="selected === opt.label ? 'bg-[#EAF2ED] text-[#163828] font-semibold' : 'text-[#132219]'"
+                                    >
+                                        <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                            <template x-if="opt.nip">
+                                                <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="opt.nip"></span>
+                                            </template>
+                                            <div class="truncate">
+                                                <div class="truncate text-xs font-medium" x-text="opt.nama"></div>
+                                                <template x-if="opt.unit_kerja || opt.jabatan">
+                                                    <div class="truncate text-[10px] text-[#62756A]" x-text="opt.unit_kerja || opt.jabatan"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <span x-show="selected === opt.label" class="text-[#163828] font-bold shrink-0 ml-1">✓</span>
+                                    </button>
+                                </template>
+                                <div x-show="filtered.length === 0" class="py-4 text-center text-[#8D9D95]">
+                                    <p class="text-xs">Tidak ada pegawai penerima cocok</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-[#62756A] mt-1">Ditentukan oleh Operator: Pegawai yang akan menerima aset.</p>
                     <p id="pihak_kedua_warning" class="text-[11px] text-[#9C322C] font-semibold mt-1 hidden items-center gap-1">
                         <svg class="w-3.5 h-3.5 shrink-0 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         <span>Pegawai penyerah atau pengaju tidak dapat dipilih sebagai penerima barang.</span>
@@ -387,7 +845,7 @@
                         type="text"
                         disabled
                         class="w-full text-xs font-medium px-3.5 py-2.5 rounded-lg border border-[#E3ECE6] text-[#62756A] bg-[#F7FAF8] cursor-not-allowed italic"
-                        value="{{ $baPerpindahan->pihak_kedua ?: 'Ditentukan oleh Operator saat verifikasi' }}"
+                        value="Ditentukan oleh Operator (saat verifikasi)"
                     />
                     <p class="text-[11px] text-[#62756A] mt-1 italic">Hanya Operator yang dapat menentukan pegawai penerima baru.</p>
                 @endif
