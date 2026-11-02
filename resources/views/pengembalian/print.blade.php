@@ -432,7 +432,8 @@
         /* BLOK MENGETAHUI (KEPALA BALAI) */
         .sig-mengetahui-block {
             text-align: left;
-            margin-top: 70px; /* Jarak vertikal lapang sesuai instruksi */
+            margin: 70px auto 0 auto;
+            display: table;
             font-size: 11pt;
             line-height: 1.15;
         }

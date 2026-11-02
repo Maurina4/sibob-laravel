@@ -396,7 +396,8 @@
 
         .sig-mengetahui-block {
             text-align: left;
-            margin-top: 50px;
+            margin: 50px auto 0 auto;
+            display: table;
             font-size: 11pt;
             line-height: 1.15;
         }
