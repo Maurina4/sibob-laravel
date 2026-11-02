@@ -360,7 +360,7 @@
         }
 
         .page-2-header {
-            text-align: left;
+            text-align: center;
             font-size: 11pt;
             margin-top: 0;
             margin-bottom: 30px; /* Jarak dari -2- ke kalimat penutup */
