@@ -17,7 +17,7 @@
             </svg>
             <span>Kembali ke Riwayat Pengajuan</span>
         </a>
-        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Formulir Pengajuan Pengembalian BMN</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Pengajuan Pengembalian BMN</h1>
         <p class="text-xs text-[#62756A] mt-0.5">
             Ajukan pengembalian BMN yang telah selesai digunakan atau laporkan barang rusak berat untuk verifikasi pengelola BMN.
         </p>
@@ -168,216 +168,302 @@
         </div>
 
         {{-- CARD 3: DAFTAR BARANG YANG DIAJUKAN --}}
-        <div class="bg-white rounded-2xl border border-[#E3ECE6] p-6 lg:p-7 shadow-2xs space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E3ECE6]">
+        <div class="bg-white rounded-2xl border border-[#E3ECE6] p-6 lg:p-8 shadow-2xs space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-[#E3ECE6]">
                 <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#163828]"></span>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Daftar Barang BMN <span class="text-[#9C322C]">*</span></h2>
+                    <span class="w-2 h-2 rounded-full bg-[#163828]"></span>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Daftar barang</h2>
                 </div>
                 <div class="text-[11px] text-[#62756A] flex items-center gap-2">
                     <span>Total barang dipilih: <strong class="text-[#132219]" x-text="items.length"></strong></span>
                 </div>
             </div>
 
-            {{-- DAFTAR BARANG LOOP --}}
-            <div class="space-y-4">
-                <template x-for="(item, index) in items" :key="item.uid">
-                    <div class="p-4 rounded-xl border border-[#E3ECE6] bg-[#FAFCFA] space-y-3 relative transition hover:border-[#163828]/30">
-                        {{-- BARIS 1: NOMOR, PILIH BARANG, KONDISI & HAPUS --}}
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-                            {{-- INDEX BADGE --}}
-                            <div class="md:col-span-1 flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-full bg-[#163828] text-white text-[11px] font-bold flex items-center justify-center" x-text="index + 1"></span>
-                                <span class="text-xs font-semibold text-[#132219] md:hidden">Barang #<span x-text="index + 1"></span></span>
-                            </div>
+            {{-- TABEL DAFTAR BARANG --}}
+            <div class="overflow-x-auto border border-[#E3ECE6] rounded-xl min-h-[320px]">
+                <table class="w-full text-left border-collapse" id="items-table">
+                    <thead>
+                        <tr class="bg-[#F7FAF8] border-b border-[#E3ECE6] text-[#4D6357] text-[11px] font-semibold uppercase tracking-wider">
+                            <th class="py-3 px-3 text-center w-12 border-r border-[#E3ECE6]">No</th>
+                            <th class="py-3 px-4 min-w-[240px] border-r border-[#E3ECE6]">Nama Barang</th>
+                            <th class="py-3 px-3 min-w-[120px] border-r border-[#E3ECE6]">Merk</th>
+                            <th class="py-3 px-3 min-w-[90px] border-r border-[#E3ECE6]">NUP</th>
+                            <th class="py-3 px-3 min-w-[130px] border-r border-[#E3ECE6]">Kondisi Awal</th>
+                            <th class="py-3 px-3 min-w-[150px] border-r border-[#E3ECE6]">Kondisi Pengembalian <span class="text-[#9C322C] font-bold">*</span></th>
+                            <th class="py-3 px-3 min-w-[160px] border-r border-[#E3ECE6]">Ket</th>
+                            <th class="py-3 px-3 text-center w-16">Aksi</th>
+                        </tr>
+                    </thead>
+                    <template x-for="(item, index) in items" :key="item.uid">
+                        <tbody class="divide-y divide-[#E3ECE6] text-xs">
+                            <tr class="item-row hover:bg-[#FDFEFE] transition">
+                                {{-- NO --}}
+                                <td class="py-2.5 px-3 text-center text-[#62756A] font-mono text-[11px] font-semibold border-r border-[#E3ECE6]" x-text="index + 1"></td>
 
-                            {{-- SELECTOR SEARCHABLE BARANG --}}
-                            <div class="md:col-span-6 relative">
-                                <label class="block text-[11px] font-semibold text-[#4D6357] mb-1 md:hidden">Pilih BMN</label>
-                                <div class="relative">
-                                    {{-- Hidden input for form submission --}}
+                                {{-- NAMA BARANG --}}
+                                <td class="py-2 px-3 border-r border-[#E3ECE6]">
+                                    <div class="relative w-full">
+                                        <input
+                                            type="hidden"
+                                            :name="`items[${index}][bmn_id]`"
+                                            :value="item.bmn_id"
+                                        />
+
+                                        <button
+                                            type="button"
+                                            :id="`bmn-trigger-${index}`"
+                                            @click="toggleDropdown(index, $event.currentTarget)"
+                                            class="w-full flex items-center justify-between text-left text-xs px-3 py-2 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:outline-none focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 transition cursor-pointer"
+                                            :class="item.open ? 'border-[#163828] ring-2 ring-[#163828]/20' : ''"
+                                        >
+                                            <div class="flex items-center gap-1.5 truncate pr-2">
+                                                <template x-if="item.bmn_id">
+                                                    <div class="flex items-center gap-1.5 truncate">
+                                                        <template x-if="item.is_mine">
+                                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 shrink-0">Saya</span>
+                                                        </template>
+                                                        <span class="font-medium text-[#132219] truncate" x-text="item.nama_barang"></span>
+                                                        <span class="text-[#62756A] text-[11px] font-mono shrink-0" x-text="`(Kode: ${item.kode_barang || '-'} | NUP: ${item.nup || '-'})`"></span>
+                                                    </div>
+                                                </template>
+                                                <template x-if="!item.bmn_id">
+                                                    <span class="text-[#8D9D95]">Pilih Barang</span>
+                                                </template>
+                                            </div>
+                                            <div class="flex items-center gap-1 shrink-0">
+                                                <span
+                                                    x-show="item.bmn_id"
+                                                    @click.stop="clearBmn(index)"
+                                                    class="p-0.5 text-[#8D9D95] hover:text-[#9C322C] rounded transition cursor-pointer"
+                                                    title="Kosongkan pilihan"
+                                                >
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </span>
+                                                <svg class="w-4 h-4 text-[#8D9D95] transition-transform duration-200" :class="item.open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </div>
+                                        </button>
+
+                                        {{-- Floating Dropdown Panel --}}
+                                        <div
+                                            x-show="item.open"
+                                            @click.outside="item.open = false"
+                                            @scroll.window="if (item.open) updateDropdownPos(index)"
+                                            @resize.window="if (item.open) updateDropdownPos(index)"
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="opacity-100 scale-100"
+                                            x-transition:leave-end="opacity-0 scale-95"
+                                            style="display: none;"
+                                            class="fixed z-[9999] bg-white border border-[#D5E5DA] rounded-xl shadow-2xl overflow-hidden flex flex-col"
+                                            :style="item.panelStyle"
+                                        >
+                                            <div class="p-2 border-b border-[#E3ECE6] bg-[#F7FAF8] shrink-0">
+                                                <div class="relative">
+                                                    <input
+                                                        :id="`search-input-${index}`"
+                                                        x-model="item.searchQuery"
+                                                        type="text"
+                                                        placeholder="Ketik nama, kode, atau NUP barang..."
+                                                        class="w-full text-xs pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] text-[#132219] bg-white focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                                                        @keydown.escape="item.open = false"
+                                                        @keydown.enter.prevent="const fl = filterBmnList(item.searchQuery, item.bmn_id); if (fl.length > 0) selectBmn(index, fl[0])"
+                                                    />
+                                                    <svg class="w-3.5 h-3.5 text-[#8D9D95] absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                    <button
+                                                        type="button"
+                                                        x-show="item.searchQuery"
+                                                        @click="item.searchQuery = ''; document.getElementById(`search-input-${index}`)?.focus()"
+                                                        class="absolute right-2 top-2 text-[#8D9D95] hover:text-[#132219]"
+                                                    >
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex-1 max-h-56 overflow-y-auto divide-y divide-[#E3ECE6]/50 overscroll-contain">
+                                                <template x-for="bmn in filterBmnList(item.searchQuery, item.bmn_id)" :key="bmn.id">
+                                                    <div
+                                                        @click="selectBmn(index, bmn)"
+                                                        class="px-3.5 py-2.5 text-xs cursor-pointer hover:bg-[#EAF2ED] transition flex items-center justify-between gap-2"
+                                                        :class="String(item.bmn_id) === String(bmn.id) ? 'bg-[#EAF2ED]/70 font-semibold text-[#163828]' : 'text-[#132219]'"
+                                                    >
+                                                        <div class="min-w-0">
+                                                            <div class="flex items-center gap-1.5">
+                                                                <template x-if="bmn.is_mine">
+                                                                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">Milik Saya</span>
+                                                                </template>
+                                                                <span class="font-medium text-[#132219] truncate" x-text="bmn.nama_barang"></span>
+                                                            </div>
+                                                            <div class="text-[11px] text-[#62756A] flex items-center gap-1.5 flex-wrap mt-0.5">
+                                                                <span class="font-mono text-[#163828]" x-text="'Kode: ' + (bmn.kode_barang || '-')"></span>
+                                                                <span>•</span>
+                                                                <span class="font-mono text-[#163828]" x-text="'NUP: ' + (bmn.nup || '-')"></span>
+                                                                <template x-if="bmn.merek">
+                                                                    <span class="text-[#62756A]" x-text="'• ' + bmn.merek"></span>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                        <svg x-show="String(item.bmn_id) === String(bmn.id)" class="w-4 h-4 text-[#163828] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </div>
+                                                </template>
+                                                <div x-show="filterBmnList(item.searchQuery, item.bmn_id).length === 0" class="p-4 text-center text-xs text-[#62756A]">
+                                                    Tidak ditemukan barang dengan kata kunci "<span class="font-semibold" x-text="item.searchQuery"></span>".
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {{-- MERK --}}
+                                <td class="py-2 px-3 border-r border-[#E3ECE6]">
                                     <input
-                                        type="hidden"
-                                        :name="`items[${index}][bmn_id]`"
-                                        :value="item.bmn_id"
+                                        type="text"
+                                        :value="item.merek || '-'"
+                                        readonly
+                                        class="item-merek w-full bg-[#F7FAF8] border border-[#E3ECE6] text-[#4D6357] rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
+                                        placeholder=""
                                     />
+                                </td>
+
+                                {{-- NUP --}}
+                                <td class="py-2 px-3 border-r border-[#E3ECE6]">
+                                    <input
+                                        type="text"
+                                        :value="item.nup || '-'"
+                                        readonly
+                                        class="item-nup w-full bg-[#F7FAF8] border border-[#E3ECE6] text-[#4D6357] font-mono rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
+                                        placeholder=""
+                                    />
+                                </td>
+
+                                {{-- KONDISI AWAL --}}
+                                <td class="py-2 px-3 border-r border-[#E3ECE6]">
+                                    <input
+                                        type="text"
+                                        :value="item.kondisi_awal || '-'"
+                                        readonly
+                                        class="item-kondisi-awal w-full bg-[#F7FAF8] border border-[#E3ECE6] text-[#4D6357] font-medium rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
+                                        placeholder="Kondisi awal"
+                                    />
+                                </td>
+
+                                {{-- KONDISI PENGEMBALIAN --}}
+                                <td class="py-2 px-3 border-r border-[#E3ECE6]">
                                     <input
                                         type="hidden"
                                         :name="`items[${index}][kondisi]`"
                                         :value="alasan === 'pengembalian_biasa' ? 'Baik' : 'Rusak Berat'"
                                     />
+                                    <template x-if="alasan === 'pengembalian_biasa'">
+                                        <input
+                                            type="text"
+                                            readonly
+                                            value="Baik"
+                                            class="w-full bg-[#F0FDF4] border border-[#DCFCE7] text-emerald-800 font-semibold rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
+                                        />
+                                    </template>
+                                    <template x-if="alasan === 'rusak_berat'">
+                                        <input
+                                            type="text"
+                                            readonly
+                                            value="Rusak Berat"
+                                            class="w-full bg-[#FEF2F2] border border-[#FEE2E2] text-rose-800 font-semibold rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
+                                        />
+                                    </template>
+                                </td>
 
-                                    {{-- Trigger Dropdown --}}
+                                {{-- KETERANGAN --}}
+                                <td class="py-2 px-3 border-r border-[#E3ECE6]">
+                                    <input
+                                        type="text"
+                                        :name="`items[${index}][keterangan]`"
+                                        x-model="item.keterangan"
+                                        class="item-keterangan w-full bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-[#132219] placeholder-[#8D9D95] rounded-lg text-xs py-2 px-3 transition"
+                                        placeholder="Keterangan (opsional)"
+                                    />
+                                </td>
+
+                                {{-- AKSI --}}
+                                <td class="py-2 px-3 text-center">
                                     <button
                                         type="button"
-                                        @click="toggleDropdown(index)"
-                                        class="w-full flex items-center justify-between text-left text-xs px-3 py-2 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
-                                        :class="item.open ? 'border-[#163828] ring-1 ring-[#163828]' : ''"
+                                        @click="removeItem(index)"
+                                        x-show="items.length > 1"
+                                        class="btn-remove-row p-1.5 text-[#9C322C] hover:bg-[#FDF0EE] rounded-lg transition cursor-pointer"
+                                        title="Hapus Baris"
                                     >
-                                        <div class="truncate pr-2">
-                                            <template x-if="item.bmn_id">
-                                                <div class="flex items-center gap-1.5 truncate">
-                                                    <template x-if="item.is_mine">
-                                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">Saya</span>
-                                                    </template>
-                                                    <span class="font-medium text-[#132219] truncate" x-text="item.nama_barang"></span>
-                                                    <span class="text-[#62756A] text-[11px] font-mono" x-text="`(${item.kode_barang} / ${item.nup})`"></span>
-                                                </div>
-                                            </template>
-                                            <template x-if="!item.bmn_id">
-                                                <span class="text-[#8D9D95]">-- Cari & Pilih Barang BMN --</span>
-                                            </template>
-                                        </div>
-                                        <svg class="w-4 h-4 text-[#8D9D95] shrink-0 transition-transform" :class="item.open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
+                                </td>
+                            </tr>
 
-                                    {{-- DROPDOWN PANEL --}}
-                                    <div
-                                        x-show="item.open"
-                                        @click.outside="item.open = false"
-                                        class="absolute z-50 left-0 right-0 mt-1 bg-white border border-[#D5E5DA] rounded-xl shadow-xl overflow-hidden flex flex-col"
-                                        style="display: none;"
-                                    >
-                                        {{-- Search box in dropdown --}}
-                                        <div class="p-2 border-b border-[#E3ECE6] bg-[#F7FAF8]">
+                            {{-- SUB-BARIS UNTUK RUSAK BERAT --}}
+                            <tr x-show="alasan === 'rusak_berat'" class="bg-[#FFF8F7] border-b border-[#F8D4D0]">
+                                <td colspan="8" class="py-3 px-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full bg-[#9C322C]"></span>
+                                        <span class="text-xs font-bold text-[#9C322C] uppercase tracking-wide">Rincian Kerusakan Berat (Barang #<span x-text="index + 1"></span>)</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                                        <div class="md:col-span-4">
+                                            <label class="block text-[11px] font-semibold text-[#9C322C] mb-1">
+                                                Tanggal Temuan Kerusakan <span class="text-[#9C322C]">*</span>
+                                            </label>
                                             <input
-                                                type="text"
-                                                x-model="item.searchQuery"
-                                                placeholder="Ketik nama, kode, atau NUP..."
-                                                class="w-full text-xs pl-3 pr-3 py-1.5 rounded-lg border border-[#E3ECE6] text-[#132219] bg-white focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828]"
-                                                @click.stop
+                                                type="date"
+                                                :name="`items[${index}][tanggal_temuan]`"
+                                                x-model="item.tanggal_temuan"
+                                                max="{{ date('Y-m-d') }}"
+                                                :required="alasan === 'rusak_berat'"
+                                                class="w-full text-xs rounded-lg border border-[#F8D4D0] bg-white focus:border-[#9C322C] focus:ring-1 focus:ring-[#9C322C] py-2 px-3 text-[#132219]"
                                             />
                                         </div>
-
-                                        {{-- List items --}}
-                                        <div class="max-h-56 overflow-y-auto divide-y divide-[#E3ECE6]/60 overscroll-contain">
-                                            <template x-for="bmn in filterBmnList(item.searchQuery, item.bmn_id)" :key="bmn.id">
-                                                <div
-                                                    @click="selectBmn(index, bmn)"
-                                                    class="px-3 py-2 text-xs cursor-pointer hover:bg-[#EAF2ED] transition flex items-center justify-between gap-2"
-                                                    :class="item.bmn_id == bmn.id ? 'bg-[#EAF2ED] font-semibold text-[#163828]' : 'text-[#132219]'"
-                                                >
-                                                    <div class="min-w-0">
-                                                        <div class="flex items-center gap-1.5">
-                                                            <template x-if="bmn.is_mine">
-                                                                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">Milik Saya</span>
-                                                            </template>
-                                                            <span class="font-medium text-[#132219] truncate" x-text="bmn.nama_barang"></span>
-                                                        </div>
-                                                        <div class="text-[10px] text-[#62756A] flex items-center gap-2 mt-0.5">
-                                                            <span class="font-mono text-[#163828]" x-text="'Kode: ' + (bmn.kode_barang || '-')"></span>
-                                                            <span>•</span>
-                                                            <span class="font-mono text-[#163828]" x-text="'NUP: ' + (bmn.nup || '-')"></span>
-                                                            <span x-text="'• ' + (bmn.merek || '-')"></span>
-                                                        </div>
-                                                    </div>
-                                                    <svg x-show="item.bmn_id == bmn.id" class="w-4 h-4 text-[#163828] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                            </template>
-                                            <div x-show="filterBmnList(item.searchQuery, item.bmn_id).length === 0" class="p-3 text-center text-xs text-[#62756A]">
-                                                Tidak ada barang yang cocok.
-                                            </div>
+                                        <div class="md:col-span-8">
+                                            <label class="block text-[11px] font-semibold text-[#9C322C] mb-1">
+                                                Rincian & Gejala Kerusakan Berat <span class="text-[#9C322C]">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                :name="`items[${index}][deskripsi_kerusakan]`"
+                                                x-model="item.deskripsi_kerusakan"
+                                                placeholder="Contoh: Korsleting listrik, mati total, motherboard terbakar dan tidak ekonomis diperbaiki."
+                                                :required="alasan === 'rusak_berat'"
+                                                class="w-full text-xs rounded-lg border border-[#F8D4D0] bg-white focus:border-[#9C322C] focus:ring-1 focus:ring-[#9C322C] py-2 px-3 text-[#132219]"
+                                            />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            {{-- MERK & NUP INFO --}}
-                            <div class="md:col-span-3 text-xs text-[#4D6357]">
-                                <div class="flex md:flex-col justify-between text-[11px] gap-1">
-                                    <span>Merk: <strong class="text-[#132219]" x-text="item.merek || '-'"></strong></span>
-                                    <span>NUP: <strong class="font-mono text-[#132219]" x-text="item.nup || '-'"></strong></span>
-                                </div>
-                            </div>
-
-                            {{-- KONDISI BADGE & HAPUS --}}
-                            <div class="md:col-span-2 flex items-center justify-between md:justify-end gap-2">
-                                <template x-if="alasan === 'pengembalian_biasa'">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                                        Baik
-                                    </span>
-                                </template>
-                                <template x-if="alasan === 'rusak_berat'">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800">
-                                        Rusak Berat
-                                    </span>
-                                </template>
-
-                                <button
-                                    type="button"
-                                    @click="removeItem(index)"
-                                    x-show="items.length > 1"
-                                    class="p-1.5 text-[#9C322C] hover:bg-[#FDF0EE] rounded-lg transition"
-                                    title="Hapus baris"
-                                >
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- SUB-FORM KONDISI RUSAK BERAT (TANGGAL TEMUAN & DESKRIPSI) --}}
-                        <div x-show="alasan === 'rusak_berat'" class="pt-3 border-t border-[#E3ECE6] grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-3 rounded-lg border">
-                            <div class="md:col-span-4">
-                                <label class="block text-[11px] font-semibold text-[#9C322C] mb-1">
-                                    Tanggal Temuan Kerusakan <span class="text-[#9C322C]">*</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    :name="`items[${index}][tanggal_temuan]`"
-                                    x-model="item.tanggal_temuan"
-                                    max="{{ date('Y-m-d') }}"
-                                    :required="alasan === 'rusak_berat'"
-                                    class="w-full text-xs rounded-lg border border-[#E3ECE6] focus:border-[#9C322C] focus:ring-1 focus:ring-[#9C322C] py-1.5 px-2.5 text-[#132219]"
-                                />
-                            </div>
-                            <div class="md:col-span-8">
-                                <label class="block text-[11px] font-semibold text-[#9C322C] mb-1">
-                                    Rincian & Gejala Kerusakan Berat <span class="text-[#9C322C]">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    :name="`items[${index}][deskripsi_kerusakan]`"
-                                    x-model="item.deskripsi_kerusakan"
-                                    placeholder="Contoh: Korsleting listrik, mati total, motherboard terbakar dan tidak ekonomis diperbaiki."
-                                    :required="alasan === 'rusak_berat'"
-                                    class="w-full text-xs rounded-lg border border-[#E3ECE6] focus:border-[#9C322C] focus:ring-1 focus:ring-[#9C322C] py-1.5 px-2.5 text-[#132219]"
-                                />
-                            </div>
-                        </div>
-
-                        {{-- KETERANGAN OPSIONAL --}}
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-                            <div class="md:col-span-12">
-                                <input
-                                    type="text"
-                                    :name="`items[${index}][keterangan]`"
-                                    x-model="item.keterangan"
-                                    placeholder="Catatan / keterangan tambahan untuk item ini (opsional)"
-                                    class="w-full text-[11px] rounded-lg border border-[#E3ECE6] focus:border-[#163828] focus:ring-1 focus:ring-[#163828] py-1.5 px-2.5 text-[#132219] bg-white placeholder-[#8D9D95]"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </template>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </table>
             </div>
 
-            {{-- TOMBOL TAMBAH BARIS --}}
-            <div class="pt-2">
+            {{-- TOMBOL TAMBAH BARIS BARU --}}
+            <div>
                 <button
                     type="button"
                     @click="addItem()"
-                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-[#163828] text-[#163828] bg-white hover:bg-[#F7FAF8] text-xs font-semibold transition cursor-pointer"
+                    class="w-full py-2.5 bg-[#9AA9A1]/35 hover:bg-[#9AA9A1]/50 text-[#163828] border border-[#CBD7D0] rounded-xl text-xs font-bold tracking-wider uppercase transition flex items-center justify-center gap-2 cursor-pointer"
                 >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>Tambah Barang Lainnya</span>
+                    <span>TAMBAH BARIS BARU</span>
                 </button>
             </div>
         </div>
@@ -396,28 +482,73 @@
             >{{ old('catatan_pemohon') }}</textarea>
         </div>
 
-        {{-- ACTIONS FOOTER --}}
-        <div class="flex items-center justify-between pt-2">
-            <a
-                href="{{ route('pengajuan-pengembalian.index') }}"
-                class="px-4 py-2.5 rounded-xl border border-[#E3ECE6] text-xs font-semibold text-[#62756A] hover:bg-[#F7FAF8] hover:text-[#132219] transition"
-            >
-                Batal
-            </a>
+        {{-- CARD 5: TOMBOL AKSI / SUBMIT --}}
+        <div class="bg-white rounded-2xl border border-[#E3ECE6] p-6 shadow-2xs flex items-center justify-between">
             <button
                 type="submit"
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#163828] hover:bg-[#0E281C] text-white text-xs font-semibold shadow-xs transition cursor-pointer"
+                style="background-color: #163828 !important; color: #ffffff !important;"
+                class="inline-flex items-center gap-2.5 px-6 py-3 bg-[#163828] hover:bg-[#1E4834] active:bg-[#0E281C] text-white rounded-xl text-sm font-bold tracking-wide shadow-md transition cursor-pointer"
             >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Kirim Pengajuan Pengembalian</span>
+                <span>Kirim Pengajuan</span>
             </button>
+
+            <a
+                href="{{ route('pengajuan-pengembalian.index') }}"
+                class="px-5 py-2.5 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-xl text-xs font-semibold transition"
+            >
+                Batalkan
+            </a>
         </div>
     </form>
 </div>
 
 @push('scripts')
+@php
+    $oldItems = old('items');
+    $initialItemsList = [];
+    if (!empty($oldItems) && is_array($oldItems)) {
+        foreach ($oldItems as $it) {
+            $bmnModel = !empty($it['bmn_id']) ? $initialBmns->firstWhere('id', $it['bmn_id']) : null;
+            $initialItemsList[] = [
+                'uid' => uniqid(),
+                'bmn_id' => $it['bmn_id'] ?? '',
+                'nama_barang' => $bmnModel?->nama_barang ?? '',
+                'kode_barang' => (string)($bmnModel?->kode_barang ?? ''),
+                'nup' => (string)($bmnModel?->nup ?? ''),
+                'merek' => $bmnModel?->merek ?? '',
+                'kondisi_awal' => $bmnModel?->kondisi ?: 'Baik',
+                'is_mine' => (bool)($bmnModel?->is_mine ?? false),
+                'open' => false,
+                'panelStyle' => '',
+                'searchQuery' => '',
+                'tanggal_temuan' => $it['tanggal_temuan'] ?? date('Y-m-d'),
+                'deskripsi_kerusakan' => $it['deskripsi_kerusakan'] ?? '',
+                'keterangan' => $it['keterangan'] ?? '',
+            ];
+        }
+    }
+    if (empty($initialItemsList)) {
+        $initialItemsList[] = [
+            'uid' => uniqid(),
+            'bmn_id' => '',
+            'nama_barang' => '',
+            'kode_barang' => '',
+            'nup' => '',
+            'merek' => '',
+            'kondisi_awal' => '',
+            'is_mine' => false,
+            'open' => false,
+            'panelStyle' => '',
+            'searchQuery' => '',
+            'tanggal_temuan' => date('Y-m-d'),
+            'deskripsi_kerusakan' => '',
+            'keterangan' => '',
+        ];
+    }
+@endphp
 <script>
 function pengajuanForm() {
     const rawBmns = @json($initialBmns);
@@ -425,27 +556,10 @@ function pengajuanForm() {
     return {
         alasan: '{{ old('alasan', 'pengembalian_biasa') }}',
         allBmns: rawBmns || [],
-        items: [
-            {
-                uid: Date.now() + '-' + Math.random(),
-                bmn_id: '',
-                nama_barang: '',
-                kode_barang: '',
-                nup: '',
-                merek: '',
-                kondisi_awal: '',
-                is_mine: false,
-                open: false,
-                searchQuery: '',
-                tanggal_temuan: '{{ date('Y-m-d') }}',
-                deskripsi_kerusakan: '',
-                keterangan: ''
-            }
-        ],
+        items: @json($initialItemsList),
 
         setAlasan(val) {
             this.alasan = val;
-            // Fetch updated list of available BMNs from API
             fetch(`{{ route('pengajuan-pengembalian.api-search-bmn') }}?alasan=${val}`)
                 .then(res => res.json())
                 .then(data => {
@@ -465,6 +579,7 @@ function pengajuanForm() {
                 kondisi_awal: '',
                 is_mine: false,
                 open: false,
+                panelStyle: '',
                 searchQuery: '',
                 tanggal_temuan: '{{ date('Y-m-d') }}',
                 deskripsi_kerusakan: '',
@@ -478,10 +593,46 @@ function pengajuanForm() {
             }
         },
 
-        toggleDropdown(index) {
-            const current = this.items[index].open;
+        toggleDropdown(index, triggerEl) {
+            const wasOpen = this.items[index].open;
             this.items.forEach(i => i.open = false);
-            this.items[index].open = !current;
+            this.items[index].open = !wasOpen;
+
+            if (this.items[index].open) {
+                this.updateDropdownPos(index, triggerEl);
+                this.$nextTick(() => {
+                    this.updateDropdownPos(index, triggerEl);
+                    const input = document.getElementById(`search-input-${index}`);
+                    if (input) input.focus();
+                });
+            } else {
+                this.items[index].searchQuery = '';
+            }
+        },
+
+        updateDropdownPos(index, el) {
+            const trigger = el || document.getElementById(`bmn-trigger-${index}`);
+            if (!trigger) return;
+            const rect = trigger.getBoundingClientRect();
+            const panelHeight = 280;
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+
+            let top;
+            if (spaceBelow < panelHeight && spaceAbove > spaceBelow) {
+                top = Math.max(10, rect.top - panelHeight - 6);
+            } else {
+                top = rect.bottom + 6;
+            }
+
+            const width = Math.max(rect.width, 360);
+            let left = rect.left;
+            if (left + width > window.innerWidth - 16) {
+                left = window.innerWidth - width - 16;
+            }
+            if (left < 16) left = 16;
+
+            this.items[index].panelStyle = `top: ${top}px; left: ${left}px; width: ${width}px; max-height: ${panelHeight}px;`;
         },
 
         filterBmnList(query, currentId) {
@@ -505,17 +656,31 @@ function pengajuanForm() {
             const target = this.items[index];
             target.bmn_id = bmn.id;
             target.nama_barang = bmn.nama_barang;
-            target.kode_barang = bmn.kode_barang;
-            target.nup = bmn.nup;
-            target.merek = bmn.merek;
+            target.kode_barang = bmn.kode_barang || '';
+            target.nup = bmn.nup || '';
+            target.merek = bmn.merek || '';
             target.kondisi_awal = bmn.kondisi || 'Baik';
-            target.is_mine = bmn.is_mine;
+            target.is_mine = bmn.is_mine || false;
             target.open = false;
             target.searchQuery = '';
         },
 
+        clearBmn(index) {
+            const target = this.items[index];
+            target.bmn_id = '';
+            target.nama_barang = '';
+            target.kode_barang = '';
+            target.nup = '';
+            target.merek = '';
+            target.kondisi_awal = '';
+            target.is_mine = false;
+            target.open = false;
+            target.searchQuery = '';
+            target.keterangan = '';
+            target.deskripsi_kerusakan = '';
+        },
+
         handleSubmit(e) {
-            // Validasi client-side: pastikan minimal 1 bmn terpilih
             const emptyItems = this.items.filter(i => !i.bmn_id);
             if (emptyItems.length > 0) {
                 e.preventDefault();
@@ -523,7 +688,6 @@ function pengajuanForm() {
                 return false;
             }
 
-            // Validasi rusak berat: pastikan tanggal dan deskripsi terisi
             if (this.alasan === 'rusak_berat') {
                 for (let i = 0; i < this.items.length; i++) {
                     const it = this.items[i];
