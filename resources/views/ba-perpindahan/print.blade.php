@@ -442,6 +442,13 @@
             line-height: 1.15;
         }
 
+        .sig-mengetahui-lead {
+            text-align: center;
+            margin-bottom: 2px;
+            line-height: 1.2;
+            font-size: 11pt;
+        }
+
         .sig-mengetahui-title {
             margin-bottom: 2px;
             line-height: 1.2;
@@ -785,7 +792,7 @@
 
                 {{-- TANDA TANGAN MENGETAHUI (KEPALA BALAI BESAR POM DI BANJARBARU) --}}
                 <div class="sig-mengetahui-block">
-                    <div class="sig-mengetahui-title">Mengetahui,</div>
+                    <div class="sig-mengetahui-lead">Mengetahui,</div>
                     <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
                     <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
 
