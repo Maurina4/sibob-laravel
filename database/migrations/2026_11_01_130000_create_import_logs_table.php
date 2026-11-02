@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('import_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->string('nama_file_asli');
             $table->string('nama_file_hash');
             $table->integer('total_baris')->default(0);

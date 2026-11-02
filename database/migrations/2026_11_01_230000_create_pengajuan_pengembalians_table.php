@@ -18,13 +18,15 @@ return new class extends Migration
             $table->foreignId('pegawai_id')->nullable()->constrained('pegawais')->nullOnDelete();
             $table->string('nama_pegawai');
             $table->string('nip_pegawai')->nullable();
-            $table->foreignId('diajukan_oleh')->constrained('users')->cascadeOnDelete();
+            $table->unsignedInteger('diajukan_oleh');
+            $table->foreign('diajukan_oleh')->references('id')->on('users')->cascadeOnDelete();
             $table->string('alasan'); // 'pengembalian_biasa', 'rusak_berat'
             $table->string('status')->default('diajukan'); // 'diajukan', 'disetujui', 'ditolak', 'dibatalkan'
             $table->text('catatan_pemohon')->nullable();
             $table->text('catatan_penolakan')->nullable();
             $table->string('nomor_ba')->nullable()->unique();
-            $table->foreignId('disetujui_oleh')->nullable()->constrained('users')->nullOnDelete();
+            $table->unsignedInteger('disetujui_oleh')->nullable();
+            $table->foreign('disetujui_oleh')->references('id')->on('users')->nullOnDelete();
             $table->timestamp('disetujui_pada')->nullable();
             $table->timestamps();
             $table->softDeletes();
