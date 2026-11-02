@@ -55,10 +55,6 @@
 
             <dl class="space-y-3 text-xs">
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
-                    <dt class="text-[#62756A]">Nomor Seri</dt>
-                    <dd class="font-mono font-semibold text-[#132219]">{{ $bmn->no_seri ?: '—' }}</dd>
-                </div>
-                <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Merek / Tipe</dt>
                     <dd class="font-semibold text-[#132219]">{{ $bmn->merek ?: '—' }}</dd>
                 </div>

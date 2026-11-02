@@ -411,7 +411,6 @@
                         <th class="py-3.5 px-4 text-center w-12">No</th>
                         <th class="py-3.5 px-4 whitespace-nowrap">Kode Barang</th>
                         <th class="py-3.5 px-4 text-center whitespace-nowrap">NUP</th>
-                        <th class="py-3.5 px-4">No. Seri</th>
                         <th class="py-3.5 px-4">Nama Perangkat TIK</th>
                         <th class="py-3.5 px-4">Kategori TIK</th>
                         <th class="py-3.5 px-4 text-center">Tahun</th>
@@ -443,11 +442,6 @@
                                 <span class="font-semibold text-[#163828] bg-[#EAF2ED] px-2 py-0.5 rounded border border-[#D5E5DA]">
                                     {{ $item->nup ?? '—' }}
                                 </span>
-                            </td>
-
-                            {{-- NO SERI --}}
-                            <td class="py-3.5 px-4 font-mono text-[11px] text-[#4D6357]">
-                                {{ $item->no_seri ?: '—' }}
                             </td>
 
                             {{-- NAMA BARANG --}}
@@ -746,7 +740,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="13" class="py-12 text-center">
+                            <td colspan="12" class="py-12 text-center">
                                 <div class="max-w-xs mx-auto space-y-3">
                                     <div class="w-12 h-12 rounded-full bg-[#EAF2ED] text-[#163828] flex items-center justify-center mx-auto">
                                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

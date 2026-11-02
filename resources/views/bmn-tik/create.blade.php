@@ -42,7 +42,7 @@
             <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Rincian Perangkat TIK</h2>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {{-- KODE BARANG --}}
             <div>
                 <x-input-label for="kode_barang" value="Kode Barang *" />
@@ -77,19 +77,6 @@
                     :value="old('nup')"
                     placeholder="mis. 1"
                     required
-                />
-            </div>
-
-            {{-- NO. SERI --}}
-            <div>
-                <x-input-label for="no_seri" value="Nomor Seri / Serial Number" />
-                <x-text-input
-                    id="no_seri"
-                    name="no_seri"
-                    type="text"
-                    class="w-full font-mono text-xs"
-                    :value="old('no_seri')"
-                    placeholder="mis. PF2X981A / SN12345"
                 />
             </div>
         </div>

@@ -55,7 +55,7 @@
                         <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Informasi Identitas Barang</h2>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {{-- KODE BARANG --}}
                         <div>
                             <x-input-label for="kode_barang" value="Kode Barang *" />
@@ -91,20 +91,6 @@
                                 required
                             />
                             <x-input-error :messages="$errors->get('nup')" />
-                        </div>
-
-                        {{-- NO. SERI --}}
-                        <div>
-                            <x-input-label for="no_seri" value="No. Seri" />
-                            <x-text-input
-                                id="no_seri"
-                                name="no_seri"
-                                type="text"
-                                class="w-full font-mono text-xs"
-                                :value="old('no_seri', $bmn->no_seri)"
-                                placeholder="mis. SN-8923489127"
-                            />
-                            <x-input-error :messages="$errors->get('no_seri')" />
                         </div>
                     </div>
 
