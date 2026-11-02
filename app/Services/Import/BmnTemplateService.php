@@ -204,7 +204,7 @@ class BmnTemplateService
         $sheetPetunjuk->getRowDimension(4)->setRowHeight(24);
 
         $petunjukData = [
-            ['Kode Barang', 'Wajib', 'Teks (Angka)', 'Kode barang aset inventaris (contoh: 3080305002). Format teks menjaga angka nol di depan tidak hilang.'],
+            ['Kode Barang', 'Wajib', 'Teks (10 Digit Angka)', 'Kode barang aset inventaris wajib tepat 10 digit angka (contoh: 3080305002 atau 3.08.03.05.002). Format teks menjaga angka nol di depan tidak hilang.'],
             ['NUP', 'Wajib', 'Angka Bulat Positif (> 0)', 'Nomor Urut Pendaftaran. Kombinasi Kode Barang + NUP harus unik (tidak boleh duplikat di sistem/file).'],
             ['Nama Barang', 'Wajib', 'Teks', 'Nama lengkap barang milik negara (contoh: Komputer Unit PC, Laptop Lenovo).'],
             ['Merk/Type', 'Wajib', 'Teks', 'Merek, model, atau pabrikan pembuat (contoh: Lenovo ThinkCentre M70q, Dell Inspiron).'],

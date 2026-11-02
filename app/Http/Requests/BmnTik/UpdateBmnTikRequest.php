@@ -17,7 +17,7 @@ class UpdateBmnTikRequest extends FormRequest
     {
         $merge = [];
         if ($this->has('kode_barang') && is_string($this->kode_barang)) {
-            $merge['kode_barang'] = trim($this->kode_barang);
+            $merge['kode_barang'] = str_replace(['.', '-', ' '], '', trim($this->kode_barang));
         }
         if ($this->filled('nilai_perolehan') && is_string($this->nilai_perolehan)) {
             $cleaned = preg_replace('/[^0-9.]/', '', str_replace(',', '.', $this->nilai_perolehan));
@@ -39,7 +39,7 @@ class UpdateBmnTikRequest extends FormRequest
             'kode_barang' => [
                 'required',
                 'string',
-                'max:100',
+                'digits:10',
                 Rule::unique('bmns', 'kode_barang')->ignore($bmnId),
                 Rule::unique('bmns_tik', 'kode_barang')->ignore($tikId),
             ],
@@ -60,6 +60,7 @@ class UpdateBmnTikRequest extends FormRequest
         return [
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
+            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3090405012 atau 3.09.04.05.012).',
             'kode_barang.unique' => 'Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.',
         ];
     }

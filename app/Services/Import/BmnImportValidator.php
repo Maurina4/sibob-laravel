@@ -36,7 +36,7 @@ class BmnImportValidator
 
         // Kumpulkan pasangan (kode_barang, nup) untuk pengecekan batch ke DB
         foreach ($rows as $r) {
-            $kode = trim((string) ($r['kode_barang'] ?? ''));
+            $kode = str_replace(['.', '-', ' '], '', trim((string) ($r['kode_barang'] ?? '')));
             $nup = trim((string) ($r['nup_raw'] ?? ''));
             if ($kode !== '' && $nup !== '') {
                 $uniquePairs[] = ['kode' => $kode, 'nup' => $nup];
@@ -69,9 +69,18 @@ class BmnImportValidator
             $excelRow = $row['excel_row'];
 
             // 1. Kode Barang
-            $kode = trim((string) ($row['kode_barang'] ?? ''));
-            if ($kode === '') {
+            $rawKode = trim((string) ($row['kode_barang'] ?? ''));
+            $cleanKode = str_replace(['.', '-', ' '], '', $rawKode);
+
+            if ($rawKode === '') {
                 $rowErrors['kode_barang'] = 'Kode Barang wajib diisi.';
+                $kode = '';
+            } elseif (! ctype_digit($cleanKode) || strlen($cleanKode) !== 10) {
+                $rowErrors['kode_barang'] = 'Kode Barang harus berupa 10 digit angka (contoh: 3080305002 atau 3.08.03.05.002).';
+                $kode = $cleanKode;
+            } else {
+                $kode = $cleanKode;
+                $row['kode_barang'] = $cleanKode;
             }
 
             // 2. NUP

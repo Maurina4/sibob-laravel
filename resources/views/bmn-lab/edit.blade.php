@@ -57,11 +57,12 @@
                     name="kode_barang"
                     type="text"
                     inputmode="numeric"
-                    pattern="[0-9]*"
+                    maxlength="14"
                     data-numeric="true"
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                    oninput="this.value = this.value.replace(/[^0-9.-]/g, '').slice(0, 14)"
                     class="w-full font-mono text-xs"
                     :value="old('kode_barang', $bmnsLab->kode_barang)"
+                    placeholder="mis. 3080101005 atau 3.08.01.01.005"
                     required
                 />
                 <x-input-error :messages="$errors->get('kode_barang')" class="mt-1" />
