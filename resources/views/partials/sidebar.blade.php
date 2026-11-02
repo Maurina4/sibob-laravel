@@ -83,6 +83,10 @@
                         </a>
                     @endif
 
+                    <a href="{{ session('nav_last_url.pengembalians', route('pengembalians.index')) }}" data-nav-key="pengembalians" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('pengembalians.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                        <span>Pengembalian (Legacy)</span>
+                    </a>
+
                     <a href="{{ session('nav_last_url.bmns-tik', route('bmns-tik.index')) }}" data-nav-key="bmns-tik" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-tik.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>BMN TIK</span>
                     </a>
