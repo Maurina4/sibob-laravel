@@ -402,14 +402,14 @@
         }
 
                 /* KOTAK TEMPAT TTE SRIKANDI / TANDA TANGAN BASAH:
-           Rata kiri, tag menjorok 6 spasi, jarak 3 enter ke atas dan 3 enter ke bawah */
+           Rata kiri, tag menjorok 6 spasi, jarak 4 enter ke atas dan 4 enter ke bawah */
         .srikandi-box {
             min-height: 1.15em;
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            margin-top: calc(3 * 1.15em);
-            margin-bottom: calc(3 * 1.15em);
+            margin-top: calc(4 * 1.15em);
+            margin-bottom: calc(4 * 1.15em);
             padding-left: 6ch;
             box-sizing: border-box;
             transition: min-height 0.2s ease;
