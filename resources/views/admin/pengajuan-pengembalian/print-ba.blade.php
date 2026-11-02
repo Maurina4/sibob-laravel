@@ -366,14 +366,18 @@
             line-height: 1.15;
         }
 
+                /* KOTAK TEMPAT TTE SRIKANDI / TANDA TANGAN BASAH:
+           Rata kiri, tag menjorok 6 spasi, jarak 3 enter ke atas dan 3 enter ke bawah */
         .srikandi-box {
-            min-height: 95px;
-            height: 95px;
+            min-height: 1.15em;
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            margin: 6px 0;
-            transition: min-height 0.2s ease, height 0.2s ease;
+            margin-top: calc(3 * 1.15em);
+            margin-bottom: calc(3 * 1.15em);
+            padding-left: 6ch;
+            box-sizing: border-box;
+            transition: min-height 0.2s ease;
         }
 
         .srikandi-tag {
@@ -408,8 +412,7 @@
         }
 
         body.mode-manual .srikandi-box {
-            min-height: 95px;
-            height: 95px;
+            min-height: 1.15em;
         }
 
         @media print {
@@ -697,7 +700,7 @@
                     <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
                     <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
 
-                    <div class="srikandi-box" id="sigBoxKabalai" style="margin: 8px 0; justify-content: flex-start;">
+                    <div class="srikandi-box" id="sigBoxKabalai">
                         <span class="srikandi-tag">${ttd_pengirim3}</span>
                     </div>
 
