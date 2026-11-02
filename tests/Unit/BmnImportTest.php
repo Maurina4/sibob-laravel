@@ -109,7 +109,7 @@ class BmnImportTest extends TestCase
     {
         // Masukkan data awal ke DB
         Bmn::create([
-            'kode_barang' => 'KD-999',
+            'kode_barang' => '3080305999',
             'nup' => '10',
             'nama_barang' => 'Komputer Lama',
             'lokasi' => 'Gudang BMN',
@@ -125,7 +125,7 @@ class BmnImportTest extends TestCase
             // Baris 1: duplikat dengan DB
             [
                 'excel_row' => 2,
-                'kode_barang' => 'KD-999',
+                'kode_barang' => '3080305999',
                 'nup_raw' => '10',
                 'nama_barang' => 'Komputer Duplikat DB',
                 'merek' => 'Dell',
@@ -142,7 +142,7 @@ class BmnImportTest extends TestCase
             // Baris 2: Data baru
             [
                 'excel_row' => 3,
-                'kode_barang' => 'KD-888',
+                'kode_barang' => '3080305888',
                 'nup_raw' => '1',
                 'nama_barang' => 'Barang Valid',
                 'merek' => 'HP',
@@ -159,7 +159,7 @@ class BmnImportTest extends TestCase
             // Baris 3: Duplikat internal dengan Baris 2
             [
                 'excel_row' => 4,
-                'kode_barang' => 'KD-888',
+                'kode_barang' => '3080305888',
                 'nup_raw' => '1',
                 'nama_barang' => 'Barang Duplikat Internal',
                 'merek' => 'HP',
@@ -191,7 +191,7 @@ class BmnImportTest extends TestCase
             // Tanggal masa depan & Tahun perolehan > tahun terima
             [
                 'excel_row' => 2,
-                'kode_barang' => 'KD-101',
+                'kode_barang' => '3080305101',
                 'nup_raw' => '0', // NUP <= 0
                 'nama_barang' => 'Barang Error',
                 'merek' => 'Acer',

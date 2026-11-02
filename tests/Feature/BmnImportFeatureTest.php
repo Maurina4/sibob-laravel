@@ -160,8 +160,8 @@ class BmnImportFeatureTest extends TestCase
         ];
 
         $rows = [
-            ['03080305001', 101, 'PC All in One', 'HP Pavilion', '15/01/2026', 2026, 18000000, 'BMN-TIK', 'unit', 'Core i7'],
-            ['03080101009', 202, 'Timbangan Analitik', 'Mettler Toledo', '20/01/2026', 2026, 35000000, 'BMN-LAB', 'unit', 'Presisi 0.1mg'],
+            ['3080305001', 101, 'PC All in One', 'HP Pavilion', '15/01/2026', 2026, 18000000, 'BMN-TIK', 'unit', 'Core i7'],
+            ['3080101009', 202, 'Timbangan Analitik', 'Mettler Toledo', '20/01/2026', 2026, 35000000, 'BMN-LAB', 'unit', 'Presisi 0.1mg'],
         ];
 
         $file = $this->createUploadableExcel($headers, $rows);
@@ -190,7 +190,7 @@ class BmnImportFeatureTest extends TestCase
         // Verifikasi tabel bmns
         $this->assertEquals(2, Bmn::count());
 
-        $tikBmn = Bmn::where('kode_barang', '03080305001')->first();
+        $tikBmn = Bmn::where('kode_barang', '3080305001')->first();
         $this->assertNotNull($tikBmn);
         $this->assertSame('Gudang BMN', $tikBmn->lokasi);
         $this->assertSame('Pengelola BMN', $tikBmn->penanggungjawab);
