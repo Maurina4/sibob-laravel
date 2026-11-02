@@ -218,7 +218,7 @@
 
         /* KE BERITA ACARA: JARAK 14MM PERSIS FOTO DOKUMEN ASLI */
         .doc-title-block {
-            text-align: center;
+            text-align: left;
             margin-top: 14mm; /* Jarak 14mm dari garis ganda kop surat ke judul sesuai foto naskah dinas resmi */
             margin-bottom: 12px;
             line-height: 1.15;
@@ -249,7 +249,7 @@
 
         /* PARAGRAF PEMBUKA (SPASI KEBANWAH 1.15) */
         .opening-paragraph {
-            text-align: justify;
+            text-align: left;
             margin-top: 12px;
             margin-bottom: 12px;
             font-size: 11pt;
@@ -281,7 +281,7 @@
 
         .parties-table td.sep {
             width: 16px;
-            text-align: center;
+            text-align: left;
         }
 
         .parties-table td.val {
@@ -301,7 +301,7 @@
             margin: 12px 0;
             font-size: 11pt;
             line-height: 1.15;
-            text-align: justify;
+            text-align: left;
         }
 
         /* TABEL DAFTAR BARANG (DENGAN KET LOKASI) */
@@ -322,14 +322,14 @@
         }
 
         .items-table th {
-            text-align: center;
+            text-align: left;
             font-weight: bold;
             background: #FAFAFA;
             line-height: 1.2;
         }
 
         .items-table td.center {
-            text-align: center;
+            text-align: left;
         }
 
         .items-table td.font-mono {
@@ -360,7 +360,7 @@
         }
 
         .page-2-header {
-            text-align: center;
+            text-align: left;
             font-size: 11pt;
             margin-top: 0;
             margin-bottom: 30px; /* Jarak dari -2- ke kalimat penutup */
@@ -372,7 +372,7 @@
         }
 
         .closing-paragraph {
-            text-align: justify;
+            text-align: left;
             font-size: 11pt;
             line-height: 1.15;
             margin-bottom: 40px; /* Jarak dari kalimat penutup ke judul TTD */
@@ -392,7 +392,7 @@
         .signatures-table td {
             width: 50%;
             vertical-align: top;
-            text-align: center;
+            text-align: left;
             padding: 0 10px;
             line-height: 1.15;
         }
@@ -411,7 +411,7 @@
             height: 105px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             margin: 8px 0;
             transition: min-height 0.2s ease, height 0.2s ease;
         }
@@ -432,7 +432,7 @@
 
         /* BLOK MENGETAHUI (KEPALA BALAI) */
         .sig-mengetahui-block {
-            text-align: center;
+            text-align: left;
             margin-top: 70px; /* Jarak vertikal lapang sesuai instruksi */
             font-size: 11pt;
             line-height: 1.15;
@@ -786,7 +786,7 @@
                     <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
                     <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
 
-                    <div class="srikandi-box" id="sigBoxKabalai" style="margin: 8px auto; justify-content: center;">
+                    <div class="srikandi-box" id="sigBoxKabalai" style="margin: 8px 0; justify-content: flex-start;">
                         <span class="srikandi-tag">${ttd_pengirim3}</span>
                     </div>
 

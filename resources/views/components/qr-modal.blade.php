@@ -36,7 +36,7 @@
             {{-- BODY MODAL --}}
             <div class="p-6 space-y-4">
                 {{-- KARTU LABEL CETAK / PREVIEW --}}
-                <div id="qr-label-card" class="bg-[#F9FCFA] border-2 border-[#163828] rounded-xl p-4 text-center">
+                <div id="qr-label-card" class="bg-[#F9FCFA] border-2 border-[#163828] rounded-xl p-4 text-left">
                     <div class="text-[10px] font-bold text-[#163828] uppercase tracking-wider">
                         Badan Pengawas Obat dan Makanan
                     </div>
@@ -59,7 +59,7 @@
                         <div id="qr-item-name" class="text-xs font-bold text-[#132219]">
                             -
                         </div>
-                        <div class="text-[11px] text-[#62756A] flex items-center justify-center gap-3 pt-1">
+                        <div class="text-[11px] text-[#62756A] flex items-center gap-3 pt-1">
                             <span>Lokasi: <strong id="qr-item-lokasi" class="text-[#132219] font-semibold">-</strong></span>
                             <span>Penanggung Jawab: <strong id="qr-item-pj" class="text-[#132219] font-semibold">-</strong></span>
                         </div>
@@ -211,7 +211,7 @@ function printQrLabel() {
                     border-radius: 8px;
                     padding: 16px 20px;
                     width: 320px;
-                    text-align: center;
+                    text-align: left;
                     box-sizing: border-box;
                 }
                 .header-instansi {
