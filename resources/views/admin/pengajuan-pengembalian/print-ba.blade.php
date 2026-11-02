@@ -275,7 +275,7 @@
         .party-clause {
             padding-top: 8px !important;
             padding-bottom: 12px !important;
-            padding-left: 0 !important;
+            padding-left: 2px !important;
             font-size: 11pt;
             line-height: 1.15;
         }
@@ -576,7 +576,8 @@
                         <td class="val">{{ $pihakPertama['unit_kerja'] }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="party-clause">
+                        <td class="num"></td>
+                        <td colspan="3" class="party-clause">
                             Selanjutnya disebut <strong>PIHAK PERTAMA</strong>
                         </td>
                     </tr>
@@ -606,7 +607,8 @@
                         <td class="val">{{ $pihakKedua['unit_kerja'] }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="party-clause">
+                        <td class="num"></td>
+                        <td colspan="3" class="party-clause">
                             Selanjutnya disebut <strong>PIHAK KEDUA</strong>
                         </td>
                     </tr>
