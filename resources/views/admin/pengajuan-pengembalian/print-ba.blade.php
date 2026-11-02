@@ -208,7 +208,7 @@
         }
 
         .doc-title-block {
-            text-align: left;
+            text-align: center;
             margin-top: 14mm;
             margin-bottom: 12px;
             line-height: 1.15;

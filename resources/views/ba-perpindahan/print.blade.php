@@ -218,7 +218,7 @@
 
         /* KE BERITA ACARA: JARAK 14MM PERSIS FOTO DOKUMEN ASLI */
         .doc-title-block {
-            text-align: left;
+            text-align: center;
             margin-top: 14mm; /* Jarak 14mm dari garis ganda kop surat ke judul sesuai foto naskah dinas resmi */
             margin-bottom: 12px;
             line-height: 1.15;
