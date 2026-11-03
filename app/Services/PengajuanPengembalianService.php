@@ -252,8 +252,8 @@ class PengajuanPengembalianService
                     ]);
                 }
 
-                // Sinkronisasi tabel ekstensi BMN-TIK / BMN-LAB jika ada
-                if ($bmn->jenis === 'BMN-TIK') {
+                // Sinkronisasi tabel ekstensi BMN-TIK / BMN-LAB jika ada (mendukung Dual Tracking)
+                if ($bmn->jenis === 'BMN-TIK' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->tik) {
                     BmnTik::where('kode_barang', $bmn->kode_barang)
                         ->where('nup', $bmn->nup)
                         ->update([
@@ -262,7 +262,8 @@ class PengajuanPengembalianService
                             'kondisi' => $bmn->kondisi,
                             'is_dikembalikan' => true,
                         ]);
-                } elseif ($bmn->jenis === 'BMN-LAB') {
+                }
+                if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
                     BmnLab::where('kode_barang', $bmn->kode_barang)
                         ->where('nup', $bmn->nup)
                         ->update([

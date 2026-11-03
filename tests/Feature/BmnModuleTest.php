@@ -235,7 +235,7 @@ class BmnModuleTest extends TestCase
         // Test file lebih dari 500 KB gagal validasi
         $tooLargeFile = UploadedFile::fake()->create('manual.pdf', 600, 'application/pdf');
         $failResponse = $this->actingAs($user)->post(route('bmns.store'), [
-            'kode_barang' => 'TEST-001',
+            'kode_barang' => '3050104001',
             'nup' => '1',
             'nama_barang' => 'Alat Uji Coba',
             'jenis' => 'BMN-TIK',
@@ -250,7 +250,7 @@ class BmnModuleTest extends TestCase
         $validFile = UploadedFile::fake()->create('manual.pdf', 200, 'application/pdf');
         $validPhoto = UploadedFile::fake()->create('foto.jpg', 150, 'image/jpeg');
         $successResponse = $this->actingAs($user)->post(route('bmns.store'), [
-            'kode_barang' => 'TEST-002',
+            'kode_barang' => '3050104002',
             'nup' => '2',
             'nama_barang' => 'Alat Uji Valid',
             'jenis' => 'BMN-TIK',
@@ -262,7 +262,7 @@ class BmnModuleTest extends TestCase
         ]);
 
         $successResponse->assertRedirect(route('bmns.index'));
-        $bmn = Bmn::where('kode_barang', 'TEST-002')->first();
+        $bmn = Bmn::where('kode_barang', '3050104002')->first();
         $this->assertNotNull($bmn);
         $this->assertCount(2, $bmn->dokumens);
     }
@@ -389,7 +389,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $response = $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-TEST-99',
+            'kode_barang' => '3090405099',
             'nup' => '99',
             'nama_barang' => 'Server Dell PowerEdge',
             'jenis' => 'Server',
@@ -400,14 +400,14 @@ class BmnModuleTest extends TestCase
         $response->assertRedirect(route('bmns-tik.index'));
 
         // Cek tersimpan di bmns_tik dan memiliki bmn_id
-        $tik = BmnTik::where('kode_barang', 'TIK-TEST-99')->where('nup', 99)->first();
+        $tik = BmnTik::where('kode_barang', '3090405099')->where('nup', 99)->first();
         $this->assertNotNull($tik);
         $this->assertNotNull($tik->bmn_id);
 
         // Cek otomatis tersimpan di tabel bmns (Daftar BMN)
         $this->assertDatabaseHas('bmns', [
             'id' => $tik->bmn_id,
-            'kode_barang' => 'TIK-TEST-99',
+            'kode_barang' => '3090405099',
             'nup' => '99',
             'nama_barang' => 'Server Dell PowerEdge',
             'jenis' => 'BMN-TIK',
@@ -421,7 +421,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $response = $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-TEST-88',
+            'kode_barang' => '3080101088',
             'nup' => '88',
             'nama_barang' => 'Spektrofotometer UV-Vis',
             'merek' => 'Shimadzu',
@@ -435,14 +435,14 @@ class BmnModuleTest extends TestCase
         $response->assertRedirect(route('bmns-lab.index'));
 
         // Cek tersimpan di bmns_lab dan memiliki bmn_id
-        $lab = BmnLab::where('kode_barang', 'LAB-TEST-88')->where('nup', 88)->first();
+        $lab = BmnLab::where('kode_barang', '3080101088')->where('nup', 88)->first();
         $this->assertNotNull($lab);
         $this->assertNotNull($lab->bmn_id);
 
         // Cek otomatis tersimpan di tabel bmns (Daftar BMN)
         $this->assertDatabaseHas('bmns', [
             'id' => $lab->bmn_id,
-            'kode_barang' => 'LAB-TEST-88',
+            'kode_barang' => '3080101088',
             'nup' => '88',
             'nama_barang' => 'Spektrofotometer UV-Vis',
             'merek' => 'Shimadzu',
@@ -459,7 +459,7 @@ class BmnModuleTest extends TestCase
 
         // Create via BMN TIK store
         $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-SYNC-01',
+            'kode_barang' => '3090405011',
             'nup' => '11',
             'nama_barang' => 'Laptop ThinkPad X1',
             'jenis' => 'Laptop',
@@ -467,7 +467,7 @@ class BmnModuleTest extends TestCase
             'penanggungjawab' => 'Staf IT',
         ]);
 
-        $tik = BmnTik::where('kode_barang', 'TIK-SYNC-01')->firstOrFail();
+        $tik = BmnTik::where('kode_barang', '3090405011')->firstOrFail();
         $bmn = $tik->bmn;
         $this->assertNotNull($bmn);
 
@@ -501,7 +501,7 @@ class BmnModuleTest extends TestCase
 
         // Create via BMN LAB store
         $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-SYNC-01',
+            'kode_barang' => '3080101022',
             'nup' => '22',
             'nama_barang' => 'Mikroskop Binokuler',
             'merek' => 'Olympus',
@@ -511,7 +511,7 @@ class BmnModuleTest extends TestCase
             'status_kalibrasi' => 'Belum Dikalibrasi',
         ]);
 
-        $lab = BmnLab::where('kode_barang', 'LAB-SYNC-01')->firstOrFail();
+        $lab = BmnLab::where('kode_barang', '3080101022')->firstOrFail();
         $bmn = $lab->bmn;
         $this->assertNotNull($bmn);
 
@@ -543,7 +543,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-FORCE-01',
+            'kode_barang' => '3090405033',
             'nup' => '33',
             'nama_barang' => 'Switch Cisco Catalyst',
             'jenis' => 'Switch',
@@ -551,7 +551,7 @@ class BmnModuleTest extends TestCase
             'penanggungjawab' => 'Staf Jaringan',
         ]);
 
-        $tik = BmnTik::where('kode_barang', 'TIK-FORCE-01')->firstOrFail();
+        $tik = BmnTik::where('kode_barang', '3090405033')->firstOrFail();
         $bmn = $tik->bmn;
         $this->assertNotNull($bmn);
 
@@ -574,7 +574,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-FORCE-01',
+            'kode_barang' => '3080101044',
             'nup' => '44',
             'nama_barang' => 'Sentrifugasi Klinis',
             'merek' => 'Eppendorf',
@@ -584,7 +584,7 @@ class BmnModuleTest extends TestCase
             'status_kalibrasi' => 'Belum Dikalibrasi',
         ]);
 
-        $lab = BmnLab::where('kode_barang', 'LAB-FORCE-01')->firstOrFail();
+        $lab = BmnLab::where('kode_barang', '3080101044')->firstOrFail();
         $bmn = $lab->bmn;
         $this->assertNotNull($bmn);
 
@@ -736,7 +736,7 @@ class BmnModuleTest extends TestCase
 
         // Create BMN TIK with no_seri
         $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-SN-01',
+            'kode_barang' => '3090405055',
             'nup' => '55',
             'no_seri' => 'SN-LENOVO-999',
             'nama_barang' => 'ThinkCentre M70q',
@@ -745,7 +745,7 @@ class BmnModuleTest extends TestCase
             'penanggungjawab' => 'Staf IT',
         ]);
 
-        $tik = BmnTik::where('kode_barang', 'TIK-SN-01')->firstOrFail();
+        $tik = BmnTik::where('kode_barang', '3090405055')->firstOrFail();
         $this->assertEquals('SN-LENOVO-999', $tik->no_seri);
 
         $bmn = $tik->bmn;
@@ -754,7 +754,7 @@ class BmnModuleTest extends TestCase
 
         // Update no_seri via BMN TIK
         $this->actingAs($user)->put(route('bmns-tik.update', $tik), [
-            'kode_barang' => 'TIK-SN-01',
+            'kode_barang' => '3090405055',
             'nup' => 55,
             'no_seri' => 'SN-LENOVO-888-REV',
             'nama_barang' => 'ThinkCentre M70q Updated',
@@ -773,7 +773,7 @@ class BmnModuleTest extends TestCase
 
         // Create BMN Lab with no_seri
         $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-SN-01',
+            'kode_barang' => '3080101066',
             'nup' => '66',
             'no_seri' => 'SN-SHIMADZU-777',
             'nama_barang' => 'GC-MS Shimadzu',
@@ -783,7 +783,7 @@ class BmnModuleTest extends TestCase
             'kondisi' => 'Baik',
         ]);
 
-        $lab = BmnLab::where('kode_barang', 'LAB-SN-01')->firstOrFail();
+        $lab = BmnLab::where('kode_barang', '3080101066')->firstOrFail();
         $this->assertEquals('SN-SHIMADZU-777', $lab->no_seri);
 
         $bmn = $lab->bmn;
@@ -792,7 +792,7 @@ class BmnModuleTest extends TestCase
 
         // Update no_seri via BMN Lab
         $this->actingAs($user)->put(route('bmns-lab.update', $lab), [
-            'kode_barang' => 'LAB-SN-01',
+            'kode_barang' => '3080101066',
             'nup' => 66,
             'no_seri' => 'SN-SHIMADZU-666-REV',
             'nama_barang' => 'GC-MS Shimadzu Updated',
@@ -1776,7 +1776,7 @@ class BmnModuleTest extends TestCase
 
         // Update data
         $updateResponse = $this->actingAs($operator)->put(route('bmns.update', $bmn), [
-            'kode_barang' => 'TEST-BMN-PAG-01',
+            'kode_barang' => '3050104071',
             'nup' => '10',
             'nama_barang' => 'Laptop Lenovo Paginate Updated',
             'lokasi' => 'Ruang TIK',
@@ -1827,7 +1827,7 @@ class BmnModuleTest extends TestCase
         $operator = User::factory()->create(['role' => 'Operator']);
 
         $bmnTik = BmnTik::create([
-            'kode_barang' => 'TIK-PAG-01',
+            'kode_barang' => '3090405072',
             'nup' => '1',
             'nama_barang' => 'Switch Hub Paginate',
             'jenis' => 'Perangkat Jaringan',
@@ -1843,7 +1843,7 @@ class BmnModuleTest extends TestCase
         ]))->assertOk();
 
         $updateResponse = $this->actingAs($operator)->put(route('bmns-tik.update', $bmnTik), [
-            'kode_barang' => 'TIK-PAG-01',
+            'kode_barang' => '3090405072',
             'nup' => '1',
             'nama_barang' => 'Switch Hub Paginate Edited',
             'jenis' => 'Perangkat Jaringan',
@@ -1863,7 +1863,7 @@ class BmnModuleTest extends TestCase
         $operator = User::factory()->create(['role' => 'Operator']);
 
         $bmnLab = BmnLab::create([
-            'kode_barang' => 'LAB-PAG-01',
+            'kode_barang' => '3080101073',
             'nup' => '1',
             'nama_barang' => 'Spektrofotometer UV',
             'tipe' => 'UV-Vis',
@@ -1880,7 +1880,7 @@ class BmnModuleTest extends TestCase
         ]))->assertOk();
 
         $updateResponse = $this->actingAs($operator)->put(route('bmns-lab.update', $bmnLab), [
-            'kode_barang' => 'LAB-PAG-01',
+            'kode_barang' => '3080101073',
             'nup' => '1',
             'nama_barang' => 'Spektrofotometer UV Edited',
             'tipe' => 'UV-Vis',
@@ -2023,7 +2023,7 @@ class BmnModuleTest extends TestCase
         $operator = User::factory()->create(['role' => 'Operator']);
 
         $response = $this->actingAs($operator)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-KONDISI-01',
+            'kode_barang' => '3090405050',
             'nup' => 50,
             'nama_barang' => 'Laptop Lenovo ThinkPad T14',
             'jenis' => 'Laptop',
@@ -2034,13 +2034,13 @@ class BmnModuleTest extends TestCase
 
         $response->assertRedirect(route('bmns-tik.index'));
 
-        $tik = BmnTik::where('kode_barang', 'TIK-KONDISI-01')->firstOrFail();
+        $tik = BmnTik::where('kode_barang', '3090405050')->firstOrFail();
         $this->assertEquals('Baik', $tik->kondisi);
         $this->assertEquals('Baik', $tik->bmn?->kondisi);
 
         // Update to Rusak
         $updateResp = $this->actingAs($operator)->put(route('bmns-tik.update', $tik), [
-            'kode_barang' => 'TIK-KONDISI-01',
+            'kode_barang' => '3090405050',
             'nup' => 50,
             'nama_barang' => 'Laptop Lenovo ThinkPad T14',
             'jenis' => 'Laptop',
@@ -2330,7 +2330,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         Bmn::create([
-            'kode_barang' => 'BMN-DUP-01',
+            'kode_barang' => '3050104031',
             'nup' => '1',
             'nama_barang' => 'Barang Eksis 1',
             'jenis' => 'BMN-NON TIK',
@@ -2340,7 +2340,7 @@ class BmnModuleTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->post(route('bmns.store'), [
-            'kode_barang' => 'BMN-DUP-01',
+            'kode_barang' => '3050104031',
             'nup' => '2',
             'nama_barang' => 'Barang Baru Kode Sama',
             'jenis' => 'BMN-NON TIK',
@@ -2359,7 +2359,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $bmn1 = Bmn::create([
-            'kode_barang' => 'BMN-UPD-01',
+            'kode_barang' => '3050104032',
             'nup' => '1',
             'nama_barang' => 'Barang 1',
             'jenis' => 'BMN-NON TIK',
@@ -2369,7 +2369,7 @@ class BmnModuleTest extends TestCase
         ]);
 
         $bmn2 = Bmn::create([
-            'kode_barang' => 'BMN-UPD-02',
+            'kode_barang' => '3050104033',
             'nup' => '2',
             'nama_barang' => 'Barang 2',
             'jenis' => 'BMN-NON TIK',
@@ -2380,7 +2380,7 @@ class BmnModuleTest extends TestCase
 
         // Update bmn1 with same kode_barang passes
         $passResponse = $this->actingAs($user)->put(route('bmns.update', $bmn1), [
-            'kode_barang' => 'BMN-UPD-01',
+            'kode_barang' => '3050104032',
             'nup' => '1',
             'nama_barang' => 'Barang 1 Diperbarui',
             'jenis' => 'BMN-NON TIK',
@@ -2393,7 +2393,7 @@ class BmnModuleTest extends TestCase
 
         // Update bmn1 with bmn2's kode_barang fails
         $failResponse = $this->actingAs($user)->put(route('bmns.update', $bmn1), [
-            'kode_barang' => 'BMN-UPD-02',
+            'kode_barang' => '3050104033',
             'nup' => '1',
             'nama_barang' => 'Barang 1 Coba Ganti Kode Sama',
             'jenis' => 'BMN-NON TIK',
@@ -2409,7 +2409,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-DUP-01',
+            'kode_barang' => '3090405041',
             'nup' => 1,
             'nama_barang' => 'Laptop Awal',
             'jenis' => 'Laptop',
@@ -2418,7 +2418,7 @@ class BmnModuleTest extends TestCase
         ]);
 
         $failResponse = $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-DUP-01',
+            'kode_barang' => '3090405041',
             'nup' => 2,
             'nama_barang' => 'Laptop Kedua Kode Sama',
             'jenis' => 'Laptop',
@@ -2436,17 +2436,17 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-U-01',
+            'kode_barang' => '3090405042',
             'nup' => 1,
             'nama_barang' => 'PC 1',
             'jenis' => 'PC',
             'lokasi' => 'Ruang TIK',
             'penanggungjawab' => 'Staf IT',
         ]);
-        $tik1 = BmnTik::where('kode_barang', 'TIK-U-01')->firstOrFail();
+        $tik1 = BmnTik::where('kode_barang', '3090405042')->firstOrFail();
 
         $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-U-02',
+            'kode_barang' => '3090405043',
             'nup' => 2,
             'nama_barang' => 'PC 2',
             'jenis' => 'PC',
@@ -2456,7 +2456,7 @@ class BmnModuleTest extends TestCase
 
         // Update tik1 keeping its own kode passes
         $passResponse = $this->actingAs($user)->put(route('bmns-tik.update', $tik1), [
-            'kode_barang' => 'TIK-U-01',
+            'kode_barang' => '3090405042',
             'nup' => 1,
             'nama_barang' => 'PC 1 Updated',
             'jenis' => 'PC',
@@ -2468,7 +2468,7 @@ class BmnModuleTest extends TestCase
 
         // Update tik1 using tik2's kode fails
         $failResponse = $this->actingAs($user)->put(route('bmns-tik.update', $tik1), [
-            'kode_barang' => 'TIK-U-02',
+            'kode_barang' => '3090405043',
             'nup' => 1,
             'nama_barang' => 'PC 1 Duplicate Code',
             'jenis' => 'PC',
@@ -2483,7 +2483,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-DUP-01',
+            'kode_barang' => '3080101045',
             'nup' => 1,
             'nama_barang' => 'Mikroskop 1',
             'merek' => 'Olympus',
@@ -2492,7 +2492,7 @@ class BmnModuleTest extends TestCase
         ]);
 
         $failResponse = $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-DUP-01',
+            'kode_barang' => '3080101045',
             'nup' => 2,
             'nama_barang' => 'Mikroskop 2 Kode Sama',
             'merek' => 'Olympus',
@@ -2510,7 +2510,7 @@ class BmnModuleTest extends TestCase
         $user = User::factory()->create(['role' => 'Operator']);
 
         Bmn::create([
-            'kode_barang' => 'BMN-CROSS-01',
+            'kode_barang' => '3050104046',
             'nup' => '1',
             'nama_barang' => 'Barang Umum Master',
             'jenis' => 'BMN-NON TIK',
@@ -2521,7 +2521,7 @@ class BmnModuleTest extends TestCase
 
         // Attempting to create BMN TIK with existing master code fails
         $failTik = $this->actingAs($user)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'BMN-CROSS-01',
+            'kode_barang' => '3050104046',
             'nup' => 1,
             'nama_barang' => 'TIK Cross Duplicate',
             'jenis' => 'PC',
@@ -2532,7 +2532,7 @@ class BmnModuleTest extends TestCase
 
         // Attempting to create BMN Lab with existing master code fails
         $failLab = $this->actingAs($user)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'BMN-CROSS-01',
+            'kode_barang' => '3050104046',
             'nup' => 1,
             'nama_barang' => 'Lab Cross Duplicate',
             'merek' => 'Olympus',
@@ -2917,7 +2917,7 @@ class BmnModuleTest extends TestCase
 
         // 1. Simpan BMN dengan lokasi baru
         $response = $this->actingAs($user)->post(route('bmns.store'), [
-            'kode_barang' => 'TEST-LOK-001',
+            'kode_barang' => '3050104091',
             'nup' => '1',
             'nama_barang' => 'Kursi Kerja Baru',
             'jenis' => 'BMN-NON TIK',
@@ -2930,14 +2930,14 @@ class BmnModuleTest extends TestCase
         $response->assertRedirect(route('bmns.index'));
         $this->assertDatabaseHas('lokasis', ['nama' => 'Ruang Rapat Utama']);
 
-        $bmn = Bmn::where('kode_barang', 'TEST-LOK-001')->firstOrFail();
+        $bmn = Bmn::where('kode_barang', '3050104091')->firstOrFail();
         $lokasi = Lokasi::where('nama', 'Ruang Rapat Utama')->firstOrFail();
         $this->assertEquals($lokasi->id, $bmn->lokasi_id);
         $this->assertEquals('Ruang Rapat Utama', $bmn->lokasi);
 
         // 2. Simpan BMN kedua dengan lokasi yang sudah ada (tidak boleh duplikat di lokasis)
         $response2 = $this->actingAs($user)->post(route('bmns.store'), [
-            'kode_barang' => 'TEST-LOK-002',
+            'kode_barang' => '3050104092',
             'nup' => '2',
             'nama_barang' => 'Meja Rapat',
             'jenis' => 'BMN-NON TIK',
@@ -2949,12 +2949,12 @@ class BmnModuleTest extends TestCase
 
         $response2->assertRedirect(route('bmns.index'));
         $this->assertEquals(1, Lokasi::where('nama', 'Ruang Rapat Utama')->count());
-        $bmn2 = Bmn::where('kode_barang', 'TEST-LOK-002')->firstOrFail();
+        $bmn2 = Bmn::where('kode_barang', '3050104092')->firstOrFail();
         $this->assertEquals($lokasi->id, $bmn2->lokasi_id);
 
         // 3. Update BMN dengan lokasi baru lainnya
         $response3 = $this->actingAs($user)->put(route('bmns.update', $bmn), [
-            'kode_barang' => 'TEST-LOK-001',
+            'kode_barang' => '3050104091',
             'nup' => '1',
             'nama_barang' => 'Kursi Kerja Baru Edit',
             'jenis' => 'BMN-NON TIK',
@@ -3134,7 +3134,7 @@ class BmnModuleTest extends TestCase
         $operator = User::factory()->create(['role' => 'Operator']);
 
         $response = $this->actingAs($operator)->post(route('bmns.store'), [
-            'kode_barang' => 'BMN-THN-01',
+            'kode_barang' => '3050104081',
             'nup' => '10',
             'no_seri' => 'SN-THN-01',
             'nama_barang' => 'Kursi Kerja Ergonomis',
@@ -3150,7 +3150,7 @@ class BmnModuleTest extends TestCase
 
         $response->assertRedirect(route('bmns.index'));
 
-        $bmn = Bmn::where('kode_barang', 'BMN-THN-01')->firstOrFail();
+        $bmn = Bmn::where('kode_barang', '3050104081')->firstOrFail();
         $this->assertEquals(2024, $bmn->tahun_perolehan);
         $this->assertEquals(3500000.0, (float) $bmn->nilai_perolehan);
 
@@ -3174,7 +3174,7 @@ class BmnModuleTest extends TestCase
         $operator = User::factory()->create(['role' => 'Operator']);
 
         $response = $this->actingAs($operator)->post(route('bmns-tik.store'), [
-            'kode_barang' => 'TIK-THN-01',
+            'kode_barang' => '3090405082',
             'nup' => 12,
             'no_seri' => 'SN-TIK-THN-01',
             'nama_barang' => 'PC All-in-One Dell',
@@ -3188,7 +3188,7 @@ class BmnModuleTest extends TestCase
 
         $response->assertRedirect(route('bmns-tik.index'));
 
-        $tik = BmnTik::where('kode_barang', 'TIK-THN-01')->firstOrFail();
+        $tik = BmnTik::where('kode_barang', '3090405082')->firstOrFail();
         $this->assertEquals(2023, $tik->tahun_perolehan);
         $this->assertEquals(17500000.0, (float) $tik->nilai_perolehan);
 
@@ -3209,7 +3209,7 @@ class BmnModuleTest extends TestCase
         $operator = User::factory()->create(['role' => 'Operator']);
 
         $response = $this->actingAs($operator)->post(route('bmns-lab.store'), [
-            'kode_barang' => 'LAB-THN-01',
+            'kode_barang' => '3080101083',
             'nup' => 15,
             'no_seri' => 'SN-LAB-THN-01',
             'nama_barang' => 'Mikroskop Olympus CX23',
@@ -3223,7 +3223,7 @@ class BmnModuleTest extends TestCase
 
         $response->assertRedirect(route('bmns-lab.index'));
 
-        $lab = BmnLab::where('kode_barang', 'LAB-THN-01')->firstOrFail();
+        $lab = BmnLab::where('kode_barang', '3080101083')->firstOrFail();
         $this->assertEquals(2022, $lab->tahun_perolehan);
         $this->assertEquals(25000000.0, (float) $lab->nilai_perolehan);
 
@@ -3824,7 +3824,7 @@ class BmnModuleTest extends TestCase
 
         // 1. BMN Store with future tanggal_terima
         $resBmn = $this->actingAs($operator)->post(route('bmns.store'), [
-            'kode_barang' => 'TEST-FUT-01',
+            'kode_barang' => '3050104084',
             'nup' => '1',
             'nama_barang' => 'Laptop Masa Depan',
             'tanggal_terima' => $futureDate,

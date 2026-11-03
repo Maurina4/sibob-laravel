@@ -60,11 +60,15 @@ class Lokasi extends Model
             }
         }
 
-        // 4. Match format 'B1.01 RUANG TAMU UTAMA' (must match room code pattern with dot and digits)
-        if (preg_match('/^([A-Za-z]{1,2}(?:\.[A-Za-z]+)?\d*\.\d+)\s+(.+)$/i', $trimmed, $matches)) {
-            $lokasi = static::where('kode_ruangan', $matches[1])
-                ->where('nama', $matches[2])
-                ->first() ?? static::where('kode_ruangan', $matches[1])->first();
+        // 4. Match format 'B1.01 RUANG TAMU UTAMA' atau 'A1.01 - RUANG...' atau 'A1.01-00001'
+        if (preg_match('/^([A-Za-z]{1,2}(?:\.[A-Za-z]+)?\d*\.\d+)[-\s]+(.*)$/i', $trimmed, $matches)) {
+            $code = trim($matches[1]);
+            $name = trim($matches[2]);
+
+            $lokasi = static::where('kode_ruangan', $code)
+                ->when($name !== '', fn ($q) => $q->where('nama', $name))
+                ->first() ?? static::where('kode_ruangan', $code)->first();
+
             if ($lokasi) {
                 return $lokasi;
             }
@@ -86,11 +90,14 @@ class Lokasi extends Model
 
         $trimmed = trim($value);
 
-        // If it starts with room code like 'B1.01 RUANG ...'
-        if (preg_match('/^([A-Za-z]{1,2}(?:\.[A-Za-z]+)?\d*\.\d+)\s+(.+)$/i', $trimmed, $matches)) {
+        // Jika diawali kode ruangan seperti 'B1.01 RUANG ...' atau 'A1.01-00001'
+        if (preg_match('/^([A-Za-z]{1,2}(?:\.[A-Za-z]+)?\d*\.\d+)[-\s]+(.*)$/i', $trimmed, $matches)) {
+            $code = trim($matches[1]);
+            $name = trim($matches[2]);
+
             return static::create([
-                'kode_ruangan' => $matches[1],
-                'nama' => trim($matches[2]),
+                'kode_ruangan' => $code,
+                'nama' => $name !== '' ? $name : $trimmed,
             ]);
         }
 

@@ -16,17 +16,18 @@
             >
         </div>
 
-        {{-- FILTER JENIS BARANG --}}
+        {{-- FILTER JENIS BARANG (4 KATEGORI UTAMA) --}}
         <div>
             <select
                 name="jenis"
                 onchange="this.form.submit()"
-                class="bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] py-2 pl-3 pr-9 transition cursor-pointer"
+                class="bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] py-2 pl-3 pr-9 transition cursor-pointer font-medium"
             >
-                <option value="">Jenis</option>
-                <option value="BMN-TIK" {{ request('jenis') === 'BMN-TIK' ? 'selected' : '' }}>BMN-TIK</option>
+                <option value="">Semua Jenis</option>
+                <option value="BMN-NON TIK" {{ request('jenis') === 'BMN-NON TIK' ? 'selected' : '' }}>BMN-NON TIK (Umum)</option>
                 <option value="BMN-LAB" {{ request('jenis') === 'BMN-LAB' ? 'selected' : '' }}>BMN-LAB</option>
-                <option value="BMN-NON TIK" {{ request('jenis') === 'BMN-NON TIK' ? 'selected' : '' }}>BMN-NON TIK</option>
+                <option value="BMN-TIK" {{ request('jenis') === 'BMN-TIK' ? 'selected' : '' }}>BMN-TIK</option>
+                <option value="BMN-TIK & LAB" {{ request('jenis') === 'BMN-TIK & LAB' ? 'selected' : '' }}>BMN-TIK & LAB</option>
             </select>
         </div>
 

@@ -7,14 +7,15 @@ use Illuminate\Support\Carbon;
 
 class BmnImportValidator
 {
-    public const VALID_JENIS = [
-        'BMN-TIK',
-        'BMN-LAB',
-        'BMN-NON TIK',
-    ];
+    public function __construct(
+        protected ?BmnExcelParser $parser = null
+    ) {
+        $this->parser = $parser ?? new BmnExcelParser();
+    }
 
     /**
      * Memvalidasi seluruh baris hasil parsing Excel.
+     * Mendukung format Master Data Aset (11 kolom) dan Template Legacy (10 kolom).
      *
      * @param  array<int, array<string, mixed>>  $rows
      * @return array{
@@ -28,6 +29,8 @@ class BmnImportValidator
      */
     public function validate(array $rows): array
     {
+        @set_time_limit(300);
+
         $today = Carbon::today()->format('Y-m-d');
         $currentYear = (int) date('Y');
 
@@ -44,18 +47,21 @@ class BmnImportValidator
         }
 
         // Ambil data duplikat yang sudah ada di database (bmns aktif / belum dihapus)
+        // Dijalankan dalam chunk 500 kode barang untuk keamanan batas parameter SQLite / MySQL
         $existingDbMap = [];
         if (! empty($uniquePairs)) {
-            $uniqueKodes = array_unique(array_column($uniquePairs, 'kode'));
-            $existingDbRecords = Bmn::query()
-                ->where('dihapus', false)
-                ->whereIn('kode_barang', $uniqueKodes)
-                ->select(['kode_barang', 'nup'])
-                ->get();
+            $uniqueKodes = array_values(array_unique(array_column($uniquePairs, 'kode')));
+            foreach (array_chunk($uniqueKodes, 500) as $kodeChunk) {
+                $existingDbRecords = Bmn::query()
+                    ->where('dihapus', false)
+                    ->whereIn('kode_barang', $kodeChunk)
+                    ->select(['kode_barang', 'nup'])
+                    ->get();
 
-            foreach ($existingDbRecords as $record) {
-                $key = strtolower(trim((string) $record->kode_barang)).'#'.trim((string) $record->nup);
-                $existingDbMap[$key] = true;
+                foreach ($existingDbRecords as $record) {
+                    $key = strtolower(trim((string) $record->kode_barang)).'#'.trim((string) $record->nup);
+                    $existingDbMap[$key] = true;
+                }
             }
         }
 
@@ -68,7 +74,7 @@ class BmnImportValidator
             $rowErrors = [];
             $excelRow = $row['excel_row'];
 
-            // 1. Kode Barang
+            // 1. Kode Barang (wajib 10 digit angka)
             $rawKode = trim((string) ($row['kode_barang'] ?? ''));
             $cleanKode = str_replace(['.', '-', ' '], '', $rawKode);
 
@@ -83,7 +89,7 @@ class BmnImportValidator
                 $row['kode_barang'] = $cleanKode;
             }
 
-            // 2. NUP
+            // 2. NUP (wajib bilangan bulat positif)
             $nupRaw = trim((string) ($row['nup_raw'] ?? ''));
             $nupInt = null;
             if ($nupRaw === '') {
@@ -94,74 +100,135 @@ class BmnImportValidator
                 $nupInt = (int) $nupRaw;
             }
 
-            // 3. Nama Barang
+            // 3. Nama Barang (wajib teks)
             $nama = trim((string) ($row['nama_barang'] ?? ''));
             if ($nama === '') {
                 $rowErrors['nama_barang'] = 'Nama Barang wajib diisi.';
             }
 
-            // 4. Merek / Type
+            // 4. Merek / Brand (opsional pada Master Data Aset seperti tanah/gedung)
             $merek = trim((string) ($row['merek'] ?? ''));
-            if ($merek === '') {
-                $rowErrors['merek'] = 'Merk/Type wajib diisi.';
+            if (strlen($merek) > 255) {
+                $rowErrors['merek'] = 'Merk/Type maksimal 255 karakter.';
             }
 
-            // 5. Tanggal Terima
-            $tglTerima = $row['tanggal_terima'];
+            // 5. Tanggal Perolehan / Terima (wajib, fleksibel)
+            $tglTerima = $row['tanggal_terima'] ?? null;
             $tglRaw = trim((string) ($row['tanggal_terima_raw'] ?? ''));
-            if ($tglRaw === '') {
-                $rowErrors['tanggal_terima'] = 'Tgl Terima wajib diisi.';
-            } elseif ($tglTerima === null) {
-                $rowErrors['tanggal_terima'] = "Format Tgl Terima tidak valid ('{$tglRaw}'). Gunakan format DD/MM/YYYY.";
-            } elseif ($tglTerima > $today) {
-                $rowErrors['tanggal_terima'] = 'Tgl Terima tidak boleh tanggal di masa depan (melebihi hari ini).';
+
+            if ($tglTerima === null && $tglRaw !== '') {
+                $parsed = $this->parser->parseFlexibleDateString($tglRaw);
+                if ($parsed) {
+                    $tglTerima = $parsed['date'];
+                    $row['tanggal_terima'] = $tglTerima;
+                }
             }
 
-            // 6. Tahun Perolehan
+            if ($tglRaw === '') {
+                $rowErrors['tanggal_terima'] = 'Tanggal Perolehan wajib diisi.';
+            } elseif ($tglTerima === null) {
+                $rowErrors['tanggal_terima'] = "Format Tanggal Perolehan tidak valid ('{$tglRaw}'). Gunakan format DD/MM/YYYY atau Bulan-Tahun (contoh: Jan-78).";
+            } elseif ($tglTerima > $today) {
+                $rowErrors['tanggal_terima'] = 'Tanggal Perolehan tidak boleh melebihi hari ini.';
+            }
+
+            // 6. Tahun Perolehan (otomatis diekstrak dari Tanggal Perolehan jika tidak ada kolom terpisah)
             $tahunRaw = trim((string) ($row['tahun_perolehan_raw'] ?? ''));
-            $tahunInt = $row['tahun_perolehan'];
-            if ($tahunRaw === '') {
-                $rowErrors['tahun_perolehan'] = 'Tahun Perolehan wajib diisi.';
-            } elseif ($tahunInt === null || strlen((string) $tahunInt) !== 4 || $tahunInt < 1945 || $tahunInt > $currentYear) {
+            $tahunInt = $row['tahun_perolehan'] ?? null;
+
+            if ($tahunInt === null && $tglTerima !== null) {
+                $tahunInt = (int) substr($tglTerima, 0, 4);
+                $row['tahun_perolehan'] = $tahunInt;
+            }
+
+            if ($tahunInt === null || strlen((string) $tahunInt) !== 4 || $tahunInt < 1945 || $tahunInt > $currentYear) {
                 $rowErrors['tahun_perolehan'] = "Tahun Perolehan harus 4 digit antara 1945 s.d. {$currentYear}.";
             } elseif ($tglTerima !== null) {
                 $yearOfTgl = (int) substr($tglTerima, 0, 4);
                 if ($tahunInt > $yearOfTgl) {
-                    $rowErrors['tahun_perolehan'] = "Tahun Perolehan ({$tahunInt}) tidak boleh lebih besar dari tahun Tgl Terima ({$yearOfTgl}).";
+                    $rowErrors['tahun_perolehan'] = "Tahun Perolehan ({$tahunInt}) tidak boleh lebih besar dari tahun Tanggal Perolehan ({$yearOfTgl}).";
                 }
             }
 
-            // 7. Nilai Perolehan
+            // 7. Tanggal Buku Pertama (opsional/nullable)
+            $tglBukuRaw = trim((string) ($row['tanggal_buku_pertama_raw'] ?? ''));
+            $tglBuku = $row['tanggal_buku_pertama'] ?? null;
+
+            if ($tglBuku === null && $tglBukuRaw !== '') {
+                $parsedBuku = $this->parser->parseFlexibleDateString($tglBukuRaw);
+                if ($parsedBuku) {
+                    $tglBuku = $parsedBuku['date'];
+                    $row['tanggal_buku_pertama'] = $tglBuku;
+                }
+            }
+
+            if ($tglBukuRaw !== '' && $tglBuku === null) {
+                $rowErrors['tanggal_buku_pertama'] = "Format Tanggal Buku Pertama tidak valid ('{$tglBukuRaw}').";
+            } elseif ($tglBuku !== null && $tglBuku > $today) {
+                $rowErrors['tanggal_buku_pertama'] = 'Tanggal Buku Pertama tidak boleh melebihi hari ini.';
+            }
+
+            // 8. Nilai Perolehan (wajib angka positif)
             $nilaiRaw = trim((string) ($row['nilai_perolehan_raw'] ?? ''));
-            $nilaiFloat = $row['nilai_perolehan'];
+            $nilaiFloat = $row['nilai_perolehan'] ?? null;
             if ($nilaiRaw === '') {
                 $rowErrors['nilai_perolehan'] = 'Nilai Perolehan wajib diisi.';
             } elseif ($nilaiFloat === null || $nilaiFloat < 0) {
                 $rowErrors['nilai_perolehan'] = "Nilai Perolehan harus berupa angka positif (diterima: '{$nilaiRaw}').";
             }
 
-            // 8. Jenis Barang
+            // 9. Jenis BMN (fleksibel: TANAH, ALAT BESAR, BMN-TIK, dsb.)
             $jenis = strtoupper(trim((string) ($row['jenis'] ?? '')));
             if ($jenis === '') {
-                $rowErrors['jenis'] = 'Jenis Barang wajib dipilih.';
-            } elseif (! in_array($jenis, self::VALID_JENIS, true)) {
-                $rowErrors['jenis'] = "Jenis Barang '{$jenis}' tidak valid. Pilihan: BMN-TIK, BMN-LAB, BMN-NON TIK.";
+                $jenis = 'UMUM';
             }
 
-            // 9. Satuan
+            // 10. Kondisi (opsional, default: Baik)
+            $kondisi = trim((string) ($row['kondisi'] ?? ''));
+            if ($kondisi === '') {
+                $kondisi = 'Baik';
+            }
+
+            // 11. Lokasi Ruang (opsional, default: Belum berlokasi / Gudang BMN)
+            $lokasiRuang = trim((string) ($row['lokasi_ruang'] ?? ''));
+            if ($lokasiRuang === '') {
+                $lokasiRuang = ($row['schema'] ?? '') === 'legacy' ? 'Gudang BMN' : 'Belum berlokasi';
+            }
+
+            // Hitung klasifikasi cerdas & Dual Tracking untuk preview
+            $lokasiLower = strtolower($lokasiRuang);
+            $isLabLocation = $lokasiLower !== 'belum berlokasi' && (
+                preg_match('/^A[\d.]/i', $lokasiRuang) ||
+                str_contains($lokasiLower, 'lab') ||
+                str_contains($lokasiLower, 'laboratorium')
+            );
+
+            $jenisUpper = strtoupper($jenis);
+            $isNonTik = str_contains($jenisUpper, 'NON TIK') || str_contains($jenisUpper, 'NON-TIK') || str_contains($jenisUpper, 'NONTIK');
+            $isPureTik = ! $isNonTik && str_contains($jenisUpper, 'TIK');
+            $isLab = $isLabLocation || str_contains($jenisUpper, 'LAB');
+
+            $jenisTerklasifikasi = match (true) {
+                $isPureTik && $isLab => 'BMN-TIK & LAB',
+                $isPureTik => 'BMN-TIK',
+                $isLab => 'BMN-LAB',
+                default => 'BMN-NON TIK',
+            };
+
+            // 12. Satuan (opsional, default: unit)
             $satuan = trim((string) ($row['satuan'] ?? ''));
             if ($satuan === '') {
-                $rowErrors['satuan'] = 'Satuan wajib diisi.';
+                $satuan = 'unit';
             }
 
-            // 10. Cek Duplikasi Kombinasi (Kode Barang + NUP)
+            // 13. Cek Duplikasi Kombinasi (Kode Barang + NUP)
             if ($kode !== '' && $nupInt !== null) {
                 $pairKey = strtolower($kode).'#'.$nupInt;
 
                 // Cek duplikat dalam file yang sama
                 if (isset($seenInFile[$pairKey])) {
                     $prevRow = $seenInFile[$pairKey];
-                    $rowErrors['duplikat'] = "Kombinasi Kode Barang ({$kode}) dan NUP ({$nupInt}) duplikat dengan Baris {$prevRow} di dalam file ini.";
+                    $rowErrors['duplikat'] = "Kombinasi Kode Barang ({$kode}) dan NUP ({$nupInt}) duplikat dengan Baris {$prevRow} di dalam berkas ini.";
                 } else {
                     $seenInFile[$pairKey] = $excelRow;
                 }
@@ -188,8 +255,12 @@ class BmnImportValidator
 
             $validatedRows[] = array_merge($row, [
                 'nup' => $nupInt,
-                'jenis' => $jenis,
-                'satuan' => $satuan ?: 'unit',
+                'jenis_asal' => $jenis,
+                'jenis' => $jenisTerklasifikasi,
+                'jenis_terklasifikasi' => $jenisTerklasifikasi,
+                'kondisi' => $kondisi,
+                'satuan' => $satuan,
+                'lokasi_ruang' => $lokasiRuang,
                 'is_valid' => $isValid,
                 'errors' => $rowErrors,
             ]);

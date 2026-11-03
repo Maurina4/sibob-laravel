@@ -14,17 +14,21 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BmnTemplateService
 {
+    /**
+     * Header standar Master Data Aset (SIMAN / SAKTI).
+     */
     public const HEADERS = [
-        'A' => 'Kode Barang',
-        'B' => 'NUP',
-        'C' => 'Nama Barang',
-        'D' => 'Merk/Type',
-        'E' => 'Tgl Terima',
-        'F' => 'Tahun Perolehan',
-        'G' => 'Nilai Perolehan',
-        'H' => 'Jenis Barang',
-        'I' => 'Satuan',
-        'J' => 'Spesifikasi',
+        'A' => 'No',
+        'B' => 'Jenis BMN',
+        'C' => 'Kode Barang',
+        'D' => 'NUP',
+        'E' => 'Nama Barang',
+        'F' => 'Merk',
+        'G' => 'Kondisi',
+        'H' => 'Tanggal Buku Pertama',
+        'I' => 'Tanggal Perolehan',
+        'J' => 'Nilai Perolehan',
+        'K' => 'Lokasi Ruang',
     ];
 
     /**
@@ -41,7 +45,7 @@ class BmnTemplateService
         $sheetData->setTitle('Data');
 
         // Header Styling
-        $headerRange = 'A1:J1';
+        $headerRange = 'A1:K1';
         $sheetData->getStyle($headerRange)->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -75,48 +79,62 @@ class BmnTemplateService
         $sheetData->freezePane('A2');
 
         // Format kolom Kode Barang sebagai Teks Murni (@)
-        $sheetData->getStyle('A2:A1000')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
-
-        // Format kolom Tgl Terima
-        $sheetData->getStyle('E2:E1000')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $sheetData->getStyle('C2:C1000')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
 
         // Format kolom Nilai Perolehan
-        $sheetData->getStyle('G2:G1000')->getNumberFormat()->setFormatCode('#,##0');
+        $sheetData->getStyle('J2:J1000')->getNumberFormat()->setFormatCode('#,##0');
 
         // Alignment kolom
-        $sheetData->getStyle('A2:A1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        $sheetData->getStyle('B2:B1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheetData->getStyle('E2:E1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheetData->getStyle('F2:F1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheetData->getStyle('G2:G1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheetData->getStyle('H2:I1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheetData->getStyle('A2:A1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheetData->getStyle('B2:B1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheetData->getStyle('C2:C1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheetData->getStyle('D2:D1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheetData->getStyle('E2:F1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheetData->getStyle('G2:I1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheetData->getStyle('J2:J1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheetData->getStyle('K2:K1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        // Baris Contoh 1: BMN-TIK
-        $sheetData->setCellValueExplicit('A2', '3080305002', DataType::TYPE_STRING);
-        $sheetData->setCellValue('B2', 1);
-        $sheetData->setCellValue('C2', 'Komputer Unit PC');
-        $sheetData->setCellValue('D2', 'Lenovo ThinkCentre M70q');
-        $sheetData->setCellValue('E2', '15/01/'.date('Y'));
-        $sheetData->setCellValue('F2', (int) date('Y'));
-        $sheetData->setCellValue('G2', 18500000);
-        $sheetData->setCellValue('H2', 'BMN-TIK');
-        $sheetData->setCellValue('I2', 'unit');
-        $sheetData->setCellValue('J2', 'Core i7, RAM 16GB, SSD 512GB, OS Win 11 Pro');
+        // Baris Contoh 1: TANAH (tanpa merk, tanggal format Jan-78)
+        $sheetData->setCellValue('A2', 1);
+        $sheetData->setCellValue('B2', 'TANAH');
+        $sheetData->setCellValueExplicit('C2', '2010101001', DataType::TYPE_STRING);
+        $sheetData->setCellValue('D2', 2);
+        $sheetData->setCellValue('E2', 'Tanah Bangunan Rumah Negara Golongan I');
+        $sheetData->setCellValue('F2', '');
+        $sheetData->setCellValue('G2', 'Baik');
+        $sheetData->setCellValue('H2', '31/12/2021');
+        $sheetData->setCellValue('I2', 'Jan-78');
+        $sheetData->setCellValue('J2', 10550088000);
+        $sheetData->setCellValue('K2', 'Belum berlokasi');
 
-        // Baris Contoh 2: BMN-LAB
-        $sheetData->setCellValueExplicit('A3', '3080101005', DataType::TYPE_STRING);
-        $sheetData->setCellValue('B3', 2);
-        $sheetData->setCellValue('C3', 'Spektrofotometer UV-Vis');
-        $sheetData->setCellValue('D3', 'Shimadzu UV-1900i');
-        $sheetData->setCellValue('E3', '20/02/'.date('Y'));
-        $sheetData->setCellValue('F3', (int) date('Y'));
-        $sheetData->setCellValue('G3', 125000000);
-        $sheetData->setCellValue('H3', 'BMN-LAB');
-        $sheetData->setCellValue('I3', 'unit');
-        $sheetData->setCellValue('J3', 'Rentang panjang gelombang 190-1100 nm, akurasi tinggi');
+        // Baris Contoh 2: ALAT BESAR (ada merk, tanggal DD/MM/YYYY)
+        $sheetData->setCellValue('A3', 2);
+        $sheetData->setCellValue('B3', 'ALAT BESAR');
+        $sheetData->setCellValueExplicit('C3', '3010305010', DataType::TYPE_STRING);
+        $sheetData->setCellValue('D3', 1);
+        $sheetData->setCellValue('E3', 'Pompa Air');
+        $sheetData->setCellValue('F3', 'Hitachi WT P-255EX');
+        $sheetData->setCellValue('G3', 'Baik');
+        $sheetData->setCellValue('H3', '31/12/2021');
+        $sheetData->setCellValue('I3', '18/06/2013');
+        $sheetData->setCellValue('J3', 7500000);
+        $sheetData->setCellValue('K3', 'Belum berlokasi');
+
+        // Baris Contoh 3: BMN-TIK
+        $sheetData->setCellValue('A4', 3);
+        $sheetData->setCellValue('B4', 'BMN-TIK');
+        $sheetData->setCellValueExplicit('C4', '3080305002', DataType::TYPE_STRING);
+        $sheetData->setCellValue('D4', 1);
+        $sheetData->setCellValue('E4', 'Komputer Unit PC');
+        $sheetData->setCellValue('F4', 'Lenovo ThinkCentre M70q');
+        $sheetData->setCellValue('G4', 'Baik');
+        $sheetData->setCellValue('H4', '31/12/2021');
+        $sheetData->setCellValue('I4', '15/01/2023');
+        $sheetData->setCellValue('J4', 18500000);
+        $sheetData->setCellValue('K4', 'Gudang BMN');
 
         // Style baris contoh
-        $sheetData->getStyle('A2:J3')->applyFromArray([
+        $sheetData->getStyle('A2:K4')->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -129,39 +147,18 @@ class BmnTemplateService
             ],
         ]);
 
-        // Dropdown Data Validation: Jenis Barang (Kolom H) & Satuan (Kolom I)
+        // Dropdown Data Validation: Kondisi (Kolom G)
         for ($row = 2; $row <= 500; $row++) {
-            // Jenis Barang
-            $valJenis = $sheetData->getCell("H{$row}")->getDataValidation();
-            $valJenis->setType(DataValidation::TYPE_LIST);
-            $valJenis->setErrorStyle(DataValidation::STYLE_STOP);
-            $valJenis->setAllowBlank(false);
-            $valJenis->setShowInputMessage(true);
-            $valJenis->setShowErrorMessage(true);
-            $valJenis->setShowDropDown(true);
-            $valJenis->setErrorTitle('Pilihan Jenis Tidak Valid');
-            $valJenis->setError('Pilih Jenis Barang dari opsi: BMN-TIK, BMN-LAB, atau BMN-NON TIK.');
-            $valJenis->setPromptTitle('Jenis Barang');
-            $valJenis->setPrompt('Pilih jenis barang dari daftar pilihan.');
-            $valJenis->setFormula1('"BMN-TIK,BMN-LAB,BMN-NON TIK"');
-
-            // Satuan
-            $valSatuan = $sheetData->getCell("I{$row}")->getDataValidation();
-            $valSatuan->setType(DataValidation::TYPE_LIST);
-            $valSatuan->setErrorStyle(DataValidation::STYLE_INFORMATION);
-            $valSatuan->setAllowBlank(false);
-            $valSatuan->setShowInputMessage(true);
-            $valSatuan->setShowErrorMessage(true);
-            $valSatuan->setShowDropDown(true);
-            $valSatuan->setErrorTitle('Pilihan Satuan');
-            $valSatuan->setError('Gunakan salah satu satuan umum: unit, buah, set, atau paket.');
-            $valSatuan->setPromptTitle('Satuan');
-            $valSatuan->setPrompt('Pilih satuan yang sesuai.');
-            $valSatuan->setFormula1('"unit,buah,set,paket"');
+            $valKondisi = $sheetData->getCell("G{$row}")->getDataValidation();
+            $valKondisi->setType(DataValidation::TYPE_LIST);
+            $valKondisi->setErrorStyle(DataValidation::STYLE_INFORMATION);
+            $valKondisi->setAllowBlank(true);
+            $valKondisi->setShowDropDown(true);
+            $valKondisi->setFormula1('"Baik,Rusak Ringan,Rusak Berat"');
         }
 
         // Auto width untuk tiap kolom di Sheet Data
-        foreach (range('A', 'J') as $col) {
+        foreach (range('A', 'K') as $col) {
             $sheetData->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -172,11 +169,11 @@ class BmnTemplateService
         $sheetPetunjuk->setTitle('Petunjuk');
 
         // Judul Petunjuk
-        $sheetPetunjuk->setCellValue('A1', 'PETUNJUK PENGISIAN TEMPLATE IMPORT BMN (SIBOB)');
+        $sheetPetunjuk->setCellValue('A1', 'PETUNJUK PENGISIAN TEMPLATE IMPORT MASTER DATA ASET (SIBOB)');
         $sheetPetunjuk->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('163828'));
         $sheetPetunjuk->mergeCells('A1:D1');
 
-        $sheetPetunjuk->setCellValue('A2', 'Pastikan Anda mengisi data pada sheet "Data" sesuai dengan ketentuan kolom di bawah ini:');
+        $sheetPetunjuk->setCellValue('A2', 'Format ini kompatibel langsung dengan ekspor Master Data Aset dari SIMAN/SAKTI maupun input manual:');
         $sheetPetunjuk->getStyle('A2')->getFont()->setItalic(true)->setSize(10);
         $sheetPetunjuk->mergeCells('A2:D2');
 
@@ -204,16 +201,17 @@ class BmnTemplateService
         $sheetPetunjuk->getRowDimension(4)->setRowHeight(24);
 
         $petunjukData = [
-            ['Kode Barang', 'Wajib', 'Teks (10 Digit Angka)', 'Kode barang aset inventaris wajib tepat 10 digit angka (contoh: 3080305002 atau 3.08.03.05.002). Format teks menjaga angka nol di depan tidak hilang.'],
+            ['No', 'Opsional', 'Angka', 'Nomor urut baris dokumen.'],
+            ['Jenis BMN', 'Opsional', 'Teks', 'Teks klasifikasi aset (contoh: TANAH, ALAT BESAR, BMN-TIK, BMN-LAB, dsb.). Sistem otomatis mengelompokkan ke kategori yang sesuai.'],
+            ['Kode Barang', 'Wajib', 'Teks (10 Digit Angka)', 'Kode barang aset inventaris wajib tepat 10 digit angka (contoh: 2010101001 atau 3080305002).'],
             ['NUP', 'Wajib', 'Angka Bulat Positif (> 0)', 'Nomor Urut Pendaftaran. Kombinasi Kode Barang + NUP harus unik (tidak boleh duplikat di sistem/file).'],
-            ['Nama Barang', 'Wajib', 'Teks', 'Nama lengkap barang milik negara (contoh: Komputer Unit PC, Laptop Lenovo).'],
-            ['Merk/Type', 'Wajib', 'Teks', 'Merek, model, atau pabrikan pembuat (contoh: Lenovo ThinkCentre M70q, Dell Inspiron).'],
-            ['Tgl Terima', 'Wajib', 'Tanggal (DD/MM/YYYY)', 'Tanggal barang diterima resmi di kantor. Tidak boleh tanggal di masa depan.'],
-            ['Tahun Perolehan', 'Wajib', 'Angka 4 Digit (1945 - tahun ini)', 'Tahun saat barang diadakan. Nilai tahun tidak boleh lebih besar dari tahun Tanggal Terima.'],
-            ['Nilai Perolehan', 'Wajib', 'Angka (>= 0)', 'Harga perolehan barang dalam rupiah tanpa tulisan "Rp" atau titik (contoh: 15000000 atau 1.500.000).'],
-            ['Jenis Barang', 'Wajib', 'Pilihan (Dropdown)', 'Pilih tepat salah satu: BMN-TIK, BMN-LAB, atau BMN-NON TIK.'],
-            ['Satuan', 'Wajib', 'Pilihan (Dropdown)', 'Pilih satuan barang: unit, buah, set, atau paket.'],
-            ['Spesifikasi', 'Opsional', 'Teks', 'Rincian spesifikasi teknis, kelengkapan, nomor seri internal, atau keterangan pendukung.'],
+            ['Nama Barang', 'Wajib', 'Teks', 'Nama lengkap barang milik negara (contoh: Tanah Bangunan Rumah Negara Golongan I, Pompa Air, PC).'],
+            ['Merk', 'Opsional', 'Teks', 'Merek atau pabrikan aset. Dapat dikosongkan untuk aset seperti tanah atau bangunan.'],
+            ['Kondisi', 'Opsional', 'Teks (Default: Baik)', 'Kondisi fisik aset (contoh: Baik, Rusak Ringan, Rusak Berat). Jika dikosongkan otomatis terisi "Baik".'],
+            ['Tanggal Buku Pertama', 'Opsional', 'Tanggal (DD/MM/YYYY)', 'Tanggal pembukuan pertama kali aset pada neraca (contoh: 31/12/2021).'],
+            ['Tanggal Perolehan', 'Wajib', 'Tanggal / Bulan-Tahun', 'Mendukung format DD/MM/YYYY (30/03/2016), Bulan-Tahun (Jan-78, Jan-81), atau Tahun (1978). Sistem otomatis mengekstrak Tahun Perolehan.'],
+            ['Nilai Perolehan', 'Wajib', 'Angka (>= 0)', 'Nilai perolehan barang dalam rupiah tanpa tulisan "Rp" (contoh: 10550088000 atau 7500000).'],
+            ['Lokasi Ruang', 'Opsional', 'Teks', 'Nama ruangan penempatan aset. Jika terisi "Belum berlokasi", sistem akan mengaitkannya ke master lokasi resmi Belum Berlokasi.'],
         ];
 
         $pRow = 5;
@@ -245,15 +243,15 @@ class BmnTemplateService
 
         // Catatan Otomatisasi Sistem
         $pRow += 2;
-        $sheetPetunjuk->setCellValue("A{$pRow}", 'CATATAN NILAI DEFAULT OTOMATIS SISTEM:');
+        $sheetPetunjuk->setCellValue("A{$pRow}", 'CATATAN OTOMATISASI DAN KEBIJAKAN SISTEM:');
         $sheetPetunjuk->getStyle("A{$pRow}")->getFont()->setBold(true)->setSize(11)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('163828'));
 
         $catatan = [
-            '1. Lokasi Ruangan otomatis diisi ke "Gudang BMN" (dapat dipindahkan nanti melalui modul Berita Acara Perpindahan / Distribusi).',
-            '2. Penanggung Jawab otomatis dialokasikan ke "Pengelola BMN" (penampung aset baru di gudang).',
-            '3. Kondisi Fisik barang baru otomatis diset "Baik".',
-            '4. Berita Acara Distribusi Gudang otomatis diterbitkan sebagai draf untuk penempatan ke ruangan dan penerima.',
-            '5. Import menerapkan kebijakan "All-or-Nothing": jika ditemukan 1 baris salah/duplikat, tidak ada data yang disimpan dan sistem menyediakan laporan error Excel.',
+            '1. Auto-Deteksi Format Tanggal: Tanggal seperti "Jan-78" atau "Jan-81" otomatis diubah menjadi "1978-01-01" / "1981-01-01" dan diekstrak tahunnya.',
+            '2. Lokasi "Belum berlokasi": Terintegrasi resmi ke master data ruangan sehingga aset dapat didistribusikan / dipindahkan kemudian via Berita Acara.',
+            '3. Toleransi Merek Kosong: Khusus aset tanah, gedung, atau infrastruktur yang tidak memiliki merek, kolom Merk dapat dikosongkan tanpa error.',
+            '4. Kebijakan Impor Parsial (Toleransi Error): Baris data yang valid akan langsung tersimpan ke sistem. Baris yang bermasalah akan dilewati dan disediakan file Excel Laporan Error untuk diperbaiki.',
+            '5. Dual-Support Skema: Parser sistem juga tetap menerima berkas Excel dengan format template lama 10 kolom (Kode Barang, NUP, Merek, Tgl Terima, Tahun, Nilai, Jenis, Satuan, Spesifikasi).',
         ];
 
         foreach ($catatan as $c) {
@@ -263,10 +261,10 @@ class BmnTemplateService
             $sheetPetunjuk->getStyle("A{$pRow}")->getFont()->setSize(10);
         }
 
-        $sheetPetunjuk->getColumnDimension('A')->setWidth(20);
+        $sheetPetunjuk->getColumnDimension('A')->setWidth(22);
         $sheetPetunjuk->getColumnDimension('B')->setWidth(14);
-        $sheetPetunjuk->getColumnDimension('C')->setWidth(28);
-        $sheetPetunjuk->getColumnDimension('D')->setWidth(80);
+        $sheetPetunjuk->getColumnDimension('C')->setWidth(26);
+        $sheetPetunjuk->getColumnDimension('D')->setWidth(85);
 
         // Aktifkan kembali Sheet Data saat pertama kali dibuka
         $spreadsheet->setActiveSheetIndex(0);
@@ -280,7 +278,7 @@ class BmnTemplateService
         $writer = new Xlsx($spreadsheet);
         $writer->save($tempFile);
 
-        $filename = 'Template_Import_Barang_Masuk_BMN.xlsx';
+        $filename = 'Template_Master_Data_Aset_BMN.xlsx';
 
         return response()->download($tempFile, $filename, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
