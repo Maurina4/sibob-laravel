@@ -729,6 +729,17 @@
                         class="relative mt-1"
                     >
                         <input type="hidden" id="pihak_kedua" name="pihak_kedua" :value="selected" required>
+                        <datalist id="pegawai_pihak_kedua_list_edit">
+                            @foreach(($pegawais ?? collect()) as $p)
+                                @php
+                                    $isPengaju = ($p->id == $baPerpindahan->pengaju_pegawai_id) || ($p->nama === $baPerpindahan->pengaju_nama);
+                                    $isPenyerah = ($p->id == $baPerpindahan->pihak_pertama_id) || ($p->nama === $baPerpindahan->pihak_pertama);
+                                @endphp
+                                @if(! $isPengaju && ! $isPenyerah)
+                                    <option value="{{ $p->nip ? $p->nama . ' (' . $p->nip . ')' : $p->nama }}">{{ $p->nip ? $p->nama . ' (' . $p->nip . ')' : $p->nama }}</option>
+                                @endif
+                            @endforeach
+                        </datalist>
 
                         {{-- Trigger Button --}}
                         <button

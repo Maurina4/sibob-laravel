@@ -66,10 +66,10 @@ class DistribusiController extends Controller
             ->first();
 
         $pihakPertama = [
-            'nama' => $pengelolaBmn?->nama ?: 'M. Ridwan Prasetyo, S.E.',
-            'nip' => $pengelolaBmn?->nip ?: '198703202012031003',
-            'jabatan' => $pengelolaBmn?->jabatan ?: 'Pengelola Distribusi & Gudang BMN',
-            'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Subbag Tata Usaha',
+            'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno, A. Md.',
+            'nip' => $pengelolaBmn?->nip ?: '19840722 2023211 010',
+            'jabatan' => $pengelolaBmn?->jabatan ?: 'Pengelola BMN',
+            'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Balai Besar POM di Banjarbaru',
         ];
 
         // Resolusi Pihak Kedua (Pegawai Penerima)
@@ -103,7 +103,7 @@ class DistribusiController extends Controller
 
         // Resolusi Kepala Balai (Mengetahui)
         $kabalai = Pegawai::where('jabatan', 'like', '%Kepala Balai%')->first();
-        $kabalaiNama = request('kabalai_nama') ?: ($kabalai?->nama ?: 'Ary Yustantiningsih,S.Si.,Apt.');
+        $kabalaiNama = request('kabalai_nama') ?: ($kabalai?->nama ?: 'Ary Yustantingsih,S.Si., Apt.');
         $kabalaiNip = request('kabalai_nip') ?: ($kabalai?->nip ?: '-');
 
         // Resolusi Kasubag TU (Mengetahui)

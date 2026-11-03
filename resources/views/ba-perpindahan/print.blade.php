@@ -329,7 +329,7 @@
         }
 
         .items-table td.center {
-            text-align: left;
+            text-align: center;
         }
 
         .items-table td.font-mono {
@@ -357,6 +357,17 @@
            =================================================== */
         #page2 {
             padding: 20mm 20mm 20mm 30mm; /* Atas 2cm, Kanan 2cm, Bawah 2cm, Kiri 3cm */
+            position: relative;
+        }
+
+        .doc-form-code {
+            position: absolute;
+            bottom: 15mm;
+            left: 30mm;
+            font-size: 7.5pt;
+            font-family: Arial, sans-serif !important;
+            color: #000;
+            line-height: 1;
         }
 
         .page-2-header {
@@ -611,7 +622,7 @@
                     <h1>BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)</h1>
                     <h2>BALAI BESAR PENGAWAS OBAT DAN MAKANAN DI BANJARBARU</h2>
                     <div class="doc-number">
-                        NOMOR : {{ $baPerpindahan->nomor_ba ?: 'PL.03.03.43B.08.26.944' }}
+                        NOMOR : {{ $baPerpindahan->nomor_ba ?: 'PL.03.03.17A.03.26.246' }}
                     </div>
                 </div>
 
@@ -687,7 +698,7 @@
                     </tr>
                 </table>
 
-                @if(!empty($baPerpindahan->pengaju_nama))
+                @if(!empty($baPerpindahan->pengaju_nama) && $baPerpindahan->pengaju_nama !== $pihakPertama['nama'])
                     <div style="font-size: 8.5pt; color: #444; margin: 2px 0 6px 28px;">
                         <em>(Diajukan Oleh: {{ $baPerpindahan->pengajuPegawai ? $baPerpindahan->pengajuPegawai->nama : $baPerpindahan->pengaju_nama }})</em>
                     </div>
@@ -695,29 +706,21 @@
 
                 {{-- PERNYATAAN SERAH TERIMA --}}
                 <p class="statement-p">
-                    PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima penyerahan Barang Milik Negara (BMN) dengan kondisi <strong>{{ $kondisiGeneral }}</strong> Spesifikasi sebagai berikut :
+                    PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima penyerahan Barang Milik Negara (BMN) dengan Spesifikasi sebagai berikut :
                 </p>
 
-                <p class="statement-p">
-                    PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.
-                </p>
-
-                <p class="statement-p">
-                    Apabila terjadi kehilangan menjadi tanggung jawab petugas yang diserahkan barang.
-                </p>
-
-                {{-- TABEL BARANG DENGAN KOLOM KET. LOKASI --}}
+                {{-- TABEL BARANG PERSIS DOKUMEN RESMI BAST PERPINDAHAN --}}
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">No</th>
+                            <th style="width: 5%; text-align: center;">No</th>
                             <th style="width: 20%;">Nama Barang</th>
-                            <th style="width: 14%;">Kode Barang</th>
-                            <th style="width: 7%;">NUP</th>
-                            <th style="width: 15%;">Merk/Type</th>
-                            <th style="width: 8%;">Jumlah (unit)</th>
-                            <th style="width: 11%;">Tahun Perolehan</th>
-                            <th style="width: 20%;">Ket. Lokasi</th>
+                            <th style="width: 14%; text-align: center;">Kode Barang</th>
+                            <th style="width: 8%; text-align: center;">NUP</th>
+                            <th style="width: 18%;">Merk/Type</th>
+                            <th style="width: 9%; text-align: center;">Jumlah (unit)</th>
+                            <th style="width: 11%; text-align: center;">Tahun Perolehan</th>
+                            <th style="width: 15%;">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -730,12 +733,7 @@
                                 <td>{{ $it->merk }}</td>
                                 <td class="center">{{ $it->jumlah }}</td>
                                 <td class="center">{{ $it->tahun_perolehan }}</td>
-                                <td>
-                                    <div class="location-tag">
-                                        <div><span class="badge-from">Dari:</span> {{ $it->lokasi_asal ?: '-' }}</div>
-                                        <div><span class="badge-to">Ke:</span> {{ $it->lokasi_tujuan ?: '-' }}</div>
-                                    </div>
-                                </td>
+                                <td>{{ $it->lokasi_tujuan ?: ($baPerpindahan->ke ?: '—') }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -744,6 +742,14 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <p class="statement-p">
+                    PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.
+                </p>
+
+                <p class="statement-p">
+                    Apabila terjadi kehilangan menjadi tanggung jawab petugas yang diserahkan barang.
+                </p>
             </div>
 
             {{-- DEKORASI SUDUT BAWAH KANAN RESMI BADAN POM --}}
@@ -763,14 +769,14 @@
                     Demikian Berita Acara ini dibuat dengan benar untuk dipergunakan sebagaimana mestinya.
                 </p>
 
-                {{-- TANDA TANGAN PIHAK PERTAMA & PIHAK KEDUA --}}
+                {{-- TANDA TANGAN PIHAK KEDUA & PIHAK PERTAMA --}}
                 <table class="signatures-table">
                     <tr>
                         {{-- KIRI: PIHAK KEDUA --}}
                         <td>
                             <div class="sig-title">PIHAK KEDUA</div>
                             <div class="srikandi-box" id="sigBoxPihak2">
-                                <span class="srikandi-tag">${ttd_pengirim2}</span>
+                                <span class="srikandi-tag">${ttd_pengirim1}</span>
                             </div>
                             <div class="sig-name">
                                 {{ $pihakKedua['nama'] }}
@@ -781,7 +787,7 @@
                         <td>
                             <div class="sig-title">PIHAK PERTAMA</div>
                             <div class="srikandi-box" id="sigBoxPihak1">
-                                <span class="srikandi-tag">${ttd_pengirim1}</span>
+                                <span class="srikandi-tag">${ttd_pengirim2}</span>
                             </div>
                             <div class="sig-name">
                                 {{ $pihakPertama['nama'] }}
@@ -793,8 +799,8 @@
                 {{-- TANDA TANGAN MENGETAHUI (KEPALA BALAI BESAR POM DI BANJARBARU) --}}
                 <div class="sig-mengetahui-block">
                     <div class="sig-mengetahui-lead">Mengetahui,</div>
-                    <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
-                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
+                    <div class="sig-mengetahui-title">Plt. Kepala Balai Besar POM di Banjarbaru</div>
+                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang,</div>
 
                     <div class="srikandi-box" id="sigBoxKabalai">
                         <span class="srikandi-tag">${ttd_pengirim3}</span>
@@ -804,6 +810,11 @@
                         {{ $kabalaiNama }}
                     </div>
                 </div>
+            </div>
+
+            {{-- KODE DOKUMEN MUTU / STANDAR BBPOM --}}
+            <div class="doc-form-code">
+                POM-14.01/CFM.01/SOP.01/IK.17A.01/F.01
             </div>
         </div>
 

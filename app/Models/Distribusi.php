@@ -88,6 +88,66 @@ class Distribusi extends Model
         return $this->nup ? "{$this->kode_barang}-NUP.{$this->nup}" : (string) $this->kode_barang;
     }
 
+    public function getTanggalTerbilangAttribute(): string
+    {
+        $date = $this->tanggal ?: now();
+        $hari = match ($date->dayOfWeek) {
+            0 => 'Minggu',
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu',
+            default => '',
+        };
+        $tglTerbilang = ucfirst(self::terbilang($date->day));
+        $bulanNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+        $bulan = $bulanNames[$date->month] ?? '';
+        $tahunTerbilang = ucfirst(self::terbilang($date->year));
+
+        return "Pada hari ini {$hari} tanggal {$tglTerbilang} bulan {$bulan} tahun {$tahunTerbilang} yang bertanda tangan di bawah ini:";
+    }
+
+    public static function terbilang(int $angka): string
+    {
+        $bilangan = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas'];
+        if ($angka < 12) {
+            return $bilangan[$angka];
+        } elseif ($angka < 20) {
+            return self::terbilang($angka - 10).' belas';
+        } elseif ($angka < 100) {
+            $puluh = (int) ($angka / 10);
+            $sisa = $angka % 10;
+
+            return self::terbilang($puluh).' puluh'.($sisa > 0 ? ' '.self::terbilang($sisa) : '');
+        } elseif ($angka < 200) {
+            $sisa = $angka - 100;
+
+            return 'seratus'.($sisa > 0 ? ' '.self::terbilang($sisa) : '');
+        } elseif ($angka < 1000) {
+            $ratus = (int) ($angka / 100);
+            $sisa = $angka % 100;
+
+            return self::terbilang($ratus).' ratus'.($sisa > 0 ? ' '.self::terbilang($sisa) : '');
+        } elseif ($angka < 2000) {
+            $sisa = $angka - 1000;
+
+            return 'seribu'.($sisa > 0 ? ' '.self::terbilang($sisa) : '');
+        } elseif ($angka < 1000000) {
+            $ribu = (int) ($angka / 1000);
+            $sisa = $angka % 1000;
+
+            return self::terbilang($ribu).' ribu'.($sisa > 0 ? ' '.self::terbilang($sisa) : '');
+        }
+
+        return (string) $angka;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->whereNull('deleted_at')->where('dihapus', false);

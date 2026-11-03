@@ -278,9 +278,9 @@ class BaPerpindahanController extends Controller
         $p1 = $baPerpindahan->pihakPertamaPegawai
             ?? Pegawai::where('nama', $baPerpindahan->pihak_pertama)->first();
         $pihakPertama = [
-            'nama' => $p1?->nama ?: ($baPerpindahan->pihak_pertama ?: ($baPerpindahan->bmn?->penanggungjawab ?: 'Irma Nur Azizah, A.Md.Kes.')),
-            'nip' => $p1?->nip ?: ($baPerpindahan->bmn?->penanggungjawab_nip ?: '-'),
-            'jabatan' => $p1?->jabatan ?: 'Pengelola Layanan Operasional',
+            'nama' => $p1?->nama ?: ($baPerpindahan->pihak_pertama ?: ($baPerpindahan->bmn?->penanggungjawab ?: 'Yuli Supriyatno, A. Md')),
+            'nip' => $p1?->nip ?: ($baPerpindahan->bmn?->penanggungjawab_nip ?: '19840722 202321 1 010'),
+            'jabatan' => $p1?->jabatan ?: 'Pengelola BMN',
             'unit_kerja' => $p1?->unit_kerja ?: 'Balai Besar POM di Banjarbaru',
         ];
 
@@ -294,9 +294,9 @@ class BaPerpindahanController extends Controller
         }
 
         $pihakKedua = [
-            'nama' => $p2?->nama ?: ($namaPihakKeduaClean ?: ($baPerpindahan->pihak_kedua ?: 'Yuli Supriyatno,A.Md.')),
-            'nip' => $p2?->nip ?: ($matches[1] ?? '-'),
-            'jabatan' => $p2?->jabatan ?: 'Pengelola Barang Milik Negara (BMN)',
+            'nama' => $p2?->nama ?: ($namaPihakKeduaClean ?: ($baPerpindahan->pihak_kedua ?: 'Risma Wulandari,A.Md., Kes.')),
+            'nip' => $p2?->nip ?: ($matches[1] ?? '19970516 202521 2 009'),
+            'jabatan' => $p2?->jabatan ?: 'Pengelola Layanan Operasional',
             'unit_kerja' => $p2?->unit_kerja ?: 'Balai Besar POM di Banjarbaru',
         ];
 

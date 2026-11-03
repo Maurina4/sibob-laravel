@@ -217,9 +217,13 @@ class Bmn extends Model
             $query->where('penanggung_jawab_id', $filters['penanggung_jawab_id']);
         } elseif (! empty($filters['penanggungjawab'])) {
             $pjInput = trim($filters['penanggungjawab']);
+            $concatSql = DB::getDriverName() === 'sqlite'
+                ? "nama || ' (' || nip || ')' = ?"
+                : "CONCAT(nama, ' (', nip, ')') = ?";
+
             $pegawai = Pegawai::where('nama', $pjInput)
                 ->orWhere('nip', $pjInput)
-                ->orWhereRaw("CONCAT(nama, ' (', nip, ')') = ?", [$pjInput])
+                ->orWhereRaw($concatSql, [$pjInput])
                 ->first();
             if ($pegawai) {
                 $query->where(function (Builder $q) use ($pegawai, $pjInput) {

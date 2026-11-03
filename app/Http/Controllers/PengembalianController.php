@@ -126,10 +126,10 @@ class PengembalianController extends Controller
             ->first();
 
         $pihakKedua = [
-            'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno',
-            'nip' => $pengelolaBmn?->nip ?: '198001012005011001',
-            'jabatan' => $pengelolaBmn?->jabatan ?: 'Operator / Pengelola BMN',
-            'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Subbag Tata Usaha',
+            'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno,A.Md.',
+            'nip' => $pengelolaBmn?->nip ?: '19840722 202321 1 010',
+            'jabatan' => $pengelolaBmn?->jabatan ?: 'Pengelola Barang Milik Negara (BMN)',
+            'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Balai Besar POM di Banjarbaru',
         ];
 
         // Resolusi Kepala Balai (Mengetahui)

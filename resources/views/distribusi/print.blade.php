@@ -14,10 +14,10 @@
     }
 
     $pihakPertama = $pihakPertama ?? [
-        'nama' => 'M. Ridwan Prasetyo, S.E.',
-        'nip' => '198703202012031003',
-        'jabatan' => 'Pengelola Distribusi & Gudang BMN',
-        'unit_kerja' => 'Subbag Tata Usaha',
+        'nama' => 'Yuli Supriyatno, A. Md.',
+        'nip' => '19840722 2023211 010',
+        'jabatan' => 'Pengelola BMN',
+        'unit_kerja' => 'Balai Besar POM di Banjarbaru',
     ];
 
     $pihakKedua = $pihakKedua ?? [
@@ -27,7 +27,7 @@
         'unit_kerja' => 'Balai Besar POM di Banjarbaru',
     ];
 
-    $kabalaiNama = $kabalaiNama ?? 'Ary Yustantiningsih,S.Si.,Apt.';
+    $kabalaiNama = $kabalaiNama ?? 'Ary Yustantingsih,S.Si., Apt.';
     $kabalaiNip = $kabalaiNip ?? '-';
     $kasubagNama = $kasubagNama ?? 'Kepala Sub Bagian Tata Usaha';
     $kasubagNip = $kasubagNip ?? '-';
@@ -300,8 +300,8 @@
         }
 
         .party-clause {
-            padding-top: 10px !important;
-            padding-bottom: 14px !important;
+            padding-top: 4px !important;
+            padding-bottom: 8px !important;
             padding-left: 2px !important;
             font-size: 11pt;
             line-height: 1.15;
@@ -309,7 +309,7 @@
 
         /* PERNYATAAN SERAH TERIMA & TANGGUNG JAWAB (SPASI 1.15) */
         .statement-p {
-            margin: 12px 0;
+            margin: 6px 0;
             font-size: 11pt;
             line-height: 1.15;
             text-align: left;
@@ -340,7 +340,7 @@
         }
 
         .items-table td.center {
-            text-align: left;
+            text-align: center;
         }
 
         .items-table td.font-mono {
@@ -389,7 +389,7 @@
             margin-bottom: 40px;
         }
 
-        /* BLOK TANDA TANGAN PERSIS FOTO */
+                /* BLOK TANDA TANGAN PERSIS FOTO */
         .signatures-table {
             width: 100%;
             border-collapse: collapse;
@@ -414,7 +414,7 @@
             line-height: 1.15;
         }
 
-                /* KOTAK TEMPAT TTE SRIKANDI / TANDA TANGAN BASAH:
+        /* KOTAK TEMPAT TTE SRIKANDI / TANDA TANGAN BASAH:
            Rata kiri, tag menjorok 6 spasi, jarak 4 enter ke atas dan 4 enter ke bawah */
         .srikandi-box {
             min-height: 1.15em;
@@ -472,6 +472,14 @@
 
         body.mode-manual .srikandi-box {
             min-height: 1.15em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: calc(4 * 1.15em);
+            margin-bottom: calc(4 * 1.15em);
+            padding-left: 0;
+            box-sizing: border-box;
+            transition: min-height 0.2s ease;
         }
 
         /* ===================================================
@@ -599,7 +607,7 @@
 
                 {{-- JUDUL BERITA ACARA --}}
                 <div class="doc-title-block">
-                    <h1>BERITA ACARA DISTRIBUSI BARANG MILIK NEGARA</h1>
+                    <h1>BERITA ACARA PERPINDAHAN BARANG MILIK NEGARA (BMN)</h1>
                     <h2>BALAI BESAR PENGAWAS OBAT DAN MAKANAN DI BANJARBARU</h2>
                     <div class="doc-number">
                         NOMOR : {{ $distribusi->nomor }}
@@ -608,7 +616,7 @@
 
                 {{-- PARAGRAF PEMBUKA --}}
                 <p class="opening-paragraph">
-                    Pada hari ini, tanggal {{ $distribusi->tanggal ? $distribusi->tanggal->translatedFormat('d F Y') : date('d F Y') }}, kami yang bertanda tangan di bawah ini:
+                    {{ $distribusi->tanggal_terbilang }}
                 </p>
 
                 {{-- DATA IDENTITAS PARA PIHAK (FORMAT 2 PIHAK) --}}
@@ -678,22 +686,32 @@
                     </tr>
                 </table>
 
-                {{-- PERNYATAAN SERAH TERIMA --}}
+                {{-- PERNYATAAN SERAH TERIMA & TANGGUNG JAWAB --}}
                 <p class="statement-p">
-                    PIHAK PERTAMA menyerahkan kepada PIHAK KEDUA dan PIHAK KEDUA menerima dari PIHAK PERTAMA Barang Milik Negara (BMN) untuk didistribusikan / ditempatkan pada ruangan <strong>{{ $distribusi->lokasi_tujuan ?: '—' }}</strong> dengan rincian sebagai berikut:
+                    PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima penyerahan perpindahan Barang Milik Negara (BMN) dengan Spesifikasi sebagai berikut :
                 </p>
 
-                {{-- TABEL BARANG BMN DENGAN KOLOM KET. LOKASI --}}
+                <p class="statement-p">
+                    PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.
+                </p>
+
+                <p class="statement-p">
+                    Apabila terjadi kehilangan menjadi tanggung jawab petugas/penanggung jawab ruangan yang diserahkan barang.
+                </p>
+
+                {{-- TABEL BARANG BMN PERSIS FORMAT KANTOR --}}
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">No</th>
-                            <th style="width: 25%;">Nama Barang</th>
-                            <th style="width: 16%;">Kode Barang</th>
-                            <th style="width: 8%;">NUP</th>
-                            <th style="width: 16%;">Merk/Type</th>
-                            <th style="width: 10%;">Jumlah</th>
-                            <th style="width: 20%;">Ket. Lokasi</th>
+                            <th style="width: 4%; text-align: center;">No</th>
+                            <th style="width: 20%;">Nama Barang</th>
+                            <th style="width: 14%; text-align: center;">Kode Barang</th>
+                            <th style="width: 6%; text-align: center;">NUP</th>
+                            <th style="width: 14%;">Merk/Type</th>
+                            <th style="width: 9%; text-align: center;">Jumlah (unit)</th>
+                            <th style="width: 11%; text-align: center;">Tahun Perolehan</th>
+                            <th style="width: 11%;">Ruang Asal</th>
+                            <th style="width: 11%;">Ruang Baru</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -704,30 +722,24 @@
                                 <td>{{ $it->nama_barang ?: ($it->bmn?->nama_barang ?: '—') }}</td>
                                 <td class="center font-mono">{{ $it->kode_barang ?: ($it->bmn?->kode_barang ?: '—') }}</td>
                                 <td class="center font-mono">{{ $it->nup ?: ($it->bmn?->nup ?: '—') }}</td>
-                                <td>{{ $it->bmn?->merek ?: '—' }}</td>
-                                <td class="center">{{ $it->jumlah ?: 1 }} {{ $it->satuan ?: '' }}</td>
-                                <td>
-                                    <div class="location-tag">
-                                        <div><span class="badge-from">Dari:</span> {{ $distribusi->lokasi_asal ?: 'Gudang BMN' }}</div>
-                                        <div><span class="badge-to">Ke:</span> {{ $distribusi->lokasi_tujuan ?: '—' }}</div>
-                                    </div>
-                                </td>
+                                <td>{{ $it->bmn?->merek ?: ($it->bmn?->spesifikasi ?: '—') }}</td>
+                                <td class="center">{{ $it->jumlah ?: 1 }}</td>
+                                <td class="center">{{ $it->bmn?->tahun_perolehan ?: ($distribusi->bmn?->tahun_perolehan ?: '—') }}</td>
+                                <td class="center">{{ $it->lokasi_asal ?: ($distribusi->lokasi_asal ?: 'Gudang BMN') }}</td>
+                                <td class="center">{{ $it->lokasi_tujuan ?: ($distribusi->lokasi_tujuan ?: '—') }}</td>
                             </tr>
                             @endforeach
                         @else
                             <tr>
                                 <td class="center">1</td>
                                 <td>{{ $distribusi->nama_barang }}</td>
-                                <td class="center font-mono">{{ $distribusi->kode_barang ?: '—' }}</td>
-                                <td class="center font-mono">{{ $distribusi->nup ?: '—' }}</td>
-                                <td>{{ $distribusi->bmn?->merek ?: '—' }}</td>
-                                <td class="center">{{ $distribusi->jumlah }} {{ $distribusi->satuan }}</td>
-                                <td>
-                                    <div class="location-tag">
-                                        <div><span class="badge-from">Dari:</span> {{ $distribusi->lokasi_asal ?: 'Gudang BMN' }}</div>
-                                        <div><span class="badge-to">Ke:</span> {{ $distribusi->lokasi_tujuan ?: '—' }}</div>
-                                    </div>
-                                </td>
+                                <td class="center font-mono">{{ $distribusi->kode_barang ?: ($distribusi->bmn?->kode_barang ?: '—') }}</td>
+                                <td class="center font-mono">{{ $distribusi->nup ?: ($distribusi->bmn?->nup ?: '—') }}</td>
+                                <td>{{ $distribusi->bmn?->merek ?: ($distribusi->bmn?->spesifikasi ?: '—') }}</td>
+                                <td class="center">{{ $distribusi->jumlah ?: 1 }}</td>
+                                <td class="center">{{ $distribusi->bmn?->tahun_perolehan ?: '—' }}</td>
+                                <td class="center">{{ $distribusi->lokasi_asal ?: 'Gudang BMN' }}</td>
+                                <td class="center">{{ $distribusi->lokasi_tujuan ?: '—' }}</td>
                             </tr>
                         @endif
                     </tbody>
@@ -748,7 +760,7 @@
 
             <div class="page-content">
                 <p class="closing-paragraph">
-                    Demikian Berita Acara ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
+                    Demikian Berita Acara ini dibuat dengan benar untuk dipergunakan sebagaimana mestinya.
                 </p>
 
                 {{-- TANDA TANGAN PIHAK PERTAMA & PIHAK KEDUA --}}

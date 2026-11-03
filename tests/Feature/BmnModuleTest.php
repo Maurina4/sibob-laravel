@@ -2745,7 +2745,7 @@ class BmnModuleTest extends TestCase
         // Cek halaman cetak render sukses
         $printResponse = $this->actingAs($user)->get(route('distribusi.print', $distribusi));
         $printResponse->assertOk();
-        $printResponse->assertSee('BERITA ACARA DISTRIBUSI BARANG MILIK NEGARA');
+        $printResponse->assertSee('BERITA ACARA PERPINDAHAN BARANG MILIK NEGARA (BMN)');
         $printResponse->assertSee('BA-DIST/TEST/PRINT01');
         $printResponse->assertSee('Kursi Kerja Ergonomis');
         $printResponse->assertSee('Ruang Administrasi');
@@ -2755,7 +2755,7 @@ class BmnModuleTest extends TestCase
         $printResponse->assertSee('${ttd_pengirim3}', false);
         $printResponse->assertSee('Kepala Balai Besar POM di Banjarbaru');
         $printResponse->assertSee('Selaku Kuasa Pengguna Barang');
-        $printResponse->assertSee('Ary Yustantiningsih,S.Si.,Apt.');
+        $printResponse->assertSee('Ary Yustantingsih,S.Si., Apt.');
         $printResponse->assertSee('Format TTE:');
         $printResponse->assertSee('Srikandi TTE');
         $printResponse->assertSee('Tanda Tangan Basah');
@@ -3449,9 +3449,8 @@ class BmnModuleTest extends TestCase
         $resA4->assertSee('size-a4');
         $resA4->assertSee('BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)');
         $resA4->assertSee('PL.03.03.43B.08.26.944');
-        $resA4->assertSee('Ket. Lokasi');
-        $resA4->assertSee('Dari:');
-        $resA4->assertSee('Ke:');
+        $resA4->assertSee('Keterangan');
+        $resA4->assertSee('Gudang BMN');
         $resA4->assertSee('${ttd_pengirim1}', false);
         $resA4->assertSee('${ttd_pengirim2}', false);
         $resA4->assertSee('${ttd_pengirim3}', false);
@@ -4127,7 +4126,7 @@ class BmnModuleTest extends TestCase
 
         $response = $this->actingAs($operator)->get(route('pengembalians.print', $pengembalian));
         $response->assertOk();
-        $response->assertSee('BERITA ACARA PENGEMBALIAN BARANG MILIK NEGARA');
+        $response->assertSee('BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)');
         $response->assertSee('BA-KEMBALI/TEST/001');
         $response->assertSee('${ttd_pengirim1}', false);
         $response->assertSee('${ttd_pengirim2}', false);

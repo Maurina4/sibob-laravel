@@ -156,9 +156,13 @@ class BmnService
         $pjNip = trim($validated['penanggungjawab_nip'] ?? '');
 
         if (! $penanggungJawabId && $pjName !== '') {
+            $concatSql = DB::getDriverName() === 'sqlite'
+                ? "nama || ' (' || nip || ')' = ?"
+                : "CONCAT(nama, ' (', nip, ')') = ?";
+
             $pegawai = Pegawai::where('nama', $pjName)
                 ->orWhere('nip', $pjNip !== '-' ? $pjNip : '___not_found___')
-                ->orWhereRaw("CONCAT(nama, ' (', nip, ')') = ?", [$pjName])
+                ->orWhereRaw($concatSql, [$pjName])
                 ->first();
 
             if (! $pegawai && str_contains(strtolower($pjName), 'pengelola bmn')) {
