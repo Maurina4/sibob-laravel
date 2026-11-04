@@ -42,6 +42,16 @@ class BmnModuleTest extends TestCase
         $this->assertIsArray($stats['aktivitasTerkini']);
     }
 
+    public function test_dashboard_laporan_kerusakan_card_links_to_laporan_kerusakan_index(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response->assertOk();
+        $response->assertSee(route('laporan-kerusakan.index'));
+        $response->assertSee('Laporan Kerusakan');
+    }
+
     public function test_bmn_index_page_is_accessible_by_operator(): void
     {
         $user = User::factory()->create([
