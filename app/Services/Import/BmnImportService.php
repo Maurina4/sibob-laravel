@@ -110,7 +110,7 @@ class BmnImportService
         // 3. Validasi Baris Data
         $validationResult = $this->validator->validate($parseResult['rows']);
 
-        // 4. Catat Log Status Preview
+        // 4. Catat Log Status Preview (hanya simpan ringkasan baris error untuk efisiensi ukuran paket database)
         $importLog = ImportLog::create([
             'user_id' => $userId,
             'nama_file_asli' => $file->getClientOriginalName(),
@@ -122,7 +122,7 @@ class BmnImportService
             'error_summary' => [
                 'has_errors' => ! $validationResult['is_valid'],
                 'errors' => $validationResult['error_messages'],
-                'rows' => $validationResult['validated_rows'],
+                'rows' => $this->extractErrorRows($validationResult['validated_rows']),
             ],
         ]);
 
@@ -192,7 +192,7 @@ class BmnImportService
                     'error_summary' => [
                         'has_errors' => true,
                         'errors' => $validation['error_messages'],
-                        'rows' => $validation['validated_rows'],
+                        'rows' => $this->extractErrorRows($validation['validated_rows']),
                     ],
                 ]);
             }
@@ -240,7 +240,7 @@ class BmnImportService
                     'error_summary' => [
                         'has_errors' => $errorCount > 0,
                         'errors' => $validation['error_messages'],
-                        'rows' => $validation['validated_rows'],
+                        'rows' => $this->extractErrorRows($validation['validated_rows']),
                     ],
                 ]);
             }
@@ -386,5 +386,46 @@ class BmnImportService
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'Cache-Control' => 'no-cache, private',
         ])->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Mengekstrak baris bermasalah untuk disimpan ke kolom error_summary pada import_logs.
+     * Hanya menyimpan baris yang tidak valid (is_valid == false) dan membatasi ukuran data
+     * agar terhindar dari batas max_allowed_packet MySQL ketika menangani berkas ribuan baris.
+     *
+     * @param  array<int, array<string, mixed>>  $rows
+     * @return array<int, array<string, mixed>>
+     */
+    protected function extractErrorRows(array $rows): array
+    {
+        $errorRows = [];
+        foreach ($rows as $r) {
+            if (! empty($r['is_valid'])) {
+                continue;
+            }
+
+            $errorRows[] = [
+                'excel_row' => $r['excel_row'] ?? null,
+                'jenis' => $r['jenis'] ?? '',
+                'kode_barang' => (string) ($r['kode_barang'] ?? ''),
+                'nup_raw' => $r['nup_raw'] ?? '',
+                'nama_barang' => $r['nama_barang'] ?? '',
+                'merek' => $r['merek'] ?? '',
+                'kondisi' => $r['kondisi'] ?? 'Baik',
+                'tanggal_buku_pertama_raw' => $r['tanggal_buku_pertama_raw'] ?? '',
+                'tanggal_terima_raw' => $r['tanggal_terima_raw'] ?? '',
+                'nilai_perolehan_raw' => $r['nilai_perolehan_raw'] ?? '',
+                'lokasi_ruang' => $r['lokasi_ruang'] ?? 'Belum berlokasi',
+                'is_valid' => false,
+                'errors' => $r['errors'] ?? [],
+            ];
+
+            // Batasi maksimal 1.000 sampel baris error untuk efisiensi penyimpanan database
+            if (count($errorRows) >= 1000) {
+                break;
+            }
+        }
+
+        return $errorRows;
     }
 }
