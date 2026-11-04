@@ -176,13 +176,17 @@ class KodeBarangValidationFeatureTest extends TestCase
             'lokasi' => 'Ruang Server TIK',
             'penanggungjawab' => 'Laboran Kimia',
             'kondisi' => 'Baik',
-            'kategori_lab' => 'Kimia',
+            'merek' => 'Shimadzu',
         ]);
 
         $storeResponse->assertRedirect(route('bmns-lab.index'));
         $this->assertDatabaseHas('bmns', [
             'kode_barang' => '3080101009',
             'nup' => '20',
+        ]);
+        $this->assertDatabaseHas('bmns_lab', [
+            'kode_barang' => '3080101009',
+            'nama_barang' => 'Spectrophotometer',
         ]);
 
         $bmn = Bmn::where('kode_barang', '3080101009')->first();
@@ -196,12 +200,16 @@ class KodeBarangValidationFeatureTest extends TestCase
             'lokasi' => 'Ruang Server TIK',
             'penanggungjawab' => 'Laboran Kimia',
             'kondisi' => 'Baik',
-            'kategori_lab' => 'Kimia',
+            'merek' => 'Shimadzu',
         ]);
 
         $updateResponse->assertRedirect(route('bmns-lab.index'));
         $this->assertDatabaseHas('bmns', [
             'id' => $bmn->id,
+            'nama_barang' => 'Spectrophotometer UV-Vis',
+        ]);
+        $this->assertDatabaseHas('bmns_lab', [
+            'id' => $bmnLab->id,
             'nama_barang' => 'Spectrophotometer UV-Vis',
         ]);
     }

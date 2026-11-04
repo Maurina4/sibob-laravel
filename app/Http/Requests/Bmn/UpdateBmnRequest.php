@@ -47,7 +47,7 @@ class UpdateBmnRequest extends FormRequest
             'tahun_perolehan' => ['nullable', 'integer', 'min:1900', 'max:'.date('Y')],
             'nilai_perolehan' => ['nullable', 'numeric', 'min:0'],
             'tanggal_terima' => ['nullable', 'date', 'before_or_equal:today'],
-            'jenis' => ['required', 'string', 'in:BMN-TIK,BMN-LAB,BMN-NON TIK'],
+            'jenis' => ['required', 'string', 'in:BMN-TIK,BMN-LAB,BMN-NON TIK,BMN-TIK & LAB'],
             'satuan' => ['nullable', 'string', 'max:255'],
             'lokasi' => ['required', 'string', 'max:255'],
             'penanggungjawab' => ['required', 'string', 'max:255'],

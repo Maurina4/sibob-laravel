@@ -206,8 +206,12 @@
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF2ED] text-[#137333] border border-[#CDE1D4]">
                                                     Berhasil
                                                 </span>
+                                            @elseif($log->status === 'parsial')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF7E0] text-[#B06000] border border-[#FEEFC3]" title="{{ $log->jumlah_sukses }} Sukses, {{ $log->jumlah_gagal }} Gagal">
+                                                    Selesai Sebagian
+                                                </span>
                                             @elseif($log->status === 'preview')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF7E0] text-[#B06000] border border-[#FEEFC3]">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F0F4F2] text-[#4A5D52] border border-[#D0DCD5]">
                                                     Preview
                                                 </span>
                                             @else
@@ -217,7 +221,7 @@
                                             @endif
                                         </td>
                                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                                            @if($log->status === 'gagal' || ($log->error_summary['has_errors'] ?? false))
+                                            @if($log->status === 'parsial' || $log->status === 'gagal' || ($log->error_summary['has_errors'] ?? false) || $log->jumlah_gagal > 0)
                                                 <a
                                                     href="{{ route('bmns.import.error-report', $log) }}"
                                                     class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#9C322C] hover:underline"
@@ -296,10 +300,10 @@
                         </ul>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-[#FFF8E7] border border-[#FFE8A3] text-[#7A4B00] space-y-1">
-                        <div class="font-bold text-[11px] uppercase tracking-wider">Kebijakan All-or-Nothing</div>
+                    <div class="p-3 rounded-xl bg-[#EAF2ED] border border-[#CDE1D4] text-[#163828] space-y-1">
+                        <div class="font-bold text-[11px] uppercase tracking-wider">Kebijakan Toleran Parsial</div>
                         <p class="text-[11px] leading-relaxed">
-                            Jika ditemukan 1 baris yang salah atau duplikat, seluruh file tidak akan disimpan. Anda dapat mengunduh laporan error, memperbaikinya, dan mengunggah ulang.
+                            Baris data yang valid akan tetap disimpan ke sistem, sementara baris yang bermasalah akan dilewati. Anda dapat mengunduh laporan error berisi baris-baris yang gagal untuk dikoreksi dan diunggah kembali.
                         </p>
                     </div>
                 </div>

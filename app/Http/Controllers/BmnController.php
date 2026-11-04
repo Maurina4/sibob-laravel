@@ -46,7 +46,7 @@ class BmnController extends Controller
     {
         $lokasis = Lokasi::orderedByGedung()->get();
         $pegawais = Pegawai::orderBy('nama')->get();
-        $jenisBarang = ['BMN-TIK', 'BMN-LAB', 'BMN-NON TIK'];
+        $jenisBarang = ['BMN-NON TIK', 'BMN-LAB', 'BMN-TIK', 'BMN-TIK & LAB'];
 
         return view('bmn.create', compact('lokasis', 'pegawais', 'jenisBarang'));
     }
@@ -82,7 +82,7 @@ class BmnController extends Controller
 
         $lokasis = Lokasi::orderedByGedung()->get();
         $pegawais = Pegawai::orderBy('nama')->get();
-        $jenisBarang = ['BMN-TIK', 'BMN-LAB', 'BMN-NON TIK'];
+        $jenisBarang = ['BMN-NON TIK', 'BMN-LAB', 'BMN-TIK', 'BMN-TIK & LAB'];
 
         return view('bmn.edit', compact('bmn', 'lokasis', 'pegawais', 'jenisBarang'));
     }

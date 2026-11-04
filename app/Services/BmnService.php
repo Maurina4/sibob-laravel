@@ -38,6 +38,7 @@ class BmnService
     {
         return [
             'jenisFilters' => [
+                'BMN-TIK & LAB',
                 'BMN-TIK',
                 'BMN-LAB',
                 'BMN-NON TIK',
@@ -133,22 +134,226 @@ class BmnService
     }
 
     /**
+     * Mengecek apakah sebuah lokasi ruangan termasuk dalam lingkungan Laboratorium / Gedung A.
+     */
+    public function isLabLocation(?Lokasi $lokasiModel, string $rawLocation): bool
+    {
+        if ($lokasiModel) {
+            $kode = strtoupper(trim((string) $lokasiModel->kode_ruangan));
+            $nama = strtolower(trim((string) $lokasiModel->nama));
+
+            // Kode gedung A (misal A1.01, A2.15, Ax.xx), kecualikan kode khusus non-gedung seperti 'BL'
+            if ($kode !== 'BL' && (preg_match('/^A[\d.]/i', $kode) || str_starts_with($kode, 'A'))) {
+                return true;
+            }
+
+            if (str_contains($nama, 'lab') || str_contains($nama, 'laboratorium')) {
+                return true;
+            }
+        }
+
+        $rawUpper = strtoupper(trim($rawLocation));
+        $rawLower = strtolower(trim($rawLocation));
+
+        if ($rawLower === 'belum berlokasi') {
+            return false;
+        }
+
+        if (preg_match('/^A[\d.]/i', $rawUpper)) {
+            return true;
+        }
+
+        if (str_contains($rawLower, 'lab') || str_contains($rawLower, 'laboratorium')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Membangun cache in-memory untuk entitas referensi (Lokasi, Pegawai, Distribusi)
+     * guna mengoptimalkan import massal berkapasitas besar (hingga 5.000 data).
+     *
+     * @return array<string, mixed>
+     */
+    public function createImportCache(): array
+    {
+        $lokasis = Lokasi::all();
+        $lokasiByName = [];
+        $lokasiByCode = [];
+
+        foreach ($lokasis as $lokasi) {
+            $lokasiByName[strtolower(trim((string) $lokasi->nama))] = $lokasi;
+            if (! empty($lokasi->kode_ruangan)) {
+                $lokasiByCode[strtoupper(trim((string) $lokasi->kode_ruangan))] = $lokasi;
+            }
+        }
+
+        $countToday = Distribusi::whereDate('created_at', today())->count();
+        $existingToday = Distribusi::whereDate('created_at', today())->pluck('nomor')->flip()->toArray();
+
+        return [
+            'lokasi_by_name' => $lokasiByName,
+            'lokasi_by_code' => $lokasiByCode,
+            'pegawai' => Pegawai::all(),
+            'distribusi_counter' => $countToday,
+            'distribusi_existing' => $existingToday,
+        ];
+    }
+
+    /**
+     * Resolusi Lokasi dengan dukungan In-Memory Cache.
+     */
+    public function resolveLokasiCached(string $rawLocation, array &$cache): ?Lokasi
+    {
+        $trimmed = trim($rawLocation);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $lower = strtolower($trimmed);
+        if (isset($cache['lokasi_by_name'][$lower])) {
+            return $cache['lokasi_by_name'][$lower];
+        }
+
+        $upper = strtoupper($trimmed);
+        if (isset($cache['lokasi_by_code'][$upper])) {
+            return $cache['lokasi_by_code'][$upper];
+        }
+
+        // Cek format 'B1.01 - RUANG TAMU UTAMA'
+        if (str_contains($trimmed, ' - ')) {
+            [$code, $name] = explode(' - ', $trimmed, 2);
+            $codeUpper = strtoupper(trim($code));
+            $nameLower = strtolower(trim($name));
+            if (isset($cache['lokasi_by_code'][$codeUpper])) {
+                return $cache['lokasi_by_code'][$codeUpper];
+            }
+            if (isset($cache['lokasi_by_name'][$nameLower])) {
+                return $cache['lokasi_by_name'][$nameLower];
+            }
+        }
+
+        // Cek format 'B1.01 RUANG...' atau 'A1.01-00001'
+        if (preg_match('/^([A-Za-z]{1,2}(?:\.[A-Za-z]+)?\d*\.\d+)[-\s]+(.*)$/i', $trimmed, $matches)) {
+            $codeUpper = strtoupper(trim($matches[1]));
+            $nameLower = strtolower(trim($matches[2]));
+            if (isset($cache['lokasi_by_code'][$codeUpper])) {
+                return $cache['lokasi_by_code'][$codeUpper];
+            }
+            if ($nameLower !== '' && isset($cache['lokasi_by_name'][$nameLower])) {
+                return $cache['lokasi_by_name'][$nameLower];
+            }
+        }
+
+        // Jika belum ada di cache, cari atau buat di database lalu masukkan ke cache
+        $lokasi = Lokasi::findOrCreateByName($trimmed);
+        if ($lokasi) {
+            $cache['lokasi_by_name'][strtolower(trim((string) $lokasi->nama))] = $lokasi;
+            if (! empty($lokasi->kode_ruangan)) {
+                $cache['lokasi_by_code'][strtoupper(trim((string) $lokasi->kode_ruangan))] = $lokasi;
+            }
+            $cache['lokasi_by_name'][$lower] = $lokasi;
+        }
+
+        return $lokasi;
+    }
+
+    /**
+     * Resolusi ID Pegawai penanggung jawab dengan dukungan In-Memory Cache.
+     */
+    public function resolvePegawaiCached(string $pjName, string $pjNip, array &$cache): ?int
+    {
+        $pjName = trim($pjName);
+        $pjNip = trim($pjNip);
+
+        if ($pjName === '' && $pjNip === '') {
+            return null;
+        }
+
+        $pegawaiList = $cache['pegawai'] ?? null;
+        if (! $pegawaiList) {
+            return null;
+        }
+
+        $pjNameLower = strtolower($pjName);
+
+        /** @var Pegawai|null $pegawai */
+        $pegawai = $pegawaiList->first(function ($p) use ($pjNameLower, $pjNip) {
+            if ($pjNameLower !== '' && strtolower(trim((string) $p->nama)) === $pjNameLower) {
+                return true;
+            }
+            if ($pjNip !== '' && $pjNip !== '-' && trim((string) $p->nip) === $pjNip) {
+                return true;
+            }
+            if ($pjNameLower !== '') {
+                $formatted = strtolower(trim((string) $p->nama).' ('.trim((string) $p->nip).')');
+                if ($formatted === $pjNameLower) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        if (! $pegawai && str_contains($pjNameLower, 'pengelola bmn')) {
+            $pegawai = $pegawaiList->first(fn ($p) => strtolower(trim((string) $p->jabatan)) === 'pengelola bmn');
+        }
+
+        return $pegawai?->id;
+    }
+
+    /**
      * Menyimpan satu data BMN beserta sinkronisasi tabel relasi & Berita Acara Distribusi Gudang.
      * Dapat digunakan bersama baik oleh input manual maupun import Excel massal.
      *
      * @param  array<string, mixed>  $validated
+     * @param  array<string, mixed>|null  $cache
      */
-    public function storeRecord(array $validated): Bmn
+    public function storeRecord(array $validated, ?array &$cache = null): Bmn
     {
         $lokasiName = trim($validated['lokasi'] ?? '');
-        $lokasiModel = $lokasiName !== '' ? Lokasi::findOrCreateByName($lokasiName) : null;
+        if ($cache !== null) {
+            $lokasiModel = $lokasiName !== '' ? $this->resolveLokasiCached($lokasiName, $cache) : null;
+        } else {
+            $lokasiModel = $lokasiName !== '' ? Lokasi::findOrCreateByName($lokasiName) : null;
+        }
 
-        // Resolve kategori_bmn_id
-        $kategoriId = match (strtoupper(trim($validated['jenis'] ?? ''))) {
-            'BMN-TIK' => 3,
-            'BMN-LAB' => 2,
-            default => 1,
-        };
+        // Evaluasi kondisi Lab dan TIK untuk klasifikasi cerdas & Dual Tracking
+        $isLabLocation = $this->isLabLocation($lokasiModel, $lokasiName);
+        $rawJenis = strtoupper(trim($validated['jenis'] ?? ''));
+
+        // Deteksi NON TIK (contoh: BMN-NON TIK, NON TIK, ALAT NON TIK)
+        $isNonTik = str_contains($rawJenis, 'NON TIK') || str_contains($rawJenis, 'NON-TIK') || str_contains($rawJenis, 'NONTIK');
+        $isPureTik = ! $isNonTik && str_contains($rawJenis, 'TIK');
+        $isLab = $isLabLocation || str_contains($rawJenis, 'LAB');
+
+        $createTik = false;
+        $createLab = false;
+
+        if ($isPureTik && $isLab) {
+            $standarJenis = 'BMN-TIK & LAB';
+            $kategoriId = 2; // Kategori utama Lab
+            $createTik = true;
+            $createLab = true;
+        } elseif ($isPureTik) {
+            $standarJenis = 'BMN-TIK';
+            $kategoriId = 3;
+            $createTik = true;
+        } elseif ($isLab) {
+            $standarJenis = 'BMN-LAB';
+            $kategoriId = 2;
+            $createLab = true;
+        } else {
+            $standarJenis = 'BMN-NON TIK';
+            $kategoriId = 1;
+        }
+
+        // Catat klasifikasi asal pada spesifikasi jika jenis aslinya bukan format standar
+        $spesifikasi = $validated['spesifikasi'] ?? null;
+        if (! in_array($rawJenis, ['BMN-TIK', 'BMN-LAB', 'BMN-NON TIK', 'BMN-TIK & LAB', ''], true)) {
+            $spesifikasi = $spesifikasi ? "{$spesifikasi} (Klasifikasi Asal: {$rawJenis})" : "Klasifikasi Asal: {$rawJenis}";
+        }
 
         // Resolve penanggung_jawab_id jika belum di-set eksplisit
         $penanggungJawabId = $validated['penanggung_jawab_id'] ?? null;
@@ -156,20 +361,24 @@ class BmnService
         $pjNip = trim($validated['penanggungjawab_nip'] ?? '');
 
         if (! $penanggungJawabId && $pjName !== '') {
-            $concatSql = DB::getDriverName() === 'sqlite'
-                ? "nama || ' (' || nip || ')' = ?"
-                : "CONCAT(nama, ' (', nip, ')') = ?";
+            if ($cache !== null) {
+                $penanggungJawabId = $this->resolvePegawaiCached($pjName, $pjNip, $cache);
+            } else {
+                $concatSql = DB::getDriverName() === 'sqlite'
+                    ? "nama || ' (' || nip || ')' = ?"
+                    : "CONCAT(nama, ' (', nip, ')') = ?";
 
-            $pegawai = Pegawai::where('nama', $pjName)
-                ->orWhere('nip', $pjNip !== '-' ? $pjNip : '___not_found___')
-                ->orWhereRaw($concatSql, [$pjName])
-                ->first();
+                $pegawai = Pegawai::where('nama', $pjName)
+                    ->orWhere('nip', $pjNip !== '-' ? $pjNip : '___not_found___')
+                    ->orWhereRaw($concatSql, [$pjName])
+                    ->first();
 
-            if (! $pegawai && str_contains(strtolower($pjName), 'pengelola bmn')) {
-                $pegawai = Pegawai::where('jabatan', 'Pengelola BMN')->first();
+                if (! $pegawai && str_contains(strtolower($pjName), 'pengelola bmn')) {
+                    $pegawai = Pegawai::where('jabatan', 'Pengelola BMN')->first();
+                }
+
+                $penanggungJawabId = $pegawai?->id;
             }
-
-            $penanggungJawabId = $pegawai?->id;
         }
 
         $dataBmn = [
@@ -182,7 +391,8 @@ class BmnService
             'tahun_perolehan' => $validated['tahun_perolehan'] ?? null,
             'nilai_perolehan' => $validated['nilai_perolehan'] ?? null,
             'tanggal_terima' => $validated['tanggal_terima'] ?? null,
-            'jenis' => $validated['jenis'],
+            'tanggal_buku_pertama' => $validated['tanggal_buku_pertama'] ?? null,
+            'jenis' => $standarJenis,
             'satuan' => $validated['satuan'] ?? null,
             'lokasi' => $lokasiModel ? $lokasiModel->nama : ($validated['lokasi'] ?? 'Gudang BMN'),
             'lokasi_id' => $lokasiModel?->id,
@@ -191,7 +401,7 @@ class BmnService
             'penanggungjawab_nip' => $validated['penanggungjawab_nip'] ?? ($pjNip ?: '-'),
             'kondisi' => $validated['kondisi'] ?? 'Baik',
             'jadwal_pemeliharaan' => $validated['jadwal_pemeliharaan'] ?? null,
-            'spesifikasi' => $validated['spesifikasi'] ?? null,
+            'spesifikasi' => $spesifikasi,
             'dihapus' => false,
             'dihapus_pada' => null,
             'dihapus_oleh' => null,
@@ -199,7 +409,7 @@ class BmnService
 
         $bmn = Bmn::create($dataBmn);
 
-        if ($bmn->jenis === 'BMN-TIK') {
+        if ($createTik) {
             BmnTik::create([
                 'bmn_id' => $bmn->id,
                 'kode_barang' => $bmn->kode_barang,
@@ -211,9 +421,12 @@ class BmnService
                 'jenis' => 'BMN-TIK',
                 'lokasi' => $bmn->lokasi,
                 'penanggungjawab' => $bmn->penanggungjawab,
+                'kondisi' => $bmn->kondisi ?? 'Baik',
                 'dihapus' => false,
             ]);
-        } elseif ($bmn->jenis === 'BMN-LAB') {
+        }
+
+        if ($createLab) {
             BmnLab::create([
                 'bmn_id' => $bmn->id,
                 'kode_barang' => $bmn->kode_barang,
@@ -225,13 +438,13 @@ class BmnService
                 'nilai_perolehan' => $bmn->nilai_perolehan,
                 'lokasi' => $bmn->lokasi,
                 'penanggungjawab' => $bmn->penanggungjawab,
-                'kondisi' => $bmn->kondisi,
+                'kondisi' => $bmn->kondisi ?? 'Baik',
                 'status_kalibrasi' => 'Belum Dikalibrasi',
                 'dihapus' => false,
             ]);
         }
 
-        $this->createAutomaticDistribusiIfNeeded($bmn);
+        $this->createAutomaticDistribusiIfNeeded($bmn, $cache);
 
         return $bmn;
     }
@@ -365,10 +578,10 @@ class BmnService
         ]);
     }
 
-    public function createAutomaticDistribusiIfNeeded(Bmn $bmn): ?Distribusi
+    public function createAutomaticDistribusiIfNeeded(Bmn $bmn, ?array &$cache = null): ?Distribusi
     {
-        $lokasiNormalized = strtolower(trim($bmn->lokasi ?? ''));
-        $pjNormalized = strtolower(trim($bmn->penanggungjawab ?? ''));
+        $lokasiNormalized = strtolower(trim((string) ($bmn->lokasi ?? '')));
+        $pjNormalized = strtolower(trim((string) ($bmn->penanggungjawab ?? '')));
 
         $isGudang = str_contains($lokasiNormalized, 'gudang');
         $isPengelolaBmn = str_contains($pjNormalized, 'pengelola bmn') || empty($pjNormalized);
@@ -378,11 +591,23 @@ class BmnService
         }
 
         $datePart = now()->format('Ymd');
-        $countToday = Distribusi::whereDate('created_at', today())->count() + 1;
-        $nomorBa = 'BA-DIST/'.$datePart.'/'.str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
-        while (Distribusi::where('nomor', $nomorBa)->exists()) {
-            $countToday++;
+        if ($cache !== null && isset($cache['distribusi_counter'])) {
+            $cache['distribusi_counter']++;
+            $countToday = $cache['distribusi_counter'];
             $nomorBa = 'BA-DIST/'.$datePart.'/'.str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            while (isset($cache['distribusi_existing'][$nomorBa])) {
+                $countToday++;
+                $cache['distribusi_counter'] = $countToday;
+                $nomorBa = 'BA-DIST/'.$datePart.'/'.str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            }
+            $cache['distribusi_existing'][$nomorBa] = true;
+        } else {
+            $countToday = Distribusi::whereDate('created_at', today())->count() + 1;
+            $nomorBa = 'BA-DIST/'.$datePart.'/'.str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            while (Distribusi::where('nomor', $nomorBa)->exists()) {
+                $countToday++;
+                $nomorBa = 'BA-DIST/'.$datePart.'/'.str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            }
         }
 
         $distribusi = Distribusi::create([

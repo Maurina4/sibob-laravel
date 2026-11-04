@@ -78,6 +78,14 @@
                         {{ $bmn->tanggal_terima ? \Carbon\Carbon::parse($bmn->tanggal_terima)->format('d F Y') : '—' }}
                     </dd>
                 </div>
+                @if($bmn->tanggal_buku_pertama)
+                    <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
+                        <dt class="text-[#62756A]">Tanggal Buku Pertama</dt>
+                        <dd class="font-mono text-[#132219]">
+                            {{ \Carbon\Carbon::parse($bmn->tanggal_buku_pertama)->format('d F Y') }}
+                        </dd>
+                    </div>
+                @endif
                 <div class="flex justify-between py-1.5 border-b border-[#E3ECE6]/50">
                     <dt class="text-[#62756A]">Kondisi Fisik</dt>
                     <dd>

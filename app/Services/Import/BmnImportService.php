@@ -38,6 +38,9 @@ class BmnImportService
      */
     public function processPreview(UploadedFile $file, int $userId): array
     {
+        @set_time_limit(300);
+        @ini_set('memory_limit', '512M');
+
         // 1. Validasi ekstensi & mime
         $ext = strtolower($file->getClientOriginalExtension());
         if ($ext !== 'xlsx') {
@@ -79,7 +82,7 @@ class BmnImportService
 
             return [
                 'success' => false,
-                'message' => 'Format kolom header tidak sesuai dengan template resmi.',
+                'message' => 'Format kolom header tidak sesuai dengan skema Master Data Aset maupun template BMN.',
                 'header_errors' => $parseResult['header_errors'],
             ];
         }
@@ -100,7 +103,7 @@ class BmnImportService
 
             return [
                 'success' => false,
-                'message' => 'Berkas Excel tidak memiliki baris data (kosong). Harap isi data pada sheet "Data".',
+                'message' => 'Berkas Excel tidak memiliki baris data (kosong). Harap isi data pada sheet "Data" atau sheet utama.',
             ];
         }
 
@@ -115,7 +118,7 @@ class BmnImportService
             'total_baris' => $validationResult['total_rows'],
             'jumlah_sukses' => $validationResult['valid_count'],
             'jumlah_gagal' => $validationResult['error_count'],
-            'status' => $validationResult['is_valid'] ? 'preview' : 'gagal',
+            'status' => $validationResult['valid_count'] > 0 ? 'preview' : 'gagal',
             'error_summary' => [
                 'has_errors' => ! $validationResult['is_valid'],
                 'errors' => $validationResult['error_messages'],
@@ -139,12 +142,16 @@ class BmnImportService
     }
 
     /**
-     * Mengeksekusi simpan permanen All-or-Nothing ke database dalam DB::transaction.
+     * Mengeksekusi simpan permanen ke database dalam DB::transaction.
+     * Menerapkan kebijakan parsial: baris valid disimpan, baris error dilewati.
      *
      * @return array{success: bool, message: string, count?: int}
      */
     public function confirmImport(string $token, int $userId): array
     {
+        @set_time_limit(300);
+        @ini_set('memory_limit', '512M');
+
         $tempFilename = 'import_'.$token.'.xlsx';
         $storedPath = 'imports/'.$tempFilename;
 
@@ -156,7 +163,6 @@ class BmnImportService
         }
 
         $fullPath = Storage::path($storedPath);
-
         $importLog = ImportLog::where('nama_file_hash', $tempFilename)->first();
 
         // Parse ulang untuk memastikan integritas
@@ -171,13 +177,18 @@ class BmnImportService
         // Re-validasi akhir (menghindari duplikasi bila ada data baru masuk selama operator membuka preview)
         $validation = $this->validator->validate($parseResult['rows']);
 
-        // Kebijakan All-or-Nothing
-        if (! $validation['is_valid']) {
+        // Filter baris yang valid
+        $validRows = array_values(array_filter($validation['validated_rows'], fn ($r) => $r['is_valid']));
+        $validCount = count($validRows);
+        $errorCount = $validation['error_count'];
+
+        // Jika tidak ada satu pun baris valid (100% error)
+        if ($validCount === 0) {
             if ($importLog) {
                 $importLog->update([
                     'status' => 'gagal',
-                    'jumlah_gagal' => $validation['error_count'],
-                    'jumlah_sukses' => $validation['valid_count'],
+                    'jumlah_gagal' => $errorCount,
+                    'jumlah_sukses' => 0,
                     'error_summary' => [
                         'has_errors' => true,
                         'errors' => $validation['error_messages'],
@@ -188,51 +199,63 @@ class BmnImportService
 
             return [
                 'success' => false,
-                'message' => "Import dibatalkan (All-or-Nothing): Ditemukan {$validation['error_count']} baris bermasalah. Tidak ada data yang disimpan.",
+                'message' => "Import tidak dapat dilanjutkan: Seluruh {$errorCount} baris data mengalami kesalahan. Tidak ada data yang disimpan.",
             ];
         }
 
-        // Eksekusi Simpan Seluruh Baris dalam 1 Transaksi Database
-        $validatedRows = $validation['validated_rows'];
+        // Siapkan in-memory cache untuk penanganan performa tinggi skala 5.000 data
+        $cache = $this->bmnService->createImportCache();
 
+        // Eksekusi Simpan Baris Valid dalam 1 Transaksi Database
         try {
-            DB::transaction(function () use ($validatedRows) {
-                foreach ($validatedRows as $row) {
+            DB::transaction(function () use ($validRows, &$cache) {
+                foreach ($validRows as $row) {
                     $this->bmnService->storeRecord([
                         'kode_barang' => $row['kode_barang'],
                         'nup' => $row['nup'],
                         'nama_barang' => $row['nama_barang'],
                         'merek' => $row['merek'],
                         'tanggal_terima' => $row['tanggal_terima'],
+                        'tanggal_buku_pertama' => $row['tanggal_buku_pertama'] ?? null,
                         'tahun_perolehan' => $row['tahun_perolehan'],
                         'nilai_perolehan' => $row['nilai_perolehan'],
-                        'jenis' => $row['jenis'],
-                        'satuan' => $row['satuan'],
-                        'spesifikasi' => $row['spesifikasi'],
-                        'lokasi' => 'Gudang BMN',
+                        'jenis' => $row['jenis_asal'] ?? $row['jenis'],
+                        'satuan' => $row['satuan'] ?? 'unit',
+                        'spesifikasi' => $row['spesifikasi'] ?? null,
+                        'lokasi' => ! empty($row['lokasi_ruang']) ? $row['lokasi_ruang'] : 'Gudang BMN',
                         'penanggungjawab' => 'Pengelola BMN',
                         'penanggungjawab_nip' => '-',
-                        'kondisi' => 'Baik',
-                    ]);
+                        'kondisi' => ! empty($row['kondisi']) ? $row['kondisi'] : 'Baik',
+                    ], $cache);
                 }
             });
 
-            // Update Log Berhasil
+            // Update Log
+            $status = $errorCount > 0 ? 'parsial' : 'berhasil';
             if ($importLog) {
                 $importLog->update([
-                    'status' => 'berhasil',
-                    'jumlah_sukses' => $validation['total_rows'],
-                    'jumlah_gagal' => 0,
+                    'status' => $status,
+                    'jumlah_sukses' => $validCount,
+                    'jumlah_gagal' => $errorCount,
+                    'error_summary' => [
+                        'has_errors' => $errorCount > 0,
+                        'errors' => $validation['error_messages'],
+                        'rows' => $validation['validated_rows'],
+                    ],
                 ]);
             }
 
             // Hapus file temporary
             Storage::delete($storedPath);
 
+            $message = $errorCount > 0
+                ? "Sebanyak {$validCount} barang berhasil diimpor. {$errorCount} baris bermasalah dilewati."
+                : "Sebanyak {$validCount} barang berhasil diimpor dan didaftarkan ke sistem.";
+
             return [
                 'success' => true,
-                'message' => "Sebanyak {$validation['total_rows']} barang berhasil diimpor dan didaftarkan ke Gudang BMN.",
-                'count' => $validation['total_rows'],
+                'message' => $message,
+                'count' => $validCount,
             ];
         } catch (Exception $e) {
             if ($importLog) {
@@ -261,27 +284,28 @@ class BmnImportService
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Error Import');
 
-        // Header
+        // Header Master Data Aset + Status Error
         $headers = [
             'A1' => 'Baris Excel',
-            'B1' => 'Kode Barang',
-            'C1' => 'NUP',
-            'D1' => 'Nama Barang',
-            'E1' => 'Merk/Type',
-            'F1' => 'Tgl Terima',
-            'G1' => 'Tahun Perolehan',
-            'H1' => 'Nilai Perolehan',
-            'I1' => 'Jenis Barang',
-            'J1' => 'Satuan',
-            'K1' => 'Status Baris',
-            'L1' => 'Keterangan / Alasan Error',
+            'B1' => 'Jenis BMN',
+            'C1' => 'Kode Barang',
+            'D1' => 'NUP',
+            'E1' => 'Nama Barang',
+            'F1' => 'Merk',
+            'G1' => 'Kondisi',
+            'H1' => 'Tanggal Buku Pertama',
+            'I1' => 'Tanggal Perolehan',
+            'J1' => 'Nilai Perolehan',
+            'K1' => 'Lokasi Ruang',
+            'L1' => 'Status Baris',
+            'M1' => 'Keterangan / Alasan Error',
         ];
 
         foreach ($headers as $cell => $title) {
             $sheet->setCellValue($cell, $title);
         }
 
-        $sheet->getStyle('A1:L1')->applyFromArray([
+        $sheet->getStyle('A1:M1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
@@ -297,39 +321,41 @@ class BmnImportService
         $curRow = 2;
         foreach ($rows as $r) {
             $isRowValid = $r['is_valid'] ?? true;
+            if ($isRowValid) {
+                continue; // Hanya masukkan baris yang gagal agar user mudah memperbaikinya
+            }
+
             $errList = $r['errors'] ?? [];
             $errStr = implode('; ', array_values($errList));
 
             $sheet->setCellValue("A{$curRow}", $r['excel_row'] ?? $curRow);
-            $sheet->setCellValueExplicit("B{$curRow}", (string) ($r['kode_barang'] ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValue("C{$curRow}", $r['nup_raw'] ?? '');
-            $sheet->setCellValue("D{$curRow}", $r['nama_barang'] ?? '');
-            $sheet->setCellValue("E{$curRow}", $r['merek'] ?? '');
-            $sheet->setCellValue("F{$curRow}", $r['tanggal_terima_raw'] ?? '');
-            $sheet->setCellValue("G{$curRow}", $r['tahun_perolehan_raw'] ?? '');
-            $sheet->setCellValue("H{$curRow}", $r['nilai_perolehan_raw'] ?? '');
-            $sheet->setCellValue("I{$curRow}", $r['jenis'] ?? '');
-            $sheet->setCellValue("J{$curRow}", $r['satuan'] ?? '');
-            $sheet->setCellValue("K{$curRow}", $isRowValid ? 'Valid' : 'Error');
-            $sheet->setCellValue("L{$curRow}", $errStr ?: '-');
+            $sheet->setCellValue("B{$curRow}", $r['jenis'] ?? '');
+            $sheet->setCellValueExplicit("C{$curRow}", (string) ($r['kode_barang'] ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue("D{$curRow}", $r['nup_raw'] ?? '');
+            $sheet->setCellValue("E{$curRow}", $r['nama_barang'] ?? '');
+            $sheet->setCellValue("F{$curRow}", $r['merek'] ?? '');
+            $sheet->setCellValue("G{$curRow}", $r['kondisi'] ?? 'Baik');
+            $sheet->setCellValue("H{$curRow}", $r['tanggal_buku_pertama_raw'] ?? '');
+            $sheet->setCellValue("I{$curRow}", $r['tanggal_terima_raw'] ?? '');
+            $sheet->setCellValue("J{$curRow}", $r['nilai_perolehan_raw'] ?? '');
+            $sheet->setCellValue("K{$curRow}", $r['lokasi_ruang'] ?? 'Belum berlokasi');
+            $sheet->setCellValue("L{$curRow}", 'Error');
+            $sheet->setCellValue("M{$curRow}", $errStr ?: '-');
 
-            // Warna baris
-            if (! $isRowValid) {
-                $sheet->getStyle("A{$curRow}:L{$curRow}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'FDF0EE'],
-                    ],
-                ]);
-                $sheet->getStyle("K{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('9C322C'));
-            } else {
-                $sheet->getStyle("K{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('137333'));
-            }
+            // Warna baris error
+            $sheet->getStyle("A{$curRow}:M{$curRow}")->applyFromArray([
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'FDF0EE'],
+                ],
+            ]);
+            $sheet->getStyle("L{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('9C322C'));
 
             $curRow++;
         }
 
-        $sheet->getStyle('A1:L'.($curRow - 1))->applyFromArray([
+        $lastBorderRow = max(1, $curRow - 1);
+        $sheet->getStyle("A1:M{$lastBorderRow}")->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -341,7 +367,7 @@ class BmnImportService
             ],
         ]);
 
-        foreach (range('A', 'L') as $col) {
+        foreach (range('A', 'M') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

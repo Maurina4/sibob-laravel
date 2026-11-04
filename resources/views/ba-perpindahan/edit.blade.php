@@ -844,6 +844,30 @@
                             </div>
                         </div>
                     </div>
+                    <datalist id="pegawai_pihak_kedua_list_edit">
+                        @php
+                            $excludedNames = array_filter([
+                                strtolower($baPerpindahan->pengaju_nama ?? ''),
+                                strtolower($baPerpindahan->pihak_pertama ?? ''),
+                            ]);
+                        @endphp
+                        @foreach($pegawais ?? [] as $p)
+                            @php
+                                $pNamaLower = strtolower($p->nama);
+                                $pLabelLower = strtolower($p->nip ? "{$p->nama} ({$p->nip})" : $p->nama);
+                                $isExcluded = false;
+                                foreach ($excludedNames as $ex) {
+                                    if ($ex && ($pNamaLower === $ex || $pLabelLower === $ex || str_contains($ex, $pNamaLower))) {
+                                        $isExcluded = true;
+                                        break;
+                                    }
+                                }
+                            @endphp
+                            @if(! $isExcluded)
+                                <option value="{{ $p->nip ? "{$p->nama} ({$p->nip})" : $p->nama }}"></option>
+                            @endif
+                        @endforeach
+                    </datalist>
                     <p class="text-[11px] text-[#62756A] mt-1">Ditentukan oleh Operator: Pegawai yang akan menerima aset.</p>
                     <p id="pihak_kedua_warning" class="text-[11px] text-[#9C322C] font-semibold mt-1 hidden items-center gap-1">
                         <svg class="w-3.5 h-3.5 shrink-0 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>

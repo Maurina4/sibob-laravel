@@ -185,9 +185,10 @@
                                 class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
                             >
                                 <option value="">Pilih Jenis</option>
-                                <option value="BMN-TIK" {{ old('jenis', $bmn->jenis) == 'BMN-TIK' ? 'selected' : '' }}>BMN-TIK</option>
+                                <option value="BMN-NON TIK" {{ old('jenis', $bmn->jenis) == 'BMN-NON TIK' ? 'selected' : '' }}>BMN-NON TIK (Umum)</option>
                                 <option value="BMN-LAB" {{ old('jenis', $bmn->jenis) == 'BMN-LAB' ? 'selected' : '' }}>BMN-LAB</option>
-                                <option value="BMN-NON TIK" {{ old('jenis', $bmn->jenis) == 'BMN-NON TIK' ? 'selected' : '' }}>BMN-NON TIK</option>
+                                <option value="BMN-TIK" {{ old('jenis', $bmn->jenis) == 'BMN-TIK' ? 'selected' : '' }}>BMN-TIK</option>
+                                <option value="BMN-TIK & LAB" {{ old('jenis', $bmn->jenis) == 'BMN-TIK & LAB' ? 'selected' : '' }}>BMN-TIK & LAB</option>
                             </select>
                             <x-input-error :messages="$errors->get('jenis')" />
                         </div>
