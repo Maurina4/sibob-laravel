@@ -40,7 +40,7 @@
                 <svg class="w-4 h-4 text-[#62756A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <span>Laporan Kerusakan</span>
+                <span>Daftar Rusak Berat</span>
             </a>
         </div>
     </div>
@@ -92,13 +92,13 @@
             </div>
         </div>
 
-        {{-- CARD 3: LAPORAN KERUSAKAN --}}
+        {{-- CARD 3: DAFTAR RUSAK BERAT --}}
         <a
             href="{{ route('laporan-kerusakan.index') }}"
             class="block bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#9C322C] hover:shadow-xs cursor-pointer group shadow-2xs"
         >
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#9C322C] transition">Laporan Kerusakan</span>
+                <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#9C322C] transition">Daftar Rusak Berat</span>
                 <span class="w-7 h-7 rounded-lg bg-[#FDF0EE] text-[#9C322C] flex items-center justify-center group-hover:scale-110 transition">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -297,3 +297,5 @@
 
 </div>
 @endsection
+
+

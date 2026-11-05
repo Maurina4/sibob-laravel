@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Kerusakan BMN — SIBOB')
-@section('page-title', 'Laporan Kerusakan')
+@section('title', 'Daftar Rusak Berat — SIBOB')
+@section('page-title', 'Daftar Rusak Berat')
 
 @section('content')
 <div class="space-y-6">
@@ -10,7 +10,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Layanan & Aduan Kerusakan</div>
-            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Laporan Kerusakan BMN</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Daftar Rusak Berat</h1>
             <p class="text-xs text-[#62756A] mt-0.5">Daftar riwayat kerusakan aset BMN yang diterbitkan otomatis melalui formulir Pengajuan Pengembalian BMN.</p>
         </div>
     </div>
@@ -269,8 +269,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <div class="text-sm font-semibold text-[#132219]">Tidak Ada Laporan Kerusakan</div>
-                                    <p class="text-xs text-[#62756A]">Semua aset inventaris dalam kondisi terpantau baik atau belum ada laporan kerusakan yang diterbitkan.</p>
+                                    <div class="text-sm font-semibold text-[#132219]">Tidak Ada Data Rusak Berat</div>
+                                    <p class="text-xs text-[#62756A]">Semua aset inventaris dalam kondisi terpantau baik atau belum ada aset rusak berat yang tercatat.</p>
                                 </div>
                             </td>
                         </tr>
