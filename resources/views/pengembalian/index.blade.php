@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'BA Pengembalian BMN — SIBOB')
-@section('page-title', 'BA Pengembalian')
+@section('title', 'Berita Acara Pengembalian BMN — SIBOB')
+@section('page-title', 'Berita Acara Pengembalian')
 
 @section('content')
 <div class="space-y-6">
@@ -10,7 +10,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Dokumen Berita Acara</div>
-            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">BA Pengembalian BMN</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Berita Acara Pengembalian BMN</h1>
             <p class="text-xs text-[#62756A] mt-0.5">Pencatatan dan penerbitan Berita Acara Serah Terima (BAST) pengembalian barang milik negara.</p>
         </div>
 

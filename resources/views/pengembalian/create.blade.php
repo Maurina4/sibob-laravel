@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Pengembalian — SIBOB')
-@section('page-title', 'Tambah Pengembalian')
+@section('title', 'Buat Berita Acara Pengembalian — SIBOB')
+@section('page-title', 'Buat Berita Acara Pengembalian')
 
 @section('content')
 <div class="space-y-6 max-w-5xl mx-auto">
@@ -15,9 +15,9 @@
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Kembali ke BA Pengembalian</span>
+            <span>Kembali ke Berita Acara Pengembalian</span>
         </a>
-        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Buat BA Pengembalian BMN</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Buat Berita Acara Pengembalian BMN</h1>
         <p class="text-xs text-[#62756A] mt-0.5">Catat penyerahan kembali barang milik negara yang selesai digunakan.</p>
     </div>
 
