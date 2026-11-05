@@ -210,8 +210,13 @@ class BmnImportService
 
         // Eksekusi Simpan Baris Valid dalam 1 Transaksi Database
         try {
-            DB::transaction(function () use ($validRows, &$cache) {
+            $fallbackCount = 0;
+            DB::transaction(function () use ($validRows, &$cache, &$fallbackCount) {
                 foreach ($validRows as $row) {
+                    if (($row['pj_status'] ?? '') === 'unmatched') {
+                        $fallbackCount++;
+                    }
+
                     $this->bmnService->storeRecord([
                         'kode_barang' => $row['kode_barang'],
                         'nup' => $row['nup'],
@@ -225,10 +230,11 @@ class BmnImportService
                         'satuan' => $row['satuan'] ?? 'unit',
                         'spesifikasi' => $row['spesifikasi'] ?? null,
                         'lokasi' => ! empty($row['lokasi_ruang']) ? $row['lokasi_ruang'] : 'Gudang BMN',
-                        'penanggungjawab' => 'Pengelola BMN',
-                        'penanggungjawab_nip' => '-',
+                        'penanggungjawab' => $row['penanggungjawab'] ?? 'Pengelola BMN',
+                        'penanggungjawab_nip' => $row['penanggungjawab_nip'] ?? '-',
+                        'penanggung_jawab_id' => $row['penanggung_jawab_id'] ?? null,
                         'kondisi' => ! empty($row['kondisi']) ? $row['kondisi'] : 'Baik',
-                    ], $cache);
+                    ], $cache, true);
                 }
             });
 
@@ -241,6 +247,7 @@ class BmnImportService
                     'jumlah_gagal' => $errorCount,
                     'error_summary' => [
                         'has_errors' => $errorCount > 0,
+                        'fallback_count' => $fallbackCount,
                         'errors' => $validation['error_messages'],
                         'rows' => $this->extractErrorRows($validation['validated_rows']),
                     ],
@@ -250,9 +257,16 @@ class BmnImportService
             // Hapus file temporary
             Storage::delete($storedPath);
 
-            $message = $errorCount > 0
-                ? "Sebanyak {$validCount} barang berhasil diimpor. {$errorCount} baris bermasalah dilewati."
-                : "Sebanyak {$validCount} barang berhasil diimpor dan didaftarkan ke sistem.";
+            $notes = [];
+            if ($errorCount > 0) {
+                $notes[] = "{$errorCount} baris bermasalah dilewati";
+            }
+            if ($fallbackCount > 0) {
+                $notes[] = "{$fallbackCount} barang dialihkan ke Pengelola BMN karena NIP belum terdaftar";
+            }
+
+            $detailMsg = ! empty($notes) ? ' (Catatan: '.implode(', ', $notes).').' : '.';
+            $message = "Sebanyak {$validCount} barang berhasil diimpor{$detailMsg}";
 
             return [
                 'success' => true,

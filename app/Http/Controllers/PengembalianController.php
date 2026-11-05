@@ -120,14 +120,15 @@ class PengembalianController extends Controller
         ];
 
         // Resolusi Pihak Kedua (Pengelola BMN / Penerima)
-        $pengelolaBmn = Pegawai::where('jabatan', 'like', '%Operator BMN%')
+        $pengelolaBmn = Pegawai::where('nama', 'like', '%Yuli%')
             ->orWhere('jabatan', 'like', '%Pengelola BMN%')
+            ->orWhere('jabatan', 'like', '%Operator BMN%')
             ->orWhere('jabatan', 'like', '%Gudang%')
             ->first();
 
         $pihakKedua = [
-            'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno,A.Md.',
-            'nip' => $pengelolaBmn?->nip ?: '19840722 202321 1 010',
+            'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno, A.Md.',
+            'nip' => $pengelolaBmn?->nip ?: '198407222023211010',
             'jabatan' => $pengelolaBmn?->jabatan ?: 'Pengelola Barang Milik Negara (BMN)',
             'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Balai Besar POM di Banjarbaru',
         ];

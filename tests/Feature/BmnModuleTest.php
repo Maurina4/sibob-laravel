@@ -2351,7 +2351,7 @@ class BmnModuleTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('bmns.store'), [
             'kode_barang' => '3050104031',
-            'nup' => '2',
+            'nup' => '1',
             'nama_barang' => 'Barang Baru Kode Sama',
             'jenis' => 'BMN-NON TIK',
             'lokasi' => 'Gudang Utama',
@@ -2361,7 +2361,7 @@ class BmnModuleTest extends TestCase
 
         $response->assertSessionHasErrors(['kode_barang']);
         $errors = session('errors')->get('kode_barang');
-        $this->assertContains('Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.', $errors);
+        $this->assertStringContainsString('sudah terdaftar dalam sistem', $errors[0]);
     }
 
     public function test_updating_bmn_with_own_kode_barang_succeeds_but_duplicate_code_fails(): void
@@ -2401,10 +2401,10 @@ class BmnModuleTest extends TestCase
         $passResponse->assertSessionHasNoErrors();
         $this->assertEquals('Barang 1 Diperbarui', $bmn1->fresh()->nama_barang);
 
-        // Update bmn1 with bmn2's kode_barang fails
+        // Update bmn1 with bmn2's kode_barang and NUP fails
         $failResponse = $this->actingAs($user)->put(route('bmns.update', $bmn1), [
             'kode_barang' => '3050104033',
-            'nup' => '1',
+            'nup' => '2',
             'nama_barang' => 'Barang 1 Coba Ganti Kode Sama',
             'jenis' => 'BMN-NON TIK',
             'lokasi' => 'Gudang Utama',
@@ -2429,7 +2429,7 @@ class BmnModuleTest extends TestCase
 
         $failResponse = $this->actingAs($user)->post(route('bmns-tik.store'), [
             'kode_barang' => '3090405041',
-            'nup' => 2,
+            'nup' => 1,
             'nama_barang' => 'Laptop Kedua Kode Sama',
             'jenis' => 'Laptop',
             'lokasi' => 'Ruang TIK',
@@ -2438,7 +2438,7 @@ class BmnModuleTest extends TestCase
 
         $failResponse->assertSessionHasErrors(['kode_barang']);
         $errors = session('errors')->get('kode_barang');
-        $this->assertContains('Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.', $errors);
+        $this->assertStringContainsString('sudah terdaftar dalam sistem', $errors[0]);
     }
 
     public function test_updating_bmn_tik_with_own_kode_succeeds_but_duplicate_fails(): void
@@ -2476,10 +2476,10 @@ class BmnModuleTest extends TestCase
         $passResponse->assertSessionHasNoErrors();
         $this->assertEquals('PC 1 Updated', $tik1->fresh()->nama_barang);
 
-        // Update tik1 using tik2's kode fails
+        // Update tik1 using tik2's kode and NUP fails
         $failResponse = $this->actingAs($user)->put(route('bmns-tik.update', $tik1), [
             'kode_barang' => '3090405043',
-            'nup' => 1,
+            'nup' => 2,
             'nama_barang' => 'PC 1 Duplicate Code',
             'jenis' => 'PC',
             'lokasi' => 'Ruang TIK',
@@ -2503,7 +2503,7 @@ class BmnModuleTest extends TestCase
 
         $failResponse = $this->actingAs($user)->post(route('bmns-lab.store'), [
             'kode_barang' => '3080101045',
-            'nup' => 2,
+            'nup' => 1,
             'nama_barang' => 'Mikroskop 2 Kode Sama',
             'merek' => 'Olympus',
             'lokasi' => 'Lab Mikrobiologi',
@@ -2512,7 +2512,7 @@ class BmnModuleTest extends TestCase
 
         $failResponse->assertSessionHasErrors(['kode_barang']);
         $errors = session('errors')->get('kode_barang');
-        $this->assertContains('Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.', $errors);
+        $this->assertStringContainsString('sudah terdaftar dalam sistem', $errors[0]);
     }
 
     public function test_cannot_create_bmn_tik_or_lab_with_code_already_in_master_bmn(): void
@@ -2755,7 +2755,7 @@ class BmnModuleTest extends TestCase
         // Cek halaman cetak render sukses
         $printResponse = $this->actingAs($user)->get(route('distribusi.print', $distribusi));
         $printResponse->assertOk();
-        $printResponse->assertSee('BERITA ACARA PERPINDAHAN BARANG MILIK NEGARA (BMN)');
+        $printResponse->assertSee('BERITA ACARA DISTRIBUSI BARANG MILIK NEGARA (BMN)');
         $printResponse->assertSee('BA-DIST/TEST/PRINT01');
         $printResponse->assertSee('Kursi Kerja Ergonomis');
         $printResponse->assertSee('Ruang Administrasi');
@@ -3457,9 +3457,10 @@ class BmnModuleTest extends TestCase
         $resA4 = $this->actingAs($operator)->get(route('ba-perpindahan.print', [$ba, 'size' => 'a4']));
         $resA4->assertOk();
         $resA4->assertSee('size-a4');
-        $resA4->assertSee('BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)');
+        $resA4->assertSee('BERITA ACARA PERPINDAHAN BARANG MILIK NEGARA (BMN)');
         $resA4->assertSee('PL.03.03.43B.08.26.944');
-        $resA4->assertSee('Keterangan');
+        $resA4->assertSee('Ruang Asal');
+        $resA4->assertSee('Ruang Baru');
         $resA4->assertSee('Gudang BMN');
         $resA4->assertSee('${ttd_pengirim1}', false);
         $resA4->assertSee('${ttd_pengirim2}', false);
@@ -4337,7 +4338,7 @@ class BmnModuleTest extends TestCase
 
         $validPrintResponse = $this->actingAs($operator)->get(route('ba-perpindahan.print', $ba));
         $validPrintResponse->assertOk();
-        $validPrintResponse->assertSee('BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)');
+        $validPrintResponse->assertSee('BERITA ACARA PERPINDAHAN BARANG MILIK NEGARA (BMN)');
         $validPrintResponse->assertSee('Tri Wulandari, S.Farm.');
     }
 

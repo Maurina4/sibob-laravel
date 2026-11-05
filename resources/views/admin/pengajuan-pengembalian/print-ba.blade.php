@@ -13,32 +13,37 @@
         $kopFooterBase64 = base64_encode(file_get_contents($footerPath));
     }
 
+    $pengelolaBmn = \App\Models\Pegawai::where('nama', 'like', '%Yuli%')
+        ->orWhere('jabatan', 'like', '%Pengelola BMN%')
+        ->first();
+
     $penyetujuPegawai = $pengajuan->penyetujuUser ? \App\Models\Pegawai::where('nama', $pengajuan->penyetujuUser->name)->first() : null;
 
     $pihakPertama = [
-        'nama' => $pengajuan->pemohonUser?->name ?: '....................................................',
-        'nip' => $pengajuan->pegawai?->nip ?: '-',
+        'nama' => $pengajuan->pemohonUser?->name ?: ($pengajuan->nama_pegawai ?: '....................................................'),
+        'nip' => $pengajuan->pegawai?->nip ?: ($pengajuan->nip_pegawai ?: '-'),
         'jabatan' => $pengajuan->pegawai?->jabatan ?: 'Pegawai Pemakai BMN',
         'unit_kerja' => $pengajuan->bidang ?: 'Balai Besar POM di Banjarbaru',
     ];
 
     $pihakKedua = [
-        'nama' => $pengajuan->penyetujuUser?->name ?: 'Pengelola BMN',
-        'nip' => $penyetujuPegawai?->nip ?: '198001012005011001',
-        'jabatan' => 'Operator / Pengelola BMN',
-        'unit_kerja' => 'Subbag Tata Usaha',
+        'nama' => $penyetujuPegawai?->nama ?: ($pengajuan->penyetujuUser?->name ?: ($pengelolaBmn?->nama ?: 'Yuli Supriyatno, A.Md.')),
+        'nip' => $penyetujuPegawai?->nip ?: ($pengelolaBmn?->nip ?: '198407222023211010'),
+        'jabatan' => 'Pengelola Barang Milik Negara (BMN)',
+        'unit_kerja' => 'Balai Besar POM di Banjarbaru',
     ];
 
     $kabalaiNama = 'Ary Yustantiningsih,S.Si.,Apt.';
     $isRusakBerat = ($pengajuan->alasan === 'rusak_berat');
-    $titleDoc = $isRusakBerat ? 'BERITA ACARA KERUSAKAN BERAT BARANG MILIK NEGARA' : 'BERITA ACARA PENGEMBALIAN BARANG MILIK NEGARA';
+    $kondisiText = $isRusakBerat ? 'Rusak' : 'Baik/ Rusak';
+    $titleDoc = 'BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)';
 @endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $titleDoc }} — {{ $pengajuan->nomor_ba ?: $pengajuan->nomor_pengajuan }}</title>
+    <title>{{ $titleDoc }} — {{ $pengajuan->nomor_ba ?: $pengajuan->nomor_pengajuan }} (BERITA ACARA PENGEMBALIAN BARANG MILIK NEGARA)</title>
     <style id="dynamicPageSizeStyle">
         @page {
             size: 210mm 297mm;
@@ -58,7 +63,7 @@
             background: #4A5568;
             color: #000;
             font-family: Arial, sans-serif !important;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -209,30 +214,30 @@
 
         .doc-title-block {
             text-align: center;
-            margin-top: 14mm;
-            margin-bottom: 12px;
+            margin-top: calc(12px + 1.15em); /* Disamakan dengan jarak di bawah nomor */
+            margin-bottom: calc(12px + 1.15em); /* Tambah 1 enter di bawah nomor */
             line-height: 1.15;
         }
 
         .doc-title-block h1 {
-            font-size: 11pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: normal;
             margin: 0;
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .doc-title-block h2 {
-            font-size: 11pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: normal;
             margin: 2px 0 0 0;
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .doc-title-block .doc-number {
-            font-size: 11pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: normal;
             margin-top: 3px;
             line-height: 1.2;
         }
@@ -241,7 +246,7 @@
             text-align: left;
             margin-top: 12px;
             margin-bottom: 12px;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -249,7 +254,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 6px 0 0 0;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -276,13 +281,13 @@
             padding-top: 8px !important;
             padding-bottom: 12px !important;
             padding-left: 2px !important;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
         .statement-p {
             margin: 12px 0;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
             text-align: left;
         }
@@ -304,28 +309,39 @@
         }
 
         .items-table th {
-            text-align: left;
-            font-weight: bold;
-            background: #FAFAFA;
+            text-align: center;
+            font-weight: normal;
+            background: #fff;
             line-height: 1.2;
         }
 
         .items-table td.center {
-            text-align: left;
+            text-align: center;
         }
 
         .items-table td.font-mono {
-            font-family: Arial, monospace !important;
+            font-family: Arial, sans-serif !important;
             font-size: 9.5pt;
         }
 
         #page2 {
             padding: 20mm 20mm 20mm 30mm;
+            position: relative;
+        }
+
+        .doc-footer-code {
+            position: absolute;
+            bottom: 12mm;
+            left: 30mm;
+            font-size: 8pt;
+            font-family: Arial, sans-serif !important;
+            color: #000;
+            line-height: 1;
         }
 
         .page-2-header {
             text-align: center;
-            font-size: 11pt;
+            font-size: 12pt;
             margin-top: 0;
             margin-bottom: 24px;
             line-height: 1.15;
@@ -337,7 +353,7 @@
 
         .closing-paragraph {
             text-align: left;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
             margin-bottom: 30px;
         }
@@ -346,7 +362,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -359,7 +375,7 @@
         }
 
         .sig-title {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: normal;
             text-transform: uppercase;
             margin-bottom: 0;
@@ -382,13 +398,13 @@
 
         .srikandi-tag {
             font-family: Arial, sans-serif !important;
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: normal;
             color: #000;
         }
 
         .sig-name {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: normal;
             margin-top: 0;
             line-height: 1.15;
@@ -398,7 +414,7 @@
             text-align: left;
             margin: 50px auto 0 auto;
             display: table;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -406,13 +422,13 @@
             text-align: center;
             margin-bottom: 2px;
             line-height: 1.2;
-            font-size: 11pt;
+            font-size: 12pt;
         }
 
         .sig-mengetahui-title {
             margin-bottom: 2px;
             line-height: 1.2;
-            font-size: 11pt;
+            font-size: 12pt;
         }
 
         body.mode-manual .srikandi-tag {
@@ -462,13 +478,21 @@
             }
 
             .doc-title-block {
-                margin-top: 14mm !important;
+                margin-top: calc(12px + 1.15em) !important;
+                margin-bottom: calc(12px + 1.15em) !important;
             }
 
             #page2 {
                 padding: 20mm 20mm 20mm 30mm !important;
+                position: relative !important;
                 page-break-before: always !important;
                 break-before: page !important;
+            }
+
+            .doc-footer-code {
+                position: absolute !important;
+                bottom: 12mm !important;
+                left: 30mm !important;
             }
         }
     </style>
@@ -544,9 +568,9 @@
                     </div>
                 </div>
 
-                {{-- PARAGRAF PEMBUKA --}}
+                {{-- PARAGRAF PEMBUKA (TERBILANG LENGKAP) --}}
                 <p class="opening-paragraph">
-                    Pada hari ini, tanggal {{ $pengajuan->tanggal ? \Carbon\Carbon::parse($pengajuan->tanggal)->translatedFormat('d F Y') : date('d F Y') }}, kami yang bertanda tangan di bawah ini:
+                    {{ \App\Support\NaskahDinasHelper::tanggalTerbilang($pengajuan->tanggal) }}
                 </p>
 
                 {{-- IDENTITAS PARA PIHAK --}}
@@ -561,7 +585,7 @@
                         <td class="num"></td>
                         <td class="lbl">NIP</td>
                         <td class="sep">:</td>
-                        <td class="val">{{ $pihakPertama['nip'] }}</td>
+                        <td class="val">{{ \App\Support\NaskahDinasHelper::formatNip($pihakPertama['nip']) }}</td>
                     </tr>
                     <tr>
                         <td class="num"></td>
@@ -578,7 +602,7 @@
                     <tr>
                         <td class="num"></td>
                         <td colspan="3" class="party-clause">
-                            Selanjutnya disebut <strong>PIHAK PERTAMA</strong>
+                            Selanjutnya disebut PIHAK PERTAMA
                         </td>
                     </tr>
 
@@ -592,7 +616,7 @@
                         <td class="num"></td>
                         <td class="lbl">NIP</td>
                         <td class="sep">:</td>
-                        <td class="val">{{ $pihakKedua['nip'] }}</td>
+                        <td class="val">{{ \App\Support\NaskahDinasHelper::formatNip($pihakKedua['nip']) }}</td>
                     </tr>
                     <tr>
                         <td class="num"></td>
@@ -609,30 +633,35 @@
                     <tr>
                         <td class="num"></td>
                         <td colspan="3" class="party-clause">
-                            Selanjutnya disebut <strong>PIHAK KEDUA</strong>
+                            Selanjutnya disebut PIHAK KEDUA
                         </td>
                     </tr>
                 </table>
 
                 {{-- STATEMENT SERAH TERIMA --}}
                 <p class="statement-p">
-                    @if ($isRusakBerat)
-                        PIHAK PERTAMA melaporkan dan menyerahkan kepada PIHAK KEDUA dan PIHAK KEDUA menerima penyerahan Barang Milik Negara (BMN) dari bidang / unit kerja <strong>{{ $pengajuan->bidang }}</strong> dalam keadaan <strong>Rusak Berat</strong> untuk diproses tindak lanjut usulan penghapusan BMN dengan rincian sebagai berikut:
-                    @else
-                        PIHAK PERTAMA menyerahkan kembali kepada PIHAK KEDUA dan PIHAK KEDUA menerima penyerahan kembali Barang Milik Negara (BMN) dari bidang / unit kerja <strong>{{ $pengajuan->bidang }}</strong> dengan kondisi <strong>Baik</strong> untuk disimpan kembali di Gudang BMN dengan rincian sebagai berikut:
-                    @endif
+                    PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima penyerahan Barang Milik Negara (BMN) dengan kondisi {{ $kondisiText }} Spesifikasi sebagai berikut :
                 </p>
 
-                {{-- TABEL BARANG BMN --}}
+                {{-- KALIMAT TANGGUNG JAWAB (DI ATAS TABEL) --}}
+                <p class="statement-p">
+                    PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.
+                </p>
+                <p class="statement-p">
+                    Apabila terjadi kehilangan menjadi tanggung jawab petugas yang diserahkan barang.
+                </p>
+
+                {{-- TABEL BARANG BMN (7 KOLOM SESUAI DOKUMEN RESMI) --}}
                 <table class="items-table">
                     <thead>
                         <tr>
                             <th style="width: 5%;">No</th>
-                            <th style="width: 28%;">Nama Barang</th>
+                            <th style="width: 27%;">Nama Barang</th>
                             <th style="width: 17%;">Kode Barang</th>
-                            <th style="width: 10%;">NUP</th>
-                            <th style="width: 15%;">Kondisi</th>
-                            <th style="width: 25%;">Keterangan</th>
+                            <th style="width: 8%;">NUP</th>
+                            <th style="width: 20%;">Merk/Type</th>
+                            <th style="width: 10%;">Jumlah (unit)</th>
+                            <th style="width: 13%;">Tahun Perolehan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -642,19 +671,9 @@
                             <td>{{ $it->nama_barang }}</td>
                             <td class="center font-mono">{{ $it->kode_barang }}</td>
                             <td class="center font-mono">{{ $it->nup ?: '-' }}</td>
-                            <td class="center">{{ $it->kondisi ?: ($isRusakBerat ? 'Rusak Berat' : 'Baik') }}</td>
-                            <td>
-                                @if($it->deskripsi_kerusakan)
-                                    <div>{{ $it->deskripsi_kerusakan }}</div>
-                                    @if($it->laporanKerusakan)
-                                        <div style="font-size: 8pt; font-family: monospace; color: #444; margin-top: 2px;">
-                                            LK: {{ $it->laporanKerusakan->nomor_laporan }}
-                                        </div>
-                                    @endif
-                                @else
-                                    {{ $it->keterangan ?: 'Selesai pemakaian' }}
-                                @endif
-                            </td>
+                            <td>{{ $it->merek ?: ($it->bmn?->merek ?: ($it->bmn?->spesifikasi ?: '-')) }}</td>
+                            <td class="center">1</td>
+                            <td class="center">{{ $it->bmn?->tahun_perolehan ?: '-' }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -672,17 +691,13 @@
 
             <div class="page-content">
                 <p class="closing-paragraph">
-                    @if ($isRusakBerat)
-                        Demikian Berita Acara Kerusakan Berat BMN ini dibuat dengan sebenarnya dan penuh tanggung jawab untuk dipergunakan sebagaimana mestinya dalam rangka pemutakhiran data inventaris aset dan tindak lanjut proses pengusulan penghapusan BMN di lingkungan Balai Besar POM di Banjarbaru.
-                    @else
-                        Demikian Berita Acara Pengembalian BMN ini dibuat dengan sebenarnya dan penuh tanggung jawab untuk dipergunakan sebagaimana mestinya dalam rangka penertiban, pemeliharaan, serta pemutakhiran data aset BMN di lingkungan Balai Besar POM di Banjarbaru.
-                    @endif
+                    Demikian Berita Acara ini dibuat dengan benar untuk dipergunakan sebagaimana mestinya.
                 </p>
 
                 <table class="signatures-table">
                     <tr>
                         <td>
-                            <div class="sig-title">PIHAK KEDUA</div>
+                            <div class="sig-title">PIHAK KEDUA,</div>
                             <div class="srikandi-box" id="sigBoxPihak2">
                                 <span class="srikandi-tag">${ttd_pengirim2}</span>
                             </div>
@@ -692,7 +707,7 @@
                         </td>
 
                         <td>
-                            <div class="sig-title">PIHAK PERTAMA</div>
+                            <div class="sig-title">PIHAK PERTAMA,</div>
                             <div class="srikandi-box" id="sigBoxPihak1">
                                 <span class="srikandi-tag">${ttd_pengirim1}</span>
                             </div>
@@ -706,7 +721,7 @@
                 <div class="sig-mengetahui-block">
                     <div class="sig-mengetahui-lead">Mengetahui,</div>
                     <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
-                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
+                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang,</div>
 
                     <div class="srikandi-box" id="sigBoxKabalai">
                         <span class="srikandi-tag">${ttd_pengirim3}</span>
@@ -715,6 +730,11 @@
                     <div class="sig-name">
                         {{ $kabalaiNama }}
                     </div>
+                </div>
+
+                {{-- KODE DOKUMEN NASKAH DINAS --}}
+                <div class="doc-footer-code">
+                    {{ \App\Support\NaskahDinasHelper::KODE_FORM_BAST }}
                 </div>
             </div>
         </div>

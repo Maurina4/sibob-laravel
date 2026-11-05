@@ -46,7 +46,7 @@
             background: #4A5568;
             color: #000;
             font-family: Arial, sans-serif !important;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -219,30 +219,30 @@
         /* KE BERITA ACARA: JARAK 14MM PERSIS FOTO DOKUMEN ASLI */
         .doc-title-block {
             text-align: center;
-            margin-top: 14mm; /* Jarak 14mm dari garis ganda kop surat ke judul sesuai foto naskah dinas resmi */
-            margin-bottom: 12px;
+            margin-top: calc(12px + 1.15em); /* Disamakan dengan jarak di bawah nomor */
+            margin-bottom: calc(12px + 1.15em); /* Tambah 1 enter di bawah nomor */
             line-height: 1.15;
         }
 
         .doc-title-block h1 {
-            font-size: 11pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: normal;
             margin: 0;
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .doc-title-block h2 {
-            font-size: 11pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: normal;
             margin: 2px 0 0 0;
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .doc-title-block .doc-number {
-            font-size: 11pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: normal;
             margin-top: 3px;
             line-height: 1.2;
         }
@@ -252,7 +252,7 @@
             text-align: left;
             margin-top: 12px;
             margin-bottom: 12px;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -261,7 +261,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 6px 0 0 0;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -292,14 +292,14 @@
             padding-top: 10px !important;
             padding-bottom: 14px !important;
             padding-left: 2px !important; /* Indentasi sejajar label Nama sesuai foto */
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
         /* PERNYATAAN SERAH TERIMA & TANGGUNG JAWAB (SPASI 1.15) */
         .statement-p {
             margin: 12px 0;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
             text-align: left;
         }
@@ -322,9 +322,9 @@
         }
 
         .items-table th {
-            text-align: left;
-            font-weight: bold;
-            background: #FAFAFA;
+            text-align: center;
+            font-weight: normal;
+            background: #fff;
             line-height: 1.2;
         }
 
@@ -333,7 +333,7 @@
         }
 
         .items-table td.font-mono {
-            font-family: Arial, monospace !important;
+            font-family: Arial, sans-serif !important;
             font-size: 9.5pt;
         }
 
@@ -343,12 +343,12 @@
         }
 
         .location-tag span.badge-from {
-            font-weight: bold;
+            font-weight: normal;
             color: #111;
         }
 
         .location-tag span.badge-to {
-            font-weight: bold;
+            font-weight: normal;
             color: #111;
         }
 
@@ -370,9 +370,19 @@
             line-height: 1;
         }
 
+        .doc-footer-code {
+            position: absolute;
+            bottom: 12mm;
+            left: 30mm;
+            font-size: 8pt;
+            font-family: Arial, sans-serif !important;
+            color: #000;
+            line-height: 1;
+        }
+
         .page-2-header {
             text-align: center;
-            font-size: 11pt;
+            font-size: 12pt;
             margin-top: 0;
             margin-bottom: 30px; /* Jarak dari -2- ke kalimat penutup */
             line-height: 1.15;
@@ -384,7 +394,7 @@
 
         .closing-paragraph {
             text-align: left;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
             margin-bottom: 40px; /* Jarak dari kalimat penutup ke judul TTD */
         }
@@ -396,7 +406,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -409,7 +419,7 @@
         }
 
         .sig-title {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: normal;
             text-transform: uppercase;
             margin-bottom: 0;
@@ -432,13 +442,13 @@
 
         .srikandi-tag {
             font-family: Arial, sans-serif !important;
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: normal;
             color: #000;
         }
 
         .sig-name {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: normal; /* Persis di foto: font reguler/tidak underline */
             margin-top: 0;
             line-height: 1.15;
@@ -449,7 +459,7 @@
             text-align: left;
             margin: 70px auto 0 auto;
             display: table;
-            font-size: 11pt;
+            font-size: 12pt;
             line-height: 1.15;
         }
 
@@ -457,13 +467,13 @@
             text-align: center;
             margin-bottom: 2px;
             line-height: 1.2;
-            font-size: 11pt;
+            font-size: 12pt;
         }
 
         .sig-mengetahui-title {
             margin-bottom: 2px;
             line-height: 1.2;
-            font-size: 11pt;
+            font-size: 12pt;
         }
 
         /* MODE TANDA TANGAN BASAH (TOGGLE):
@@ -518,11 +528,19 @@
             }
 
             .doc-title-block {
-                margin-top: 14mm !important;
+                margin-top: calc(12px + 1.15em) !important;
+                margin-bottom: calc(12px + 1.15em) !important;
             }
 
             #page2 {
                 padding: 20mm 20mm 20mm 30mm !important;
+                position: relative !important;
+            }
+
+            .doc-footer-code {
+                position: absolute !important;
+                bottom: 12mm !important;
+                left: 30mm !important;
             }
         }
     </style>
@@ -619,7 +637,7 @@
 
                 {{-- KE BERITA ACARA BARU SPASI 1.5 --}}
                 <div class="doc-title-block">
-                    <h1>BERITA ACARA SERAH TERIMA BARANG MILIK NEGARA (BMN)</h1>
+                    <h1>BERITA ACARA PERPINDAHAN BARANG MILIK NEGARA (BMN)</h1>
                     <h2>BALAI BESAR PENGAWAS OBAT DAN MAKANAN DI BANJARBARU</h2>
                     <div class="doc-number">
                         NOMOR : {{ $baPerpindahan->nomor_ba ?: 'PL.03.03.17A.03.26.246' }}
@@ -644,7 +662,7 @@
                         <td class="num"></td>
                         <td class="lbl">NIP</td>
                         <td class="sep">:</td>
-                        <td class="val">{{ $pihakPertama['nip'] }}</td>
+                        <td class="val">{{ \App\Support\NaskahDinasHelper::formatNip($pihakPertama['nip']) }}</td>
                     </tr>
                     <tr>
                         <td class="num"></td>
@@ -661,7 +679,7 @@
                     <tr>
                         <td class="num"></td>
                         <td colspan="3" class="party-clause">
-                            Selanjutnya disebut <strong>PIHAK PERTAMA</strong>
+                            Selanjutnya disebut PIHAK PERTAMA
                         </td>
                     </tr>
 
@@ -676,7 +694,7 @@
                         <td class="num"></td>
                         <td class="lbl">NIP</td>
                         <td class="sep">:</td>
-                        <td class="val">{{ $pihakKedua['nip'] }}</td>
+                        <td class="val">{{ \App\Support\NaskahDinasHelper::formatNip($pihakKedua['nip']) }}</td>
                     </tr>
                     <tr>
                         <td class="num"></td>
@@ -693,7 +711,7 @@
                     <tr>
                         <td class="num"></td>
                         <td colspan="3" class="party-clause">
-                            Selanjutnya disebut <strong>PIHAK KEDUA</strong>
+                            Selanjutnya disebut PIHAK KEDUA
                         </td>
                     </tr>
                 </table>
@@ -706,21 +724,30 @@
 
                 {{-- PERNYATAAN SERAH TERIMA --}}
                 <p class="statement-p">
-                    PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima penyerahan Barang Milik Negara (BMN) dengan Spesifikasi sebagai berikut :
+                    PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima penyerahan perpindahan Barang Milik Negara (BMN) dengan Spesifikasi sebagai berikut :
                 </p>
 
-                {{-- TABEL BARANG PERSIS DOKUMEN RESMI BAST PERPINDAHAN --}}
+                {{-- KALIMAT TANGGUNG JAWAB (DI ATAS TABEL) --}}
+                <p class="statement-p">
+                    PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.
+                </p>
+                <p class="statement-p">
+                    Apabila terjadi kehilangan menjadi tanggung jawab petugas/penanggung jawab ruangan yang diserahkan barang.
+                </p>
+
+                {{-- TABEL BARANG (9 KOLOM SESUAI NASKAH RESMI) --}}
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%; text-align: center;">No</th>
-                            <th style="width: 20%;">Nama Barang</th>
-                            <th style="width: 14%; text-align: center;">Kode Barang</th>
-                            <th style="width: 8%; text-align: center;">NUP</th>
-                            <th style="width: 18%;">Merk/Type</th>
-                            <th style="width: 9%; text-align: center;">Jumlah (unit)</th>
-                            <th style="width: 11%; text-align: center;">Tahun Perolehan</th>
-                            <th style="width: 15%;">Keterangan</th>
+                            <th style="width: 4%;">No</th>
+                            <th style="width: 18%;">Nama Barang</th>
+                            <th style="width: 14%;">Kode Barang</th>
+                            <th style="width: 6%;">NUP</th>
+                            <th style="width: 14%;">Merk/Type</th>
+                            <th style="width: 8%;">Jumlah (unit)</th>
+                            <th style="width: 8%;">Tahun Perolehan</th>
+                            <th style="width: 14%;">Ruang Asal</th>
+                            <th style="width: 14%;">Ruang Baru</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -733,11 +760,12 @@
                                 <td>{{ $it->merk }}</td>
                                 <td class="center">{{ $it->jumlah }}</td>
                                 <td class="center">{{ $it->tahun_perolehan }}</td>
-                                <td>{{ $it->lokasi_tujuan ?: ($baPerpindahan->ke ?: '—') }}</td>
+                                <td class="center">{{ $it->lokasi_asal ?: '-' }}</td>
+                                <td class="center">{{ $it->lokasi_tujuan ?: '-' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="center">Data barang tidak ditemukan.</td>
+                                <td colspan="9" class="center">Data barang tidak ditemukan.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -809,6 +837,11 @@
                     <div class="sig-name">
                         {{ $kabalaiNama }}
                     </div>
+                </div>
+
+                {{-- KODE DOKUMEN NASKAH DINAS --}}
+                <div class="doc-footer-code">
+                    {{ \App\Support\NaskahDinasHelper::KODE_FORM_BAST }}
                 </div>
             </div>
 

@@ -19,6 +19,9 @@ class UpdateBmnRequest extends FormRequest
         if ($this->has('kode_barang') && is_string($this->kode_barang)) {
             $merge['kode_barang'] = str_replace(['.', '-', ' '], '', trim($this->kode_barang));
         }
+        if ($this->has('nup') && is_string($this->nup)) {
+            $merge['nup'] = trim($this->nup);
+        }
         if ($this->filled('nilai_perolehan') && is_string($this->nilai_perolehan)) {
             $cleaned = preg_replace('/[^0-9.]/', '', str_replace(',', '.', $this->nilai_perolehan));
             $merge['nilai_perolehan'] = $cleaned !== '' ? (float) $cleaned : null;
@@ -38,7 +41,10 @@ class UpdateBmnRequest extends FormRequest
                 'required',
                 'string',
                 'digits:10',
-                Rule::unique('bmns', 'kode_barang')->ignore($bmnId),
+                Rule::unique('bmns', 'kode_barang')
+                    ->where(fn ($query) => $query->where('nup', (string) $this->input('nup')))
+                    ->withoutTrashed()
+                    ->ignore($bmnId),
             ],
             'nup' => ['required', 'string', 'max:255'],
             'no_seri' => ['nullable', 'string', 'max:255'],
@@ -65,9 +71,9 @@ class UpdateBmnRequest extends FormRequest
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
             'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3050104001 atau 3.05.01.04.001).',
-            'kode_barang.unique' => 'Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.',
+            'kode_barang.unique' => 'Kombinasi Kode Barang dan NUP sudah terdaftar dalam sistem. Silakan periksa kembali NUP atau Kode Barang.',
             'jenis.required' => 'Jenis Barang wajib dipilih.',
-            'jenis.in' => 'Jenis Barang harus BMN-TIK, BMN-LAB, atau BMN-NON TIK.',
+            'jenis.in' => 'Jenis Barang harus BMN-TIK, BMN-LAB, BMN-NON TIK, atau BMN-TIK & LAB.',
         ];
     }
 }

@@ -172,6 +172,10 @@ class BmnExcelParser
         $colTahunPerolehan = $this->resolveColIndex($headerMap, ['tahun perolehan', 'tahun']);
         $colNilai = $this->resolveColIndex($headerMap, ['nilai perolehan', 'nilai perolehan (rp)', 'nilai']);
         $colLokasiRuang = $this->resolveColIndex($headerMap, ['lokasi ruang', 'lokasi', 'ruangan']);
+        $colNip = $this->resolveColIndex($headerMap, [
+            'nip penanggung jawab', 'nip penanggungjawab', 'nip pj',
+            'nip pengguna', 'nip pemakai', 'nip',
+        ]);
         $colSatuan = $this->resolveColIndex($headerMap, ['satuan']);
         $colSpesifikasi = $this->resolveColIndex($headerMap, ['spesifikasi', 'spesifikasi / keterangan', 'keterangan']);
 
@@ -205,6 +209,7 @@ class BmnExcelParser
             $cellTahun = $colTahunPerolehan ? $sheet->getCell([$colTahunPerolehan, $rowIndex]) : null;
             $cellNilai = $colNilai ? $sheet->getCell([$colNilai, $rowIndex]) : null;
             $cellLokasi = $colLokasiRuang ? $sheet->getCell([$colLokasiRuang, $rowIndex]) : null;
+            $cellNip = $colNip ? $sheet->getCell([$colNip, $rowIndex]) : null;
             $cellSatuan = $colSatuan ? $sheet->getCell([$colSatuan, $rowIndex]) : null;
             $cellSpesifikasi = $colSpesifikasi ? $sheet->getCell([$colSpesifikasi, $rowIndex]) : null;
 
@@ -217,6 +222,8 @@ class BmnExcelParser
             $satuanRaw = $cellSatuan ? $this->extractString($cellSatuan) : '';
             $spesifikasi = $cellSpesifikasi ? $this->extractString($cellSpesifikasi) : '';
             $lokasiRaw = $cellLokasi ? $this->extractString($cellLokasi) : '';
+            $nipRaw = $cellNip ? $this->extractString($cellNip) : '';
+            $cleanNip = preg_replace('/[^0-9]/', '', $nipRaw);
 
             // Ekstrak Tanggal Perolehan (Fleksibel: DD/MM/YYYY, Jan-78, YYYY, dsb)
             $parsedTglPerolehan = $cellTglPerolehan ? $this->extractFlexibleDate($cellTglPerolehan) : null;
@@ -266,6 +273,8 @@ class BmnExcelParser
                 'nilai_perolehan_raw' => $nilaiPerolehanRaw,
                 'nilai_perolehan' => $nilaiPerolehan,
                 'lokasi_ruang' => $lokasiRuang,
+                'nip_raw' => $nipRaw,
+                'nip' => $cleanNip,
                 'jenis' => $jenis,
                 'satuan' => $satuan,
                 'spesifikasi' => $spesifikasi !== '' ? $spesifikasi : null,

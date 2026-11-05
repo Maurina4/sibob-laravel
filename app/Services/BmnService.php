@@ -309,8 +309,9 @@ class BmnService
      *
      * @param  array<string, mixed>  $validated
      * @param  array<string, mixed>|null  $cache
+     * @param  bool  $isImport
      */
-    public function storeRecord(array $validated, ?array &$cache = null): Bmn
+    public function storeRecord(array $validated, ?array &$cache = null, bool $isImport = false): Bmn
     {
         $lokasiName = trim($validated['lokasi'] ?? '');
         if ($cache !== null) {
@@ -444,7 +445,7 @@ class BmnService
             ]);
         }
 
-        $this->createAutomaticDistribusiIfNeeded($bmn, $cache);
+        $this->createAutomaticDistribusiIfNeeded($bmn, $cache, $isImport);
 
         return $bmn;
     }
@@ -460,32 +461,74 @@ class BmnService
 
             $bmn->update($validated);
 
-            if ($bmn->tik) {
-                $bmn->tik->update(array_filter([
-                    'kode_barang' => $bmn->kode_barang,
-                    'nup' => (int) $bmn->nup,
-                    'no_seri' => $bmn->no_seri,
-                    'nama_barang' => $bmn->nama_barang,
-                    'tahun_perolehan' => $bmn->tahun_perolehan,
-                    'nilai_perolehan' => $bmn->nilai_perolehan,
-                    'lokasi' => $bmn->lokasi,
-                    'penanggungjawab' => $bmn->penanggungjawab,
-                ], fn ($v) => $v !== null));
+            $createTik = in_array($bmn->jenis, ['BMN-TIK', 'BMN-TIK & LAB']);
+            $createLab = in_array($bmn->jenis, ['BMN-LAB', 'BMN-TIK & LAB']);
+
+            if ($createTik) {
+                if ($bmn->tik) {
+                    $bmn->tik->update(array_filter([
+                        'kode_barang' => $bmn->kode_barang,
+                        'nup' => (int) $bmn->nup,
+                        'no_seri' => $bmn->no_seri,
+                        'nama_barang' => $bmn->nama_barang,
+                        'tahun_perolehan' => $bmn->tahun_perolehan,
+                        'nilai_perolehan' => $bmn->nilai_perolehan,
+                        'lokasi' => $bmn->lokasi,
+                        'penanggungjawab' => $bmn->penanggungjawab,
+                    ], fn ($v) => $v !== null));
+                } else {
+                    BmnTik::create([
+                        'bmn_id' => $bmn->id,
+                        'kode_barang' => $bmn->kode_barang,
+                        'nup' => (int) $bmn->nup,
+                        'no_seri' => $bmn->no_seri,
+                        'nama_barang' => $bmn->nama_barang,
+                        'tahun_perolehan' => $bmn->tahun_perolehan,
+                        'nilai_perolehan' => $bmn->nilai_perolehan,
+                        'jenis' => 'BMN-TIK',
+                        'lokasi' => $bmn->lokasi,
+                        'penanggungjawab' => $bmn->penanggungjawab,
+                        'kondisi' => $bmn->kondisi ?? 'Baik',
+                        'dihapus' => false,
+                    ]);
+                }
+            } else {
+                $bmn->tik()?->delete();
             }
 
-            if ($bmn->lab) {
-                $bmn->lab->update(array_filter([
-                    'kode_barang' => $bmn->kode_barang,
-                    'nup' => (int) $bmn->nup,
-                    'no_seri' => $bmn->no_seri,
-                    'nama_barang' => $bmn->nama_barang,
-                    'merek' => $bmn->merek,
-                    'tahun_perolehan' => $bmn->tahun_perolehan,
-                    'nilai_perolehan' => $bmn->nilai_perolehan,
-                    'lokasi' => $bmn->lokasi,
-                    'penanggungjawab' => $bmn->penanggungjawab,
-                    'kondisi' => $bmn->kondisi,
-                ], fn ($v) => $v !== null));
+            if ($createLab) {
+                if ($bmn->lab) {
+                    $bmn->lab->update(array_filter([
+                        'kode_barang' => $bmn->kode_barang,
+                        'nup' => (int) $bmn->nup,
+                        'no_seri' => $bmn->no_seri,
+                        'nama_barang' => $bmn->nama_barang,
+                        'merek' => $bmn->merek,
+                        'tahun_perolehan' => $bmn->tahun_perolehan,
+                        'nilai_perolehan' => $bmn->nilai_perolehan,
+                        'lokasi' => $bmn->lokasi,
+                        'penanggungjawab' => $bmn->penanggungjawab,
+                        'kondisi' => $bmn->kondisi,
+                    ], fn ($v) => $v !== null));
+                } else {
+                    BmnLab::create([
+                        'bmn_id' => $bmn->id,
+                        'kode_barang' => $bmn->kode_barang,
+                        'nup' => (int) $bmn->nup,
+                        'no_seri' => $bmn->no_seri,
+                        'nama_barang' => $bmn->nama_barang,
+                        'merek' => $bmn->merek,
+                        'tahun_perolehan' => $bmn->tahun_perolehan,
+                        'nilai_perolehan' => $bmn->nilai_perolehan,
+                        'lokasi' => $bmn->lokasi,
+                        'penanggungjawab' => $bmn->penanggungjawab,
+                        'kondisi' => $bmn->kondisi ?? 'Baik',
+                        'status_kalibrasi' => 'Belum Dikalibrasi',
+                        'dihapus' => false,
+                    ]);
+                }
+            } else {
+                $bmn->lab()?->delete();
             }
 
             return true;
@@ -578,16 +621,28 @@ class BmnService
         ]);
     }
 
-    public function createAutomaticDistribusiIfNeeded(Bmn $bmn, ?array &$cache = null): ?Distribusi
+    public function createAutomaticDistribusiIfNeeded(Bmn $bmn, ?array &$cache = null, bool $isImport = false): ?Distribusi
     {
         $lokasiNormalized = strtolower(trim((string) ($bmn->lokasi ?? '')));
         $pjNormalized = strtolower(trim((string) ($bmn->penanggungjawab ?? '')));
 
-        $isGudang = str_contains($lokasiNormalized, 'gudang');
-        $isPengelolaBmn = str_contains($pjNormalized, 'pengelola bmn') || empty($pjNormalized);
+        if ($isImport) {
+            // Khusus Fitur Import Excel:
+            // Jika sudah berlokasi dan bukan gudang bmn -> TIDAK MASUK BA DISTRIBUSI!
+            $isGudang = str_contains($lokasiNormalized, 'gudang');
+            $isBelumBerlokasi = empty($lokasiNormalized) || $lokasiNormalized === 'belum berlokasi';
 
-        if (! $isGudang && ! $isPengelolaBmn) {
-            return null;
+            if (! $isGudang && ! $isBelumBerlokasi) {
+                return null;
+            }
+        } else {
+            // Logika Lama (Input Manual):
+            $isGudang = str_contains($lokasiNormalized, 'gudang');
+            $isPengelolaBmn = str_contains($pjNormalized, 'pengelola bmn') || empty($pjNormalized);
+
+            if (! $isGudang && ! $isPengelolaBmn) {
+                return null;
+            }
         }
 
         $datePart = now()->format('Ymd');

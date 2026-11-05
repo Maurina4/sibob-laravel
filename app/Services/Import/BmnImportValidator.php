@@ -3,6 +3,7 @@
 namespace App\Services\Import;
 
 use App\Models\Bmn;
+use App\Models\Pegawai;
 use Illuminate\Support\Carbon;
 
 class BmnImportValidator
@@ -64,6 +65,13 @@ class BmnImportValidator
                 }
             }
         }
+
+        // Ambil peta seluruh Pegawai berdasarkan NIP yang sudah dibersihkan
+        $pegawaiMap = Pegawai::query()
+            ->select(['id', 'nama', 'nip', 'jabatan'])
+            ->get()
+            ->keyBy(fn ($p) => preg_replace('/[^0-9]/', '', (string) $p->nip))
+            ->toArray();
 
         $validatedRows = [];
         $allErrorMessages = [];
@@ -223,7 +231,31 @@ class BmnImportValidator
                 $satuan = 'unit';
             }
 
-            // 13. Cek Duplikasi Kombinasi (Kode Barang + NUP)
+            // 13. Resolusi NIP Penanggung Jawab
+            $rawNip = trim((string) ($row['nip_raw'] ?? ''));
+            $cleanNip = trim((string) ($row['nip'] ?? ''));
+            $pjStatus = 'empty';
+            $pjNama = 'Pengelola BMN';
+            $pjNip = '-';
+            $pjId = null;
+            $rowWarnings = [];
+
+            if ($cleanNip !== '') {
+                if (isset($pegawaiMap[$cleanNip])) {
+                    $peg = $pegawaiMap[$cleanNip];
+                    $pjStatus = 'matched';
+                    $pjNama = $peg['nama'];
+                    $pjNip = $peg['nip'];
+                    $pjId = $peg['id'];
+                } else {
+                    $pjStatus = 'unmatched';
+                    $pjNama = 'Pengelola BMN';
+                    $pjNip = '-';
+                    $rowWarnings['nip_unmatched'] = "NIP ({$rawNip}) tidak ditemukan di Master Pegawai. Dialihkan ke Pengelola BMN.";
+                }
+            }
+
+            // 14. Cek Duplikasi Kombinasi (Kode Barang + NUP)
             if ($kode !== '' && $nupInt !== null) {
                 $pairKey = strtolower($kode).'#'.$nupInt;
 
@@ -263,6 +295,11 @@ class BmnImportValidator
                 'kondisi' => $kondisi,
                 'satuan' => $satuan,
                 'lokasi_ruang' => $lokasiRuang,
+                'penanggungjawab' => $pjNama,
+                'penanggungjawab_nip' => $pjNip,
+                'penanggung_jawab_id' => $pjId,
+                'pj_status' => $pjStatus,
+                'warnings' => $rowWarnings,
                 'is_valid' => $isValid,
                 'errors' => $rowErrors,
             ]);

@@ -22,6 +22,8 @@
                    (r.merek && r.merek.toLowerCase().includes(q)) ||
                    (r.jenis && r.jenis.toLowerCase().includes(q)) ||
                    (r.lokasi_ruang && r.lokasi_ruang.toLowerCase().includes(q)) ||
+                   (r.penanggungjawab && r.penanggungjawab.toLowerCase().includes(q)) ||
+                   (r.nip && String(r.nip).includes(q)) ||
                    (r.nup_raw && String(r.nup_raw).includes(q));
         });
     },
@@ -316,6 +318,7 @@
                         <th class="py-2.5 px-3 text-center">Tgl Perolehan</th>
                         <th class="py-2.5 px-3 text-right">Nilai Perolehan (Rp)</th>
                         <th class="py-2.5 px-3">Lokasi Ruang</th>
+                        <th class="py-2.5 px-3">Penanggung Jawab</th>
                         <th class="py-2.5 px-3">Catatan / Alasan Error</th>
                     </tr>
                 </thead>
@@ -359,9 +362,25 @@
                             <td class="py-2.5 px-3 text-center whitespace-nowrap font-mono" x-text="row.tanggal_terima_raw || '-'"></td>
                             <td class="py-2.5 px-3 text-right font-mono whitespace-nowrap" x-text="row.nilai_perolehan ? Number(row.nilai_perolehan).toLocaleString('id-ID') : (row.nilai_perolehan_raw || '-')"></td>
                             <td class="py-2.5 px-3 whitespace-nowrap text-[#4A5D52]" x-text="row.lokasi_ruang || 'Belum berlokasi'"></td>
+                            <td class="py-2.5 px-3 whitespace-nowrap">
+                                <div class="font-medium text-[#132219]" x-text="row.penanggungjawab || 'Pengelola BMN'"></div>
+                                <template x-if="row.nip">
+                                    <div class="text-[10px] font-mono text-[#62756A]" x-text="'NIP: ' + row.nip"></div>
+                                </template>
+                            </td>
                             <td class="py-2.5 px-3 min-w-[220px]">
-                                <template x-if="row.is_valid">
+                                <template x-if="row.is_valid && (!row.warnings || Object.keys(row.warnings).length === 0)">
                                     <span class="text-[11px] text-[#62756A] italic">Siap diimpor</span>
+                                </template>
+                                <template x-if="row.is_valid && row.warnings && Object.keys(row.warnings).length > 0">
+                                    <div class="space-y-0.5">
+                                        <template x-for="(warn, key) in row.warnings" :key="key">
+                                            <div class="text-[11px] font-medium text-[#B06000] flex items-start gap-1">
+                                                <span>⚠️</span>
+                                                <span x-text="warn"></span>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </template>
                                 <template x-if="!row.is_valid">
                                     <div class="space-y-0.5">
@@ -377,7 +396,7 @@
                         </tr>
                     </template>
                     <tr x-show="filteredRows.length === 0">
-                        <td colspan="13" class="py-8 text-center text-xs text-[#8D9D95]">
+                        <td colspan="14" class="py-8 text-center text-xs text-[#8D9D95]">
                             Tidak ada data baris yang cocok dengan filter atau pencarian.
                         </td>
                     </tr>

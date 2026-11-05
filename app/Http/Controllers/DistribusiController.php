@@ -58,16 +58,17 @@ class DistribusiController extends Controller
 
         $distribusi->load(['bmn', 'items.bmn', 'lokasiAsalRef', 'lokasiTujuanRef', 'penerimaPegawai']);
 
-        // Resolusi Pihak Pertama (Petugas Gudang / Pengelola BMN / Penyerah)
-        $pengelolaBmn = Pegawai::where('jabatan', 'like', '%Gudang%')
-            ->orWhere('jabatan', 'like', '%Distribusi%')
-            ->orWhere('jabatan', 'like', '%Operator BMN%')
+        // Resolusi Pihak Pertama (Pengelola BMN / Penyerah)
+        $pengelolaBmn = Pegawai::where('nama', 'like', '%Yuli%')
             ->orWhere('jabatan', 'like', '%Pengelola BMN%')
+            ->orWhere('jabatan', 'like', '%Operator BMN%')
+            ->orWhere('jabatan', 'like', '%Gudang%')
+            ->orWhere('jabatan', 'like', '%Distribusi%')
             ->first();
 
         $pihakPertama = [
             'nama' => $pengelolaBmn?->nama ?: 'Yuli Supriyatno, A. Md.',
-            'nip' => $pengelolaBmn?->nip ?: '19840722 2023211 010',
+            'nip' => $pengelolaBmn?->nip ?: '198407222023211010',
             'jabatan' => $pengelolaBmn?->jabatan ?: 'Pengelola BMN',
             'unit_kerja' => $pengelolaBmn?->unit_kerja ?: 'Balai Besar POM di Banjarbaru',
         ];

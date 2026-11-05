@@ -40,8 +40,13 @@ class UpdateBmnLabRequest extends FormRequest
                 'required',
                 'string',
                 'digits:10',
-                Rule::unique('bmns', 'kode_barang')->ignore($bmnId),
-                Rule::unique('bmns_lab', 'kode_barang')->ignore($labId),
+                Rule::unique('bmns', 'kode_barang')
+                    ->where(fn ($query) => $query->where('nup', (string) $this->input('nup')))
+                    ->withoutTrashed()
+                    ->ignore($bmnId),
+                Rule::unique('bmns_lab', 'kode_barang')
+                    ->where(fn ($query) => $query->where('nup', (int) $this->input('nup'))->where('dihapus', 0))
+                    ->ignore($labId),
             ],
             'nup' => ['required', 'integer', 'min:1'],
             'no_seri' => ['nullable', 'string', 'max:255'],
@@ -64,7 +69,7 @@ class UpdateBmnLabRequest extends FormRequest
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
             'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3080101005 atau 3.08.01.01.005).',
-            'kode_barang.unique' => 'Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.',
+            'kode_barang.unique' => 'Kombinasi Kode Barang dan NUP sudah terdaftar dalam sistem. Silakan periksa kembali NUP atau Kode Barang.',
         ];
     }
 }

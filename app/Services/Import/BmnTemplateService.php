@@ -30,6 +30,7 @@ class BmnTemplateService
         'I' => 'Tanggal Perolehan',
         'J' => 'Nilai Perolehan',
         'K' => 'Lokasi Ruang',
+        'L' => 'NIP Penanggung Jawab',
     ];
 
     /**
@@ -46,7 +47,7 @@ class BmnTemplateService
         $sheetData->setTitle('Data');
 
         // Header Styling
-        $headerRange = 'A1:K1';
+        $headerRange = 'A1:L1';
         $sheetData->getStyle($headerRange)->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -79,8 +80,9 @@ class BmnTemplateService
         // Freeze Pane agar header tetap terlihat saat scroll
         $sheetData->freezePane('A2');
 
-        // Format kolom Kode Barang sebagai Teks Murni (@)
+        // Format kolom Kode Barang dan NIP sebagai Teks Murni (@)
         $sheetData->getStyle('C2:C1000')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+        $sheetData->getStyle('L2:L1000')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
 
         // Format kolom Nilai Perolehan
         $sheetData->getStyle('J2:J1000')->getNumberFormat()->setFormatCode('#,##0');
@@ -94,6 +96,7 @@ class BmnTemplateService
         $sheetData->getStyle('G2:I1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheetData->getStyle('J2:J1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $sheetData->getStyle('K2:K1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheetData->getStyle('L2:L1000')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         // Baris Contoh 1: TANAH (tanpa merk, tanggal format Jan-78)
         $sheetData->setCellValue('A2', 1);
@@ -107,6 +110,7 @@ class BmnTemplateService
         $sheetData->setCellValue('I2', 'Jan-78');
         $sheetData->setCellValue('J2', 10550088000);
         $sheetData->setCellValue('K2', 'Belum berlokasi');
+        $sheetData->setCellValueExplicit('L2', '', DataType::TYPE_STRING);
 
         // Baris Contoh 2: ALAT BESAR (ada merk, tanggal DD/MM/YYYY)
         $sheetData->setCellValue('A3', 2);
@@ -120,6 +124,7 @@ class BmnTemplateService
         $sheetData->setCellValue('I3', '18/06/2013');
         $sheetData->setCellValue('J3', 7500000);
         $sheetData->setCellValue('K3', 'Belum berlokasi');
+        $sheetData->setCellValueExplicit('L3', '', DataType::TYPE_STRING);
 
         // Baris Contoh 3: BMN-TIK
         $sheetData->setCellValue('A4', 3);
@@ -133,9 +138,10 @@ class BmnTemplateService
         $sheetData->setCellValue('I4', '15/01/2023');
         $sheetData->setCellValue('J4', 18500000);
         $sheetData->setCellValue('K4', 'Gudang BMN');
+        $sheetData->setCellValueExplicit('L4', '198001012005011001', DataType::TYPE_STRING);
 
         // Style baris contoh
-        $sheetData->getStyle('A2:K4')->applyFromArray([
+        $sheetData->getStyle('A2:L4')->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -159,7 +165,7 @@ class BmnTemplateService
         }
 
         // Auto width untuk tiap kolom di Sheet Data
-        foreach (range('A', 'K') as $col) {
+        foreach (range('A', 'L') as $col) {
             $sheetData->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -212,7 +218,8 @@ class BmnTemplateService
             ['Tanggal Buku Pertama', 'Opsional', 'Tanggal (DD/MM/YYYY)', 'Tanggal pembukuan pertama kali aset pada neraca (contoh: 31/12/2021).'],
             ['Tanggal Perolehan', 'Wajib', 'Tanggal / Bulan-Tahun', 'Mendukung format DD/MM/YYYY (30/03/2016), Bulan-Tahun (Jan-78, Jan-81), atau Tahun (1978). Sistem otomatis mengekstrak Tahun Perolehan.'],
             ['Nilai Perolehan', 'Wajib', 'Angka (>= 0)', 'Nilai perolehan barang dalam rupiah tanpa tulisan "Rp" (contoh: 10550088000 atau 7500000).'],
-            ['Lokasi Ruang', 'Opsional', 'Teks', 'Nama ruangan penempatan aset. Jika terisi "Belum berlokasi", sistem akan mengaitkannya ke master lokasi resmi Belum Berlokasi.'],
+            ['Lokasi Ruang', 'Opsional', 'Teks', 'Nama ruangan penempatan aset. Jika diisi ruangan spesifik, aset langsung ditempatkan di ruangan tersebut dan TIDAK masuk BA Distribusi. Jika terisi "Belum berlokasi" / "Gudang BMN" / kosong, aset otomatis masuk antrean BA Distribusi Gudang.'],
+            ['NIP Penanggung Jawab', 'Opsional', 'Teks (Angka NIP)', 'NIP pegawai penanggung jawab aset (18 digit angka). Jika terdaftar di Master Pegawai, nama resmi otomatis disinkronkan. Jika dikosongkan/tidak terdaftar, otomatis dialihkan ke "Pengelola BMN".'],
         ];
 
         $pRow = 5;
@@ -253,6 +260,7 @@ class BmnTemplateService
             '3. Toleransi Merek Kosong: Khusus aset tanah, gedung, atau infrastruktur yang tidak memiliki merek, kolom Merk dapat dikosongkan tanpa error.',
             '4. Kebijakan Impor Parsial (Toleransi Error): Baris data yang valid akan langsung tersimpan ke sistem. Baris yang bermasalah akan dilewati dan disediakan file Excel Laporan Error untuk diperbaiki.',
             '5. Dual-Support Skema: Parser sistem juga tetap menerima berkas Excel dengan format template lama 10 kolom (Kode Barang, NUP, Merek, Tgl Terima, Tahun, Nilai, Jenis, Satuan, Spesifikasi).',
+            '6. Penanganan Lokasi & BA Distribusi: Aset dengan lokasi ruangan spesifik tidak akan dibuatkan tiket Berita Acara Distribusi. Tiket distribusi hanya dibuat untuk aset yang berlokasi di Gudang BMN atau Belum berlokasi.',
         ];
 
         foreach ($catatan as $c) {

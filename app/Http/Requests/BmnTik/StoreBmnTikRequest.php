@@ -34,8 +34,11 @@ class StoreBmnTikRequest extends FormRequest
                 'required',
                 'string',
                 'digits:10',
-                Rule::unique('bmns', 'kode_barang'),
-                Rule::unique('bmns_tik', 'kode_barang'),
+                Rule::unique('bmns', 'kode_barang')
+                    ->where(fn ($query) => $query->where('nup', (string) $this->input('nup')))
+                    ->withoutTrashed(),
+                Rule::unique('bmns_tik', 'kode_barang')
+                    ->where(fn ($query) => $query->where('nup', (int) $this->input('nup'))->where('dihapus', 0)),
             ],
             'nup' => ['required', 'integer', 'min:1'],
             'no_seri' => ['nullable', 'string', 'max:255'],
@@ -55,7 +58,7 @@ class StoreBmnTikRequest extends FormRequest
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
             'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3090405012 atau 3.09.04.05.012).',
-            'kode_barang.unique' => 'Kode barang sudah terdaftar dalam sistem. Silakan gunakan kode barang yang lain.',
+            'kode_barang.unique' => 'Kombinasi Kode Barang dan NUP sudah terdaftar dalam sistem. Silakan periksa kembali NUP atau Kode Barang.',
         ];
     }
 }
