@@ -69,7 +69,7 @@
                 <thead>
                     <tr class="bg-[#F7FAF8] border-b border-[#E3ECE6] text-[#4D6357] text-[11px] font-semibold uppercase tracking-wider">
                         <th class="py-3.5 px-4 text-center w-12">No</th>
-                        <th class="py-3.5 px-4">No. Dokumen BA</th>
+                        <th class="py-3.5 px-4">Nomor (SIPANDA)</th>
                         <th class="py-3.5 px-4">Tanggal</th>
                         <th class="py-3.5 px-4 whitespace-nowrap">Kode Barang</th>
                         <th class="py-3.5 px-4 text-center whitespace-nowrap">NUP</th>
@@ -349,3 +349,4 @@
 
 </div>
 @endsection
+

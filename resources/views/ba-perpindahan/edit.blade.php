@@ -51,13 +51,14 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {{-- NOMOR BA --}}
             <div>
-                <x-input-label for="nomor_ba" value="Nomor BA Perpindahan" />
+                <x-input-label for="nomor_ba" value="Nomor (SIPANDA)" />
                 <x-text-input
                     id="nomor_ba"
                     name="nomor_ba"
                     type="text"
                     class="w-full font-mono text-xs"
                     :value="old('nomor_ba', $baPerpindahan->nomor_ba)"
+                    placeholder="mis. PL.03.01.22A.{{ date('Ymd') }}.01"
                 />
             </div>
 
@@ -1322,3 +1323,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
+

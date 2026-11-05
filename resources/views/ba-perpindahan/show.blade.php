@@ -123,6 +123,14 @@
             </div>
 
             <dl class="space-y-3 text-xs">
+                <div class="flex justify-between items-center py-1.5 border-b border-[#E3ECE6]/50">
+                    <dt class="text-[#62756A]">Nomor (SIPANDA)</dt>
+                    <dd>
+                        <span class="font-mono text-xs font-semibold text-[#163828] bg-[#EAF2ED] px-2.5 py-0.5 rounded border border-[#D5E5DA]">
+                            {{ $baPerpindahan->nomor_ba ?: '—' }}
+                        </span>
+                    </dd>
+                </div>
                 @if($baPerpindahan->bmn)
                     <div class="flex justify-between items-center py-1.5 border-b border-[#E3ECE6]/50">
                         <dt class="text-[#62756A]">Kode Barang</dt>

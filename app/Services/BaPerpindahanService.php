@@ -123,7 +123,7 @@ class BaPerpindahanService
 
         if (empty($validated['nomor_ba'])) {
             $countToday = BaPerpindahan::whereDate('created_at', today())->count() + 1;
-            $validated['nomor_ba'] = 'BA-MUT/'.date('Ymd').'/'.str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            $validated['nomor_ba'] = 'PL.03.01.22A.'.date('Ymd').'.'.str_pad((string) $countToday, 2, '0', STR_PAD_LEFT);
         }
 
         $validated['status'] = 'Diajukan';
