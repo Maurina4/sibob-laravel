@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pengembalian BMN — SIBOB')
-@section('page-title', 'Pengembalian BMN')
+@section('title', 'BA Pengembalian BMN — SIBOB')
+@section('page-title', 'BA Pengembalian')
 
 @section('content')
 <div class="space-y-6">
@@ -9,9 +9,9 @@
     {{-- HEADER HALAMAN --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Penyerahan Kembali Aset</div>
-            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Pengembalian BMN</h1>
-            <p class="text-xs text-[#62756A] mt-0.5">Pencatatan pengembalian barang milik negara dari pegawai atau unit kerja ke pengelola BMN.</p>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Dokumen Berita Acara</div>
+            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">BA Pengembalian BMN</h1>
+            <p class="text-xs text-[#62756A] mt-0.5">Pencatatan dan penerbitan Berita Acara Serah Terima (BAST) pengembalian barang milik negara.</p>
         </div>
 
         <a
@@ -21,7 +21,7 @@
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Ajukan Pengembalian</span>
+            <span>Buat BA Pengembalian</span>
         </a>
     </div>
 
