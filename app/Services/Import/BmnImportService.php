@@ -8,9 +8,11 @@ use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -280,7 +282,7 @@ class BmnImportService
         $summary = $importLog->error_summary ?? [];
         $rows = $summary['rows'] ?? [];
 
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Error Import');
 
@@ -330,7 +332,7 @@ class BmnImportService
 
             $sheet->setCellValue("A{$curRow}", $r['excel_row'] ?? $curRow);
             $sheet->setCellValue("B{$curRow}", $r['jenis'] ?? '');
-            $sheet->setCellValueExplicit("C{$curRow}", (string) ($r['kode_barang'] ?? ''), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValueExplicit("C{$curRow}", (string) ($r['kode_barang'] ?? ''), DataType::TYPE_STRING);
             $sheet->setCellValue("D{$curRow}", $r['nup_raw'] ?? '');
             $sheet->setCellValue("E{$curRow}", $r['nama_barang'] ?? '');
             $sheet->setCellValue("F{$curRow}", $r['merek'] ?? '');
@@ -349,7 +351,7 @@ class BmnImportService
                     'startColor' => ['rgb' => 'FDF0EE'],
                 ],
             ]);
-            $sheet->getStyle("L{$curRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('9C322C'));
+            $sheet->getStyle("L{$curRow}")->getFont()->setBold(true)->setColor(new Color('9C322C'));
 
             $curRow++;
         }

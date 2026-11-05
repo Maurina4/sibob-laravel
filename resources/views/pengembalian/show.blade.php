@@ -273,10 +273,12 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span>
                     Baik: <strong>{{ $countBaik }}</strong>
                 </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF4E5] text-[#B25E00] border border-[#FFE2BF] font-medium">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#B25E00]"></span>
-                    Rusak Ringan: <strong>{{ $countRusakRingan }}</strong>
-                </span>
+                @if($countRusakRingan > 0)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF4E5] text-[#B25E00] border border-[#FFE2BF] font-medium">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#B25E00]"></span>
+                        Rusak Ringan: <strong>{{ $countRusakRingan }}</strong>
+                    </span>
+                @endif
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FDF0EE] text-[#9C322C] border border-[#F8D4D0] font-medium">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#9C322C]"></span>
                     Rusak Berat: <strong>{{ $countRusakBerat }}</strong>

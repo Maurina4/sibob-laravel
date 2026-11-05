@@ -49,7 +49,7 @@ class BmnModuleTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
         $response->assertOk();
         $response->assertSee(route('laporan-kerusakan.index'));
-        $response->assertSee('Laporan Kerusakan');
+        $response->assertSee('Daftar Rusak Berat');
     }
 
     public function test_bmn_index_page_is_accessible_by_operator(): void
@@ -1627,7 +1627,7 @@ class BmnModuleTest extends TestCase
         $response->assertRedirect(route('laporan-kerusakan.index'));
 
         $this->assertEquals('Diterima', $laporan->fresh()->status);
-        $this->assertEquals('Rusak Ringan', $bmn->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmn->fresh()->kondisi);
     }
 
     public function test_accepting_laporan_kerusakan_berat_updates_condition_to_rusak_berat(): void
@@ -3949,10 +3949,10 @@ class BmnModuleTest extends TestCase
         ]);
         $resInvalid->assertSessionHasErrors('tingkat');
 
-        // 4. Create form displays only Rusak Ringan and Rusak Berat (no Sedang)
+        // 4. Create form displays only Rusak Berat (no Ringan or Sedang)
         $resCreate = $this->actingAs($operator)->get(route('laporan-kerusakan.create'));
         $resCreate->assertOk();
-        $resCreate->assertSee('value="Rusak Ringan"', false);
+        $resCreate->assertDontSee('value="Rusak Ringan"', false);
         $resCreate->assertSee('value="Rusak Berat"', false);
         $resCreate->assertDontSee('value="Sedang"', false);
     }
@@ -4048,7 +4048,7 @@ class BmnModuleTest extends TestCase
         ]);
         $acceptRes2->assertRedirect(route('laporan-kerusakan.index'));
 
-        $this->assertEquals('Rusak Ringan', $bmn2->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmn2->fresh()->kondisi);
         $this->assertEquals($bmn2->id, $laporan2->fresh()->bmn_id);
 
         // 5. Jika laporan ditolak, kondisi kembali menjadi 'Baik'

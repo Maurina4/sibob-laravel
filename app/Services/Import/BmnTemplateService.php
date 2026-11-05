@@ -7,6 +7,7 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -36,7 +37,7 @@ class BmnTemplateService
      */
     public function generateTemplate(): BinaryFileResponse
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         // ----------------------------------------------------
         // SHEET 1: Data
@@ -154,7 +155,7 @@ class BmnTemplateService
             $valKondisi->setErrorStyle(DataValidation::STYLE_INFORMATION);
             $valKondisi->setAllowBlank(true);
             $valKondisi->setShowDropDown(true);
-            $valKondisi->setFormula1('"Baik,Rusak Ringan,Rusak Berat"');
+            $valKondisi->setFormula1('"Baik,Rusak Berat"');
         }
 
         // Auto width untuk tiap kolom di Sheet Data
@@ -170,7 +171,7 @@ class BmnTemplateService
 
         // Judul Petunjuk
         $sheetPetunjuk->setCellValue('A1', 'PETUNJUK PENGISIAN TEMPLATE IMPORT MASTER DATA ASET (SIBOB)');
-        $sheetPetunjuk->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('163828'));
+        $sheetPetunjuk->getStyle('A1')->getFont()->setBold(true)->setSize(14)->setColor(new Color('163828'));
         $sheetPetunjuk->mergeCells('A1:D1');
 
         $sheetPetunjuk->setCellValue('A2', 'Format ini kompatibel langsung dengan ekspor Master Data Aset dari SIMAN/SAKTI maupun input manual:');
@@ -207,7 +208,7 @@ class BmnTemplateService
             ['NUP', 'Wajib', 'Angka Bulat Positif (> 0)', 'Nomor Urut Pendaftaran. Kombinasi Kode Barang + NUP harus unik (tidak boleh duplikat di sistem/file).'],
             ['Nama Barang', 'Wajib', 'Teks', 'Nama lengkap barang milik negara (contoh: Tanah Bangunan Rumah Negara Golongan I, Pompa Air, PC).'],
             ['Merk', 'Opsional', 'Teks', 'Merek atau pabrikan aset. Dapat dikosongkan untuk aset seperti tanah atau bangunan.'],
-            ['Kondisi', 'Opsional', 'Teks (Default: Baik)', 'Kondisi fisik aset (contoh: Baik, Rusak Ringan, Rusak Berat). Jika dikosongkan otomatis terisi "Baik".'],
+            ['Kondisi', 'Opsional', 'Teks (Default: Baik)', 'Kondisi fisik aset (contoh: Baik, Rusak Berat). Jika dikosongkan otomatis terisi "Baik".'],
             ['Tanggal Buku Pertama', 'Opsional', 'Tanggal (DD/MM/YYYY)', 'Tanggal pembukuan pertama kali aset pada neraca (contoh: 31/12/2021).'],
             ['Tanggal Perolehan', 'Wajib', 'Tanggal / Bulan-Tahun', 'Mendukung format DD/MM/YYYY (30/03/2016), Bulan-Tahun (Jan-78, Jan-81), atau Tahun (1978). Sistem otomatis mengekstrak Tahun Perolehan.'],
             ['Nilai Perolehan', 'Wajib', 'Angka (>= 0)', 'Nilai perolehan barang dalam rupiah tanpa tulisan "Rp" (contoh: 10550088000 atau 7500000).'],
@@ -222,7 +223,7 @@ class BmnTemplateService
             $sheetPetunjuk->setCellValue("D{$pRow}", $row[3]);
 
             if ($row[1] === 'Wajib') {
-                $sheetPetunjuk->getStyle("B{$pRow}")->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('B22222'));
+                $sheetPetunjuk->getStyle("B{$pRow}")->getFont()->setBold(true)->setColor(new Color('B22222'));
             }
 
             $pRow++;
@@ -244,7 +245,7 @@ class BmnTemplateService
         // Catatan Otomatisasi Sistem
         $pRow += 2;
         $sheetPetunjuk->setCellValue("A{$pRow}", 'CATATAN OTOMATISASI DAN KEBIJAKAN SISTEM:');
-        $sheetPetunjuk->getStyle("A{$pRow}")->getFont()->setBold(true)->setSize(11)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('163828'));
+        $sheetPetunjuk->getStyle("A{$pRow}")->getFont()->setBold(true)->setSize(11)->setColor(new Color('163828'));
 
         $catatan = [
             '1. Auto-Deteksi Format Tanggal: Tanggal seperti "Jan-78" atau "Jan-81" otomatis diubah menjadi "1978-01-01" / "1981-01-01" dan diekstrak tahunnya.',

@@ -301,7 +301,6 @@
                     required
                     class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
                 >
-                    <option value="Rusak Ringan" {{ in_array(old('tingkat'), ['Rusak Ringan', 'Ringan']) ? 'selected' : '' }}>Rusak Ringan</option>
                     <option value="Rusak Berat" {{ in_array(old('tingkat'), ['Rusak Berat', 'Berat']) ? 'selected' : '' }}>Rusak Berat</option>
                 </select>
             </div>
@@ -471,3 +470,4 @@ function laporanBmnSearchableSelect(config) {
 }
 </script>
 @endpush
+

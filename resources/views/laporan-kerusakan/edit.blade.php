@@ -19,7 +19,7 @@
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Kembali ke Daftar Laporan</span>
+            <span>Kembali ke Daftar Rusak Berat</span>
         </a>
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-bold tracking-tight text-[#132219]">
@@ -148,7 +148,6 @@
                         name="tingkat"
                         class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
                     >
-                        <option value="Rusak Ringan" @selected(in_array(old('tingkat', $laporanKerusakan->tingkat), ['Rusak Ringan', 'Ringan']))>Rusak Ringan</option>
                         <option value="Rusak Berat" @selected(in_array(old('tingkat', $laporanKerusakan->tingkat), ['Rusak Berat', 'Berat']))>Rusak Berat</option>
                     </select>
                 </div>
@@ -482,7 +481,6 @@
                         required
                         class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
                     >
-                        <option value="Rusak Ringan" {{ in_array(old('tingkat', $laporanKerusakan->tingkat), ['Rusak Ringan', 'Ringan']) ? 'selected' : '' }}>Rusak Ringan</option>
                         <option value="Rusak Berat" {{ in_array(old('tingkat', $laporanKerusakan->tingkat), ['Rusak Berat', 'Berat']) ? 'selected' : '' }}>Rusak Berat</option>
                     </select>
                 </div>
@@ -673,3 +671,4 @@
     </script>
     @endpush
 @endif
+

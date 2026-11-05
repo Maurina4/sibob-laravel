@@ -20,6 +20,7 @@ class BmnImportFeatureTest extends TestCase
     use RefreshDatabase;
 
     protected User $operatorUser;
+
     protected User $regularUser;
 
     protected function setUp(): void
@@ -39,7 +40,7 @@ class BmnImportFeatureTest extends TestCase
 
     protected function createUploadableExcel(array $headers, array $dataRows): UploadedFile
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Data');
 

@@ -97,8 +97,8 @@ class LaporanKerusakanController extends Controller
             if (in_array($validated['status'], ['Diterima', 'Diproses'])) {
                 $kondisiTerkait = match ($freshLaporan->tingkat) {
                     'Rusak Berat', 'Berat' => 'Rusak Berat',
-                    'Sedang' => 'Rusak Sedang',
-                    default => 'Rusak Ringan',
+                    'Sedang', 'Rusak Sedang' => 'Rusak Sedang',
+                    default => 'Rusak Berat',
                 };
                 $successMessage = "Laporan berhasil {$validated['status']}. Kondisi barang BMN otomatis diubah menjadi '{$kondisiTerkait}'.";
             } elseif ($validated['status'] === 'Selesai') {

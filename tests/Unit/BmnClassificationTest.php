@@ -3,8 +3,6 @@
 namespace Tests\Unit;
 
 use App\Models\Bmn;
-use App\Models\BmnLab;
-use App\Models\BmnTik;
 use App\Models\Lokasi;
 use App\Services\BmnService;
 use App\Services\Import\BmnImportValidator;

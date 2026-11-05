@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use App\Models\Bmn;
-use App\Models\Lokasi;
 use App\Services\Import\BmnExcelParser;
 use App\Services\Import\BmnImportValidator;
 use App\Services\Import\BmnTemplateService;
@@ -19,7 +18,7 @@ class BmnImportTest extends TestCase
 
     protected function createSampleExcel(array $headers, array $dataRows, ?string $sheetName = 'Data'): string
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle($sheetName ?? 'Data');
 
@@ -54,7 +53,7 @@ class BmnImportTest extends TestCase
 
     public function test_template_service_generates_valid_master_data_aset_spreadsheet(): void
     {
-        $service = new BmnTemplateService();
+        $service = new BmnTemplateService;
         $response = $service->generateTemplate();
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -78,7 +77,7 @@ class BmnImportTest extends TestCase
         ];
 
         $file = $this->createSampleExcel($headers, $rows);
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
         $result = $parser->parse($file);
 
         @unlink($file);
@@ -108,7 +107,7 @@ class BmnImportTest extends TestCase
 
     public function test_parser_flexible_date_string_conversions(): void
     {
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
 
         $d1 = $parser->parseFlexibleDateString('Jan-78');
         $this->assertSame('1978-01-01', $d1['date']);
@@ -147,7 +146,7 @@ class BmnImportTest extends TestCase
         ];
 
         $file = $this->createSampleExcel($headers, $rows);
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
         $result = $parser->parse($file);
 
         @unlink($file);
@@ -169,7 +168,7 @@ class BmnImportTest extends TestCase
         $rows = [['3080305002', 1, 'Laptop Asus']];
 
         $file = $this->createSampleExcel($headers, $rows);
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
         $result = $parser->parse($file);
 
         @unlink($file);
@@ -180,7 +179,7 @@ class BmnImportTest extends TestCase
 
     public function test_validator_accepts_master_data_aset_with_empty_merek_and_flexible_jenis(): void
     {
-        $validator = new BmnImportValidator();
+        $validator = new BmnImportValidator;
 
         $rows = [
             [
@@ -225,7 +224,7 @@ class BmnImportTest extends TestCase
             'dihapus' => false,
         ]);
 
-        $validator = new BmnImportValidator();
+        $validator = new BmnImportValidator;
 
         $rows = [
             // Baris 1: duplikat dengan DB
@@ -291,7 +290,7 @@ class BmnImportTest extends TestCase
 
     public function test_validator_validates_business_rules(): void
     {
-        $validator = new BmnImportValidator();
+        $validator = new BmnImportValidator;
 
         $rows = [
             // Tanggal masa depan & Tahun perolehan > tahun terima & Kode barang bukan 10 digit
@@ -331,7 +330,7 @@ class BmnImportTest extends TestCase
 
     public function test_parser_handles_raw_excel_serial_dates(): void
     {
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
 
         // 28491 -> 1978-01-01
         $d1 = $parser->parseFlexibleDateString('28491');
@@ -357,7 +356,7 @@ class BmnImportTest extends TestCase
 
     public function test_parser_handles_indonesian_full_month_names(): void
     {
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
 
         $d1 = $parser->parseFlexibleDateString('18 Juni 2013');
         $this->assertNotNull($d1);
@@ -386,11 +385,11 @@ class BmnImportTest extends TestCase
         ];
 
         $file = $this->createSampleExcel($headers, $rows);
-        $parser = new BmnExcelParser();
+        $parser = new BmnExcelParser;
         $parseResult = $parser->parse($file);
         @unlink($file);
 
-        $validator = new BmnImportValidator();
+        $validator = new BmnImportValidator;
         $validationResult = $validator->validate($parseResult['rows']);
 
         $this->assertTrue($validationResult['is_valid']);

@@ -17,9 +17,13 @@ class PengajuanPengembalianFeatureTest extends TestCase
     use RefreshDatabase;
 
     protected User $operator;
+
     protected User $regularUser;
+
     protected User $otherUser;
+
     protected Pegawai $pegawaiUser;
+
     protected Pegawai $pegawaiOperator;
 
     protected function setUp(): void
@@ -88,7 +92,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
         static $counter = 1;
 
         return PengajuanPengembalian::create(array_merge([
-            'nomor_pengajuan' => 'PGM-' . now()->format('Ymd') . '-' . str_pad((string) $counter++, 3, '0', STR_PAD_LEFT),
+            'nomor_pengajuan' => 'PGM-'.now()->format('Ymd').'-'.str_pad((string) $counter++, 3, '0', STR_PAD_LEFT),
             'diajukan_oleh' => $this->regularUser->id,
             'pegawai_id' => $this->pegawaiUser->id,
             'nama_pegawai' => $this->regularUser->name,
@@ -366,7 +370,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $bmn->refresh();
         $this->assertEquals('Gudang BMN', $bmn->lokasi);
         $this->assertEquals('Pengelola BMN', $bmn->penanggungjawab);
-        $this->assertTrue((bool)$bmn->is_dikembalikan);
+        $this->assertTrue((bool) $bmn->is_dikembalikan);
     }
 
     public function test_operator_can_approve_rusak_berat_and_generates_laporan_kerusakan(): void
@@ -409,7 +413,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $this->assertEquals('Gudang BMN', $bmn->lokasi);
         $this->assertEquals('Pengelola BMN', $bmn->penanggungjawab);
         $this->assertEquals('Rusak Berat', $bmn->kondisi);
-        $this->assertTrue((bool)$bmn->is_dikembalikan);
+        $this->assertTrue((bool) $bmn->is_dikembalikan);
 
         // Verifikasi terbitnya Laporan Kerusakan otomatis
         $this->assertDatabaseHas('laporan_kerusakans', [

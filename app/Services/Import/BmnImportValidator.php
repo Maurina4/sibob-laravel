@@ -10,7 +10,7 @@ class BmnImportValidator
     public function __construct(
         protected ?BmnExcelParser $parser = null
     ) {
-        $this->parser = $parser ?? new BmnExcelParser();
+        $this->parser = $parser ?? new BmnExcelParser;
     }
 
     /**
@@ -183,10 +183,12 @@ class BmnImportValidator
                 $jenis = 'UMUM';
             }
 
-            // 10. Kondisi (opsional, default: Baik)
+            // 10. Kondisi (opsional, default: Baik; jika barang rusak maka Rusak Berat)
             $kondisi = trim((string) ($row['kondisi'] ?? ''));
-            if ($kondisi === '') {
+            if ($kondisi === '' || strcasecmp($kondisi, 'baik') === 0) {
                 $kondisi = 'Baik';
+            } elseif (in_array(strtolower($kondisi), ['rusak', 'rusak ringan', 'rusak berat', 'berat', 'ringan', 'sedang', 'rusak sedang'])) {
+                $kondisi = 'Rusak Berat';
             }
 
             // 11. Lokasi Ruang (opsional, default: Belum berlokasi / Gudang BMN)

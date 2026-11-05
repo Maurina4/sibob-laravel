@@ -111,9 +111,8 @@ class LaporanKerusakanService
                     $oldTarget = $remainingForOld
                         ? match ($remainingForOld->tingkat) {
                             'Rusak Berat', 'Berat' => 'Rusak Berat',
-                            'Rusak Ringan', 'Ringan' => 'Rusak Ringan',
-                            'Sedang' => 'Rusak Sedang',
-                            default => 'Rusak Ringan',
+                            'Sedang', 'Rusak Sedang' => 'Rusak Sedang',
+                            default => 'Rusak Berat',
                         }
                     : 'Baik';
 
@@ -160,9 +159,8 @@ class LaporanKerusakanService
         if (in_array($laporanKerusakan->status, ['Diterima', 'Diproses'])) {
             $targetKondisi = match ($laporanKerusakan->tingkat) {
                 'Rusak Berat', 'Berat' => 'Rusak Berat',
-                'Rusak Ringan', 'Ringan' => 'Rusak Ringan',
-                'Sedang' => 'Rusak Sedang',
-                default => 'Rusak Ringan',
+                'Sedang', 'Rusak Sedang' => 'Rusak Sedang',
+                default => 'Rusak Berat',
             };
         } elseif (in_array($laporanKerusakan->status, ['Selesai', 'Ditolak', 'Dilaporkan'])) {
             $otherReport = LaporanKerusakan::query()
@@ -176,9 +174,8 @@ class LaporanKerusakanService
             if ($otherReport) {
                 $targetKondisi = match ($otherReport->tingkat) {
                     'Rusak Berat', 'Berat' => 'Rusak Berat',
-                    'Rusak Ringan', 'Ringan' => 'Rusak Ringan',
-                    'Sedang' => 'Rusak Sedang',
-                    default => 'Rusak Ringan',
+                    'Sedang', 'Rusak Sedang' => 'Rusak Sedang',
+                    default => 'Rusak Berat',
                 };
             } else {
                 $targetKondisi = 'Baik';
@@ -246,9 +243,8 @@ class LaporanKerusakanService
                 $targetKondisi = $remainingReport
                     ? match ($remainingReport->tingkat) {
                         'Rusak Berat', 'Berat' => 'Rusak Berat',
-                        'Rusak Ringan', 'Ringan' => 'Rusak Ringan',
-                        'Sedang' => 'Rusak Sedang',
-                        default => 'Rusak Ringan',
+                        'Sedang', 'Rusak Sedang' => 'Rusak Sedang',
+                        default => 'Rusak Berat',
                     }
                 : 'Baik';
 

@@ -57,7 +57,7 @@ class StorePengajuanPengembalianRequest extends FormRequest
                 $validator->errors()->add('items', "Barang berikut ({$pendingNames}) sedang dalam proses pengajuan lain yang berstatus Diajukan.");
                 foreach ($items as $idx => $it) {
                     if (in_array($it['bmn_id'] ?? null, $pendingBmnIds)) {
-                        $validator->errors()->add("items.{$idx}.bmn_id", "Barang ini sedang dalam proses pengajuan lain yang berstatus Diajukan.");
+                        $validator->errors()->add("items.{$idx}.bmn_id", 'Barang ini sedang dalam proses pengajuan lain yang berstatus Diajukan.');
                     }
                 }
             }

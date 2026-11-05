@@ -114,10 +114,10 @@ class PengajuanPengembalianService
             $prefix = 'PGM';
             $datePart = now()->format('Ymd');
             $countToday = PengajuanPengembalian::where('nomor_pengajuan', 'like', "{$prefix}-{$datePart}-%")->count() + 1;
-            $nomorPengajuan = "{$prefix}-{$datePart}-" . str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            $nomorPengajuan = "{$prefix}-{$datePart}-".str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
             while (PengajuanPengembalian::where('nomor_pengajuan', $nomorPengajuan)->exists()) {
                 $countToday++;
-                $nomorPengajuan = "{$prefix}-{$datePart}-" . str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+                $nomorPengajuan = "{$prefix}-{$datePart}-".str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
             }
 
             $pengajuan = PengajuanPengembalian::create([

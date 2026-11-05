@@ -84,7 +84,7 @@
 
                             $tingkat = match($item->tingkat) {
                                 'Rusak Berat', 'Berat' => 'Rusak Berat',
-                                default => 'Rusak Ringan',
+                                default => 'Rusak Berat',
                             };
                             $tingkatStyle = match($tingkat) {
                                 'Rusak Berat' => 'bg-[#FDF0EE] text-[#9C322C] border-[#F8D4D0]',
@@ -287,3 +287,4 @@
 
 </div>
 @endsection
+

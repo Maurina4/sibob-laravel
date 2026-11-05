@@ -329,7 +329,6 @@
                                         class="item-kondisi w-full bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-[#132219] rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
                                     >
                                         <option value="Baik" @selected(old("items.{$index}.kondisi", $kondisiVal) === 'Baik')>Baik</option>
-                                        <option value="Rusak Ringan" @selected(old("items.{$index}.kondisi", $kondisiVal) === 'Rusak Ringan')>Rusak Ringan</option>
                                         <option value="Rusak Berat" @selected(old("items.{$index}.kondisi", $kondisiVal) === 'Rusak Berat')>Rusak Berat</option>
                                     </select>
                                 </td>
@@ -554,7 +553,6 @@
                 class="item-kondisi w-full bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-[#132219] rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
             >
                 <option value="Baik">Baik</option>
-                <option value="Rusak Ringan">Rusak Ringan</option>
                 <option value="Rusak Berat">Rusak Berat</option>
             </select>
         </td>
