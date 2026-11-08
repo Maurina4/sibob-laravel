@@ -414,8 +414,16 @@
             width: 50%;
             vertical-align: top;
             text-align: left;
-            padding: 0 10px;
             line-height: 1.15;
+            box-sizing: border-box;
+        }
+
+        .signatures-table td:first-child {
+            padding: 0 10px 0 0;
+        }
+
+        .signatures-table td:last-child {
+            padding: 0 0 0 25mm;
         }
 
         .sig-title {
