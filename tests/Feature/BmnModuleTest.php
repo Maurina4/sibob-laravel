@@ -52,6 +52,25 @@ class BmnModuleTest extends TestCase
         $response->assertSee('Daftar Rusak Berat');
     }
 
+    public function test_dashboard_all_metric_cards_and_classification_panels_are_clickable(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response->assertOk();
+
+        // Cards & Classification Links
+        $response->assertSee(route('bmns.index'));
+        $response->assertSee(route('bmns.index', ['kondisi' => 'Baik']));
+        $response->assertSee(route('laporan-kerusakan.index'));
+        $response->assertSee(route('bmns-lab.index'));
+        $response->assertSee(route('bmns-tik.index'));
+
+        // Antrean Verifikasi Links
+        $response->assertSee(route('ba-perpindahan.index'));
+        $response->assertSee(route('distribusi.index'));
+    }
+
     public function test_bmn_index_page_is_accessible_by_operator(): void
     {
         $user = User::factory()->create([

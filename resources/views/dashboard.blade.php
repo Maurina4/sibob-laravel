@@ -49,10 +49,13 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
 
         {{-- CARD 1: TOTAL ASET --}}
-        <div class="bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#163828]/40 shadow-2xs">
+        <a
+            href="{{ route('bmns.index') }}"
+            class="block bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#163828] hover:shadow-xs cursor-pointer group shadow-2xs"
+        >
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-[#62756A]">Total Aset BMN</span>
-                <span class="w-7 h-7 rounded-lg bg-[#EAF2ED] text-[#163828] flex items-center justify-center">
+                <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#163828] transition">Total Aset BMN</span>
+                <span class="w-7 h-7 rounded-lg bg-[#EAF2ED] text-[#163828] flex items-center justify-center group-hover:scale-110 transition">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
@@ -68,13 +71,16 @@
                 <span>Semua Kategori</span>
                 <span class="font-medium text-[#163828]">Aktif</span>
             </div>
-        </div>
+        </a>
 
         {{-- CARD 2: KONDISI BAIK --}}
-        <div class="bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#163828]/40 shadow-2xs">
+        <a
+            href="{{ route('bmns.index', ['kondisi' => 'Baik']) }}"
+            class="block bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#1E5E38] hover:shadow-xs cursor-pointer group shadow-2xs"
+        >
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-[#62756A]">Kondisi Baik</span>
-                <span class="w-7 h-7 rounded-lg bg-[#EAF5EE] text-[#1E5E38] flex items-center justify-center">
+                <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#1E5E38] transition">Kondisi Baik</span>
+                <span class="w-7 h-7 rounded-lg bg-[#EAF5EE] text-[#1E5E38] flex items-center justify-center group-hover:scale-110 transition">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -90,7 +96,7 @@
                 <span>Siap Digunakan</span>
                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#EAF5EE] text-[#1E5E38]">Prima</span>
             </div>
-        </div>
+        </a>
 
         {{-- CARD 3: DAFTAR RUSAK BERAT --}}
         <a
@@ -134,15 +140,18 @@
 
             <div class="mt-5 space-y-4">
                 {{-- BMN UMUM --}}
-                <div class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] flex items-center justify-between">
+                <a
+                    href="{{ route('bmns.index') }}"
+                    class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] hover:bg-[#EAF2ED]/60 hover:border-[#163828]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                >
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#163828]">
+                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#163828] group-hover:bg-[#EAF2ED] transition">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-[#132219]">BMN Umum & Perkantoran</div>
+                            <div class="text-xs font-semibold text-[#132219] group-hover:text-[#163828] transition">BMN Umum & Perkantoran</div>
                             <div class="text-[11px] text-[#62756A]">Meja, kursi, lemari, fasilitas kerja kantor</div>
                         </div>
                     </div>
@@ -150,18 +159,21 @@
                         <div class="text-base font-bold text-[#132219]">{{ $jumlahBmnUmum ?? $jumlahBmn }}</div>
                         <div class="text-[10px] text-[#62756A]">Aset Terdata</div>
                     </div>
-                </div>
+                </a>
 
                 {{-- BMN LAB --}}
-                <div class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] flex items-center justify-between">
+                <a
+                    href="{{ route('bmns-lab.index') }}"
+                    class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] hover:bg-[#EAF5EE] hover:border-[#1E5E38]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                >
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#1E5E38]">
+                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#1E5E38] group-hover:bg-[#EAF5EE] transition">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                             </svg>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-[#132219]">BMN Laboratorium</div>
+                            <div class="text-xs font-semibold text-[#132219] group-hover:text-[#1E5E38] transition">BMN Laboratorium</div>
                             <div class="text-[11px] text-[#62756A]">Instrumen pengujian & perlengkapan lab terkalibrasi</div>
                         </div>
                     </div>
@@ -169,18 +181,21 @@
                         <div class="text-base font-bold text-[#1E5E38]">{{ $jumlahBmnLab }}</div>
                         <div class="text-[10px] text-[#62756A]">Instrumen</div>
                     </div>
-                </div>
+                </a>
 
                 {{-- BMN TIK --}}
-                <div class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] flex items-center justify-between">
+                <a
+                    href="{{ route('bmns-tik.index') }}"
+                    class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] hover:bg-[#EBF3FE] hover:border-[#284B66]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                >
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#284B66]">
+                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#284B66] group-hover:bg-[#EBF3FE] transition">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-[#132219]">BMN Teknologi Informasi (TIK)</div>
+                            <div class="text-xs font-semibold text-[#132219] group-hover:text-[#284B66] transition">BMN Teknologi Informasi (TIK)</div>
                             <div class="text-[11px] text-[#62756A]">Server, komputer, monitor, perangkat jaringan</div>
                         </div>
                     </div>
@@ -188,7 +203,7 @@
                         <div class="text-base font-bold text-[#284B66]">{{ $jumlahBmnTik }}</div>
                         <div class="text-[10px] text-[#62756A]">Perangkat</div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -202,26 +217,32 @@
 
                 <div class="mt-4 space-y-3">
                     {{-- BA PERPINDAHAN --}}
-                    <div class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white flex items-center justify-between">
+                    <a
+                        href="{{ route('ba-perpindahan.index') }}"
+                        class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white hover:bg-[#F7FAF8] hover:border-[#163828]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                    >
                         <div>
-                            <div class="text-xs font-medium text-[#132219]">BA Perpindahan</div>
+                            <div class="text-xs font-medium text-[#132219] group-hover:text-[#163828] transition">BA Perpindahan</div>
                             <div class="text-[11px] text-[#62756A]">Menunggu persetujuan</div>
                         </div>
-                        <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED]">
+                        <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED] group-hover:bg-[#163828] group-hover:text-white transition">
                             {{ $jumlahBaPerpindahan }}
                         </span>
-                    </div>
+                    </a>
 
                     {{-- DISTRIBUSI --}}
-                    <div class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white flex items-center justify-between">
+                    <a
+                        href="{{ route('distribusi.index') }}"
+                        class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white hover:bg-[#F7FAF8] hover:border-[#163828]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                    >
                         <div>
-                            <div class="text-xs font-medium text-[#132219]">Distribusi Barang</div>
+                            <div class="text-xs font-medium text-[#132219] group-hover:text-[#163828] transition">Distribusi Barang</div>
                             <div class="text-[11px] text-[#62756A]">Permintaan diajukan</div>
                         </div>
-                        <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED]">
+                        <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED] group-hover:bg-[#163828] group-hover:text-white transition">
                             {{ $jumlahDistribusi }}
                         </span>
-                    </div>
+                    </a>
                 </div>
             </div>
 
