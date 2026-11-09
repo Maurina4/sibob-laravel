@@ -731,14 +731,13 @@
                     <thead>
                         <tr>
                             <th style="width: 4%;">No</th>
-                            <th style="width: 18%;">Nama Barang</th>
-                            <th style="width: 14%;">Kode Barang</th>
-                            <th style="width: 6%;">NUP</th>
-                            <th style="width: 14%;">Merk/Type</th>
-                            <th style="width: 8%;">Jumlah (unit)</th>
-                            <th style="width: 8%;">Tahun Perolehan</th>
-                            <th style="width: 14%;">Ruang Asal</th>
-                            <th style="width: 14%;">Ruang Baru</th>
+                            <th style="width: 22%;">Nama Barang</th>
+                            <th style="width: 15%;">Kode Barang</th>
+                            <th style="width: 7%;">NUP</th>
+                            <th style="width: 16%;">Merk/Type</th>
+                            <th style="width: 10%;">Jumlah (unit)</th>
+                            <th style="width: 10%;">Tahun Perolehan</th>
+                            <th style="width: 16%;">Ket</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -752,8 +751,7 @@
                                 <td>{{ $it->bmn?->merek ?: ($it->bmn?->spesifikasi ?: '—') }}</td>
                                 <td class="center">{{ $it->jumlah ?: 1 }}</td>
                                 <td class="center">{{ $it->bmn?->tahun_perolehan ?: ($distribusi->bmn?->tahun_perolehan ?: '—') }}</td>
-                                <td class="center">{{ $it->lokasi_asal ?: ($distribusi->lokasi_asal ?: 'Gudang BMN') }}</td>
-                                <td class="center">{{ $it->lokasi_tujuan ?: ($distribusi->lokasi_tujuan ?: '—') }}</td>
+                                <td class="center">{{ $it->lokasi_tujuan ?: ($distribusi->lokasi_tujuan ?: ($it->catatan ?: ($distribusi->keterangan ?: '—'))) }}</td>
                             </tr>
                             @endforeach
                         @else
@@ -765,8 +763,7 @@
                                 <td>{{ $distribusi->bmn?->merek ?: ($distribusi->bmn?->spesifikasi ?: '—') }}</td>
                                 <td class="center">{{ $distribusi->jumlah ?: 1 }}</td>
                                 <td class="center">{{ $distribusi->bmn?->tahun_perolehan ?: '—' }}</td>
-                                <td class="center">{{ $distribusi->lokasi_asal ?: 'Gudang BMN' }}</td>
-                                <td class="center">{{ $distribusi->lokasi_tujuan ?: '—' }}</td>
+                                <td class="center">{{ $distribusi->lokasi_tujuan ?: ($distribusi->keterangan ?: '—') }}</td>
                             </tr>
                         @endif
                     </tbody>

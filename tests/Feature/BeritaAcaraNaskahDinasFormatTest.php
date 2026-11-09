@@ -99,9 +99,9 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.');
         $response->assertSee('Apabila terjadi kehilangan menjadi tanggung jawab petugas/penanggung jawab ruangan yang diserahkan barang.');
 
-        // 4. Tabel 9 Kolom Sesuai Naskah Dinas Resmi
-        $response->assertSee('Ruang Asal');
-        $response->assertSee('Ruang Baru');
+        // 4. Tabel Kolom Sesuai Naskah Dinas Resmi Distribusi
+        $response->assertDontSee('Ruang Asal');
+        $response->assertSee('Ket');
 
         // 5. Penutup Standar Halaman 2
         $response->assertSee('Demikian Berita Acara ini dibuat dengan benar untuk dipergunakan sebagaimana mestinya.');
