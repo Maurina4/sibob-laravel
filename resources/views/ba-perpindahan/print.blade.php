@@ -360,16 +360,6 @@
             position: relative;
         }
 
-        .doc-form-code {
-            position: absolute;
-            bottom: 15mm;
-            left: 30mm;
-            font-size: 7.5pt;
-            font-family: Arial, sans-serif !important;
-            color: #000;
-            line-height: 1;
-        }
-
         .doc-footer-code {
             position: absolute;
             bottom: 12mm;
@@ -492,6 +482,14 @@
 
         body.mode-manual .srikandi-box {
             min-height: 1.15em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: calc(4 * 1.15em);
+            margin-bottom: calc(4 * 1.15em);
+            padding-left: 0;
+            box-sizing: border-box;
+            transition: min-height 0.2s ease;
         }
 
         /* ===================================================
@@ -543,6 +541,8 @@
             #page2 {
                 padding: 20mm 20mm 20mm 30mm !important;
                 position: relative !important;
+                page-break-before: always !important;
+                break-before: page !important;
             }
 
             .doc-footer-code {
@@ -822,8 +822,8 @@
                 {{-- TANDA TANGAN MENGETAHUI (KEPALA BALAI BESAR POM DI BANJARBARU) --}}
                 <div class="sig-mengetahui-block">
                     <div class="sig-mengetahui-lead">Mengetahui,</div>
-                    <div class="sig-mengetahui-title">Plt. Kepala Balai Besar POM di Banjarbaru</div>
-                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang,</div>
+                    <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
+                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
 
                     <div class="srikandi-box" id="sigBoxKabalai">
                         <span class="srikandi-tag">${ttd_pengirim3}</span>
@@ -840,10 +840,6 @@
                 </div>
             </div>
 
-            {{-- KODE DOKUMEN MUTU / STANDAR BBPOM --}}
-            <div class="doc-form-code">
-                POM-14.01/CFM.01/SOP.01/IK.17A.01/F.01
-            </div>
         </div>
 
     </div>

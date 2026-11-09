@@ -729,7 +729,7 @@
                 <div class="sig-mengetahui-block">
                     <div class="sig-mengetahui-lead">Mengetahui,</div>
                     <div class="sig-mengetahui-title">Kepala Balai Besar POM di Banjarbaru</div>
-                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang,</div>
+                    <div class="sig-mengetahui-title">Selaku Kuasa Pengguna Barang</div>
 
                     <div class="srikandi-box" id="sigBoxKabalai">
                         <span class="srikandi-tag">${ttd_pengirim3}</span>

@@ -270,7 +270,7 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('${ttd_pengirim2}', false);
         $response->assertSee('${ttd_pengirim3}', false);
         $response->assertSee('Kepala Balai Besar POM di Banjarbaru');
-        $response->assertSee('Selaku Kuasa Pengguna Barang,');
+        $response->assertSee('Selaku Kuasa Pengguna Barang');
 
         // 8. Kode Dokumen
         $response->assertSee(NaskahDinasHelper::KODE_FORM_BAST);
@@ -315,7 +315,7 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('${ttd_pengirim2}', false);
         $response->assertSee('${ttd_pengirim3}', false);
         $response->assertSee('Kepala Balai Besar POM di Banjarbaru');
-        $response->assertSee('Selaku Kuasa Pengguna Barang,');
+        $response->assertSee('Selaku Kuasa Pengguna Barang');
 
         // 7. Kode Dokumen
         $response->assertSee(NaskahDinasHelper::KODE_FORM_BAST);
