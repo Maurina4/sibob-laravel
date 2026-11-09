@@ -90,14 +90,12 @@ class BmnModuleTest extends TestCase
         $responseCreate->assertOk();
         $responseCreate->assertSee('id="penanggungjawab_nip"', false);
         $responseCreate->assertSee('readonly', false);
-        $responseCreate->assertSee('Otomatis');
 
         $responseEdit = $this->actingAs($user)->get(route('bmns.edit', $bmn));
         $responseEdit->assertOk();
         $responseEdit->assertSee('id="penanggungjawab_nip"', false);
         $responseEdit->assertSee('readonly', false);
         $responseEdit->assertSee('198703202012031003');
-        $responseEdit->assertSee('Otomatis');
     }
 
     public function test_bmn_index_page_is_accessible_by_operator(): void

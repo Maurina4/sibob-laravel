@@ -423,10 +423,7 @@
 
                     {{-- NIP PJ --}}
                     <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <x-input-label for="penanggungjawab_nip" value="NIP Penanggung Jawab" class="!mb-0" />
-                            <span class="text-[10px] font-medium text-[#62756A] bg-[#F0F4F1] px-1.5 py-0.5 rounded border border-[#E3ECE6]">Otomatis</span>
-                        </div>
+                        <x-input-label for="penanggungjawab_nip" value="NIP Penanggung Jawab" />
                         <x-text-input
                             id="penanggungjawab_nip"
                             name="penanggungjawab_nip"
