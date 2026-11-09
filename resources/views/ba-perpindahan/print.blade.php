@@ -773,14 +773,6 @@
                         @endforelse
                     </tbody>
                 </table>
-
-                <p class="statement-p">
-                    PIHAK KEDUA bertanggung jawab segala sesuatu atas barang-barang tersebut.
-                </p>
-
-                <p class="statement-p">
-                    Apabila terjadi kehilangan menjadi tanggung jawab petugas yang diserahkan barang.
-                </p>
             </div>
 
             {{-- DEKORASI SUDUT BAWAH KANAN RESMI BADAN POM --}}
