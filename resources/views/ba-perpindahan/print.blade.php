@@ -360,15 +360,6 @@
             position: relative;
         }
 
-        .doc-footer-code {
-            position: absolute;
-            bottom: 12mm;
-            left: 30mm;
-            font-size: 8pt;
-            font-family: Arial, sans-serif !important;
-            color: #000;
-            line-height: 1;
-        }
 
         .page-2-header {
             text-align: center;
@@ -545,11 +536,6 @@
                 break-before: page !important;
             }
 
-            .doc-footer-code {
-                position: absolute !important;
-                bottom: 12mm !important;
-                left: 30mm !important;
-            }
         }
     </style>
 </head>
@@ -834,10 +820,6 @@
                     </div>
                 </div>
 
-                {{-- KODE DOKUMEN NASKAH DINAS --}}
-                <div class="doc-footer-code">
-                    {{ \App\Support\NaskahDinasHelper::KODE_FORM_BAST }}
-                </div>
             </div>
 
         </div>

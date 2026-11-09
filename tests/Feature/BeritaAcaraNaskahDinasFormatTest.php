@@ -114,7 +114,7 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('Selaku Kuasa Pengguna Barang');
 
         // 7. Kode Dokumen di Pojok Kiri Bawah
-        $response->assertSee(NaskahDinasHelper::KODE_FORM_BAST);
+        $response->assertDontSee(NaskahDinasHelper::KODE_FORM_BAST);
     }
 
     public function test_ba_perpindahan_print_view_matches_naskah_dinas_standard(): void
@@ -193,7 +193,7 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('Selaku Kuasa Pengguna Barang');
 
         // 7. Kode Dokumen di Pojok Kiri Bawah
-        $response->assertSee(NaskahDinasHelper::KODE_FORM_BAST);
+        $response->assertDontSee(NaskahDinasHelper::KODE_FORM_BAST);
     }
 
     public function test_ba_pengajuan_pengembalian_print_view_matches_naskah_dinas_standard(): void
@@ -273,7 +273,7 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('Selaku Kuasa Pengguna Barang');
 
         // 8. Kode Dokumen
-        $response->assertSee(NaskahDinasHelper::KODE_FORM_BAST);
+        $response->assertDontSee(NaskahDinasHelper::KODE_FORM_BAST);
     }
 
     public function test_ba_pengembalian_legacy_print_view_matches_naskah_dinas_standard(): void
@@ -318,6 +318,6 @@ class BeritaAcaraNaskahDinasFormatTest extends TestCase
         $response->assertSee('Selaku Kuasa Pengguna Barang');
 
         // 7. Kode Dokumen
-        $response->assertSee(NaskahDinasHelper::KODE_FORM_BAST);
+        $response->assertDontSee(NaskahDinasHelper::KODE_FORM_BAST);
     }
 }
