@@ -25,8 +25,14 @@ class PengajuanPengembalianController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['search', 'status', 'alasan']);
-        $pengajuans = $this->service->getPaginatedForUser(auth()->id(), $filters);
+        $filters = $request->only(['search', 'status', 'alasan', 'bidang']);
+        $user = auth()->user();
+
+        if ($user && $user->role === 'Operator') {
+            $pengajuans = $this->service->getPaginatedForAdmin($filters);
+        } else {
+            $pengajuans = $this->service->getPaginatedForUser($user ? $user->id : 0, $filters);
+        }
 
         return view('pengajuan-pengembalian.index', compact('pengajuans'));
     }
@@ -55,6 +61,10 @@ class PengajuanPengembalianController extends Controller
         $user = auth()->user();
         if ($user->role !== 'Operator' && $pengajuanPengembalian->diajukan_oleh !== $user->id) {
             abort(403, 'Anda tidak memiliki hak untuk mengakses pengajuan ini.');
+        }
+
+        if ($user->role === 'Operator') {
+            return redirect()->route('admin.pengajuan-pengembalian.show', $pengajuanPengembalian);
         }
 
         $pengajuanPengembalian->load(['items.bmn', 'items.laporanKerusakan', 'pegawai', 'pemohonUser', 'penyetujuUser']);

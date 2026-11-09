@@ -146,6 +146,37 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $response->assertSee('Verifikasi Pengembalian BMN');
     }
 
+    public function test_operator_can_see_incoming_pengembalian_and_terima_button_on_main_index(): void
+    {
+        $pengajuan = $this->createPengajuan([
+            'nomor_pengajuan' => 'PGM-20261109-777',
+            'diajukan_oleh' => $this->regularUser->id,
+            'nama_pegawai' => $this->regularUser->name,
+            'bidang' => 'Tata Usaha',
+            'status' => 'diajukan',
+        ]);
+
+        $response = $this->actingAs($this->operator)->get(route('pengajuan-pengembalian.index'));
+        $response->assertOk();
+        $response->assertSee('PGM-20261109-777');
+        $response->assertSee('Terima');
+        $response->assertSee(route('admin.pengajuan-pengembalian.show', $pengajuan));
+    }
+
+    public function test_operator_visiting_user_show_is_redirected_to_admin_verification(): void
+    {
+        $pengajuan = $this->createPengajuan([
+            'nomor_pengajuan' => 'PGM-20261109-888',
+            'diajukan_oleh' => $this->regularUser->id,
+            'nama_pegawai' => $this->regularUser->name,
+            'bidang' => 'Tata Usaha',
+            'status' => 'diajukan',
+        ]);
+
+        $response = $this->actingAs($this->operator)->get(route('pengajuan-pengembalian.show', $pengajuan));
+        $response->assertRedirect(route('admin.pengajuan-pengembalian.show', $pengajuan));
+    }
+
     public function test_user_can_submit_pengembalian_biasa(): void
     {
         $bmn = $this->createSampleBmn();

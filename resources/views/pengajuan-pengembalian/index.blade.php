@@ -9,9 +9,13 @@
     {{-- HEADER HALAMAN & TOMBOL TAMBAH --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Layanan Pegawai</div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">
+                {{ auth()->check() && auth()->user()->role === 'Operator' ? 'Kelola & Penerimaan Pengembalian' : 'Layanan Pegawai' }}
+            </div>
             <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Pengajuan Pengembalian BMN</h1>
-            <p class="text-xs text-[#62756A] mt-0.5">Daftar permohonan pengembalian aset inventaris yang Anda ajukan ke Pengelola BMN.</p>
+            <p class="text-xs text-[#62756A] mt-0.5">
+                {{ auth()->check() && auth()->user()->role === 'Operator' ? 'Daftar permohonan pengembalian aset dari pegawai untuk diverifikasi, diterima, dan diterbitkan Berita Acara.' : 'Daftar permohonan pengembalian aset inventaris yang Anda ajukan ke Pengelola BMN.' }}
+            </p>
         </div>
 
         <div class="flex items-center gap-2.5">
@@ -141,9 +145,17 @@
                                     {{ $pengajuan->tanggal->format('d/m/Y') }}
                                 </td>
                                 <td class="py-3 px-4 font-mono">
-                                    <a href="{{ route('pengajuan-pengembalian.show', $pengajuan) }}" class="font-bold text-[#163828] hover:underline">
+                                    <a href="{{ auth()->check() && auth()->user()->role === 'Operator' ? route('admin.pengajuan-pengembalian.show', $pengajuan) : route('pengajuan-pengembalian.show', $pengajuan) }}" class="font-bold text-[#163828] hover:underline font-mono">
                                         {{ $pengajuan->nomor_pengajuan }}
                                     </a>
+                                    @if(auth()->check() && auth()->user()->role === 'Operator' && ($pengajuan->pemohonUser || $pengajuan->nama_pegawai))
+                                        <div class="text-[11px] text-[#4A5D52] font-sans font-medium mt-0.5">
+                                            {{ $pengajuan->pemohonUser?->name ?: $pengajuan->nama_pegawai }}
+                                            @if($pengajuan->bidang)
+                                                <span class="text-[#8D9D95]">({{ $pengajuan->bidang }})</span>
+                                            @endif
+                                        </div>
+                                    @endif
                                     @if($pengajuan->nomor_sipanda)
                                         <div class="text-[10px] text-[#8D9D95]">SIPANDA: {{ $pengajuan->nomor_sipanda }}</div>
                                     @endif
@@ -187,9 +199,24 @@
                                     @endif
                                 </td>
                                 <td class="py-3 px-4 text-center whitespace-nowrap">
-                                    <div class="flex items-center justify-center gap-2">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        {{-- TOMBOL TERIMA PENGEMBALIAN (KHUSUS OPERATOR SAAT STATUS DIAJUKAN) --}}
+                                        @if(auth()->check() && auth()->user()->role === 'Operator' && $pengajuan->status === 'diajukan')
+                                            <a
+                                                href="{{ route('admin.pengajuan-pengembalian.show', $pengajuan) }}"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#163828] hover:bg-[#0E281C] text-white text-xs font-semibold shadow-xs transition"
+                                                title="Terima / Verifikasi Pengembalian"
+                                            >
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <span>Terima</span>
+                                            </a>
+                                        @endif
+
+                                        {{-- TOMBOL LIHAT DETAIL --}}
                                         <a
-                                            href="{{ route('pengajuan-pengembalian.show', $pengajuan) }}"
+                                            href="{{ auth()->check() && auth()->user()->role === 'Operator' ? route('admin.pengajuan-pengembalian.show', $pengajuan) : route('pengajuan-pengembalian.show', $pengajuan) }}"
                                             class="p-1.5 rounded-lg border border-[#E3ECE6] hover:bg-[#F2F6F3] text-[#163828] transition"
                                             title="Lihat Detail Pengajuan"
                                         >
@@ -198,7 +225,23 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </a>
-                                        @if($pengajuan->status === 'diajukan')
+
+                                        {{-- TOMBOL CETAK BERITA ACARA (JIKA DISETUJUI) --}}
+                                        @if($pengajuan->status === 'disetujui')
+                                            <a
+                                                href="{{ route('pengajuan-pengembalian.cetak-ba', $pengajuan) }}"
+                                                target="_blank"
+                                                class="p-1.5 rounded-lg border border-[#CDE1D4] bg-[#EAF2ED] hover:bg-[#D5E6DC] text-[#163828] transition"
+                                                title="Cetak Berita Acara"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                </svg>
+                                            </a>
+                                        @endif
+
+                                        {{-- TOMBOL BATALKAN (HANYA PEMOHON SENDIRI SAAT STATUS DIAJUKAN) --}}
+                                        @if($pengajuan->status === 'diajukan' && $pengajuan->diajukan_oleh === auth()->id())
                                             <form method="POST" action="{{ route('pengajuan-pengembalian.batalkan', $pengajuan) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?')">
                                                 @csrf
                                                 <button

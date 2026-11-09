@@ -10,13 +10,13 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <a
-                href="{{ route('admin.pengajuan-pengembalian.index') }}"
+                href="{{ route('pengajuan-pengembalian.index') }}"
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#62756A] hover:text-[#163828] transition mb-2"
             >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                <span>Kembali ke Daftar Verifikasi</span>
+                <span>Kembali ke Daftar Pengajuan</span>
             </a>
             <div class="flex items-center gap-3 flex-wrap">
                 <h1 class="text-2xl font-bold tracking-tight text-[#132219] font-mono">{{ $pengajuan->nomor_pengajuan }}</h1>
@@ -78,7 +78,7 @@
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Setujui & Terbitkan BA</span>
+                    <span>Terima Pengembalian & Terbitkan BA</span>
                 </button>
             @endif
         </div>
@@ -307,13 +307,13 @@
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-[#132219]">Konfirmasi Persetujuan Pengembalian</h3>
+                    <h3 class="text-base font-bold text-[#132219]">Konfirmasi Terima Pengembalian BMN</h3>
                     <p class="text-xs text-[#62756A]">Pastikan pemeriksaan fisik barang telah selesai dilakukan.</p>
                 </div>
             </div>
 
             <div class="p-4 rounded-xl bg-[#F7FAF8] border border-[#E3ECE6] text-xs space-y-2 text-[#4D6357]">
-                <p class="font-semibold text-[#132219]">Dengan menyetujui pengajuan ini:</p>
+                <p class="font-semibold text-[#132219]">Dengan menerima pengembalian ini:</p>
                 <ul class="list-disc list-inside space-y-1">
                     <li>Nomor Berita Acara resmi (BA-PGM atau BA-RB) akan diterbitkan secara otomatis.</li>
                     <li>Status pengajuan berubah menjadi <strong class="text-emerald-800">Disetujui</strong>.</li>
@@ -337,7 +337,7 @@
                     type="submit"
                     class="px-5 py-2 rounded-xl bg-[#163828] hover:bg-[#0E281C] text-white text-xs font-semibold shadow-xs transition"
                 >
-                    Ya, Setujui & Terbitkan BA
+                    Ya, Terima Pengembalian & Terbitkan BA
                 </button>
             </form>
         </div>
