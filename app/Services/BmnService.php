@@ -628,11 +628,14 @@ class BmnService
 
         if ($isImport) {
             // Khusus Fitur Import Excel:
-            // Jika sudah berlokasi dan bukan gudang bmn -> TIDAK MASUK BA DISTRIBUSI!
-            $isGudang = str_contains($lokasiNormalized, 'gudang');
-            $isBelumBerlokasi = empty($lokasiNormalized) || $lokasiNormalized === 'belum berlokasi';
+            // Hanya masuk BA Distribusi jika lokasi berstatus transit / belum ada penempatan definitif:
+            // Kosong, '-', 'belum berlokasi', 'gudang bmn', atau 'gudang' murni.
+            // Seluruh lokasi spesifik lainnya (baik berkode A/B/C/Angka maupun nama ruangan/gudang fungsional seperti
+            // Gudang Rusak Berat, Gudang ATK, Ruang Aula, Pantry, DBL, dll.) TIDAK dibuatkan BA Distribusi.
+            $isTransit = empty($lokasiNormalized)
+                || in_array($lokasiNormalized, ['-', 'belum berlokasi', 'gudang bmn', 'gudang', 'gudang utama', 'belum ada lokasi'], true);
 
-            if (! $isGudang && ! $isBelumBerlokasi) {
+            if (! $isTransit) {
                 return null;
             }
         } else {

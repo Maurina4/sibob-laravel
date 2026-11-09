@@ -99,6 +99,62 @@ class BmnImportLocationAndNipTest extends TestCase
                 'B1.06 RUANG STAFF INFOKOM',
                 '',
             ],
+            [
+                2,
+                'BMN-NON TIK',
+                '3050101001',
+                '2',
+                'Tanaman Hias',
+                'Tanaman hias',
+                'Rusak Berat',
+                '27/06/2024',
+                '27/06/2024',
+                '700000',
+                'C.Bs.05 - Gudang BMN Rusak Berat',
+                '',
+            ],
+            [
+                3,
+                'BMN-NON TIK',
+                '3050101001',
+                '3',
+                'Lemari Arsip ATK',
+                'Brother',
+                'Baik',
+                '31/12/2021',
+                '18/06/2020',
+                '2500000',
+                'Gudang ATK',
+                '',
+            ],
+            [
+                4,
+                'BMN-NON TIK',
+                '3050101001',
+                '4',
+                'Kursi Aula',
+                'Futura',
+                'Baik',
+                '31/12/2021',
+                '18/06/2020',
+                '350000',
+                'RUANG AULA UTAMA',
+                '',
+            ],
+            [
+                5,
+                'BMN-NON TIK',
+                '3050101001',
+                '5',
+                'Kulkas Reagen',
+                'Toshiba',
+                'Baik',
+                '31/12/2021',
+                '18/06/2020',
+                '4500000',
+                '18 - Gudang Reagen',
+                '',
+            ],
         ];
 
         $file = $this->createUploadableExcel($headers, $rows);
@@ -113,12 +169,33 @@ class BmnImportLocationAndNipTest extends TestCase
         $confirmResponse->assertRedirect(route('bmns.index'));
 
         // Verifikasi BMN dan Lokasi tersimpan (Lokasi otomatis memisahkan kode ruangan dan nama)
-        $bmn = Bmn::where('kode_barang', '3050101001')->where('nup', 1)->first();
-        $this->assertNotNull($bmn);
-        $this->assertSame('RUANG STAFF INFOKOM', $bmn->lokasi);
+        $bmn1 = Bmn::where('kode_barang', '3050101001')->where('nup', 1)->first();
+        $this->assertNotNull($bmn1);
+        $this->assertSame('RUANG STAFF INFOKOM', $bmn1->lokasi);
         $this->assertTrue(Lokasi::where('kode_ruangan', 'B1.06')->where('nama', 'RUANG STAFF INFOKOM')->exists());
 
-        // Verifikasi TIDAK ADA BA Distribusi yang dibuat karena sudah berlokasi spesifik
+        $bmn2 = Bmn::where('kode_barang', '3050101001')->where('nup', 2)->first();
+        $this->assertNotNull($bmn2);
+        $this->assertSame('GUDANG RUSAK BERAT', $bmn2->lokasi);
+        $this->assertTrue(Lokasi::where('kode_ruangan', 'C.Bs.05')->where('nama', 'GUDANG RUSAK BERAT')->exists());
+
+        $bmn3 = Bmn::where('kode_barang', '3050101001')->where('nup', 3)->first();
+        $this->assertNotNull($bmn3);
+        $this->assertSame('GUDANG ATK', $bmn3->lokasi);
+
+        $bmn4 = Bmn::where('kode_barang', '3050101001')->where('nup', 4)->first();
+        $this->assertNotNull($bmn4);
+        $this->assertSame('RUANG AULA UTAMA', $bmn4->lokasi);
+
+        $bmn5 = Bmn::where('kode_barang', '3050101001')->where('nup', 5)->first();
+        $this->assertNotNull($bmn5);
+        $this->assertSame('Gudang Reagen', $bmn5->lokasi);
+        $this->assertTrue(Lokasi::where('kode_ruangan', '18')->where('nama', 'Gudang Reagen')->exists());
+
+        // Verifikasi 5 BMN tersimpan
+        $this->assertSame(5, Bmn::where('kode_barang', '3050101001')->count());
+
+        // Verifikasi TIDAK ADA BA Distribusi yang dibuat untuk seluruh lokasi spesifik tersebut
         $this->assertSame(0, Distribusi::count());
     }
 

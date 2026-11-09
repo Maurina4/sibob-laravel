@@ -90,6 +90,20 @@ class Lokasi extends Model
 
         $trimmed = trim($value);
 
+        // Jika ada format 'CODE - NAME' (contoh: 'POS.01 - R. Pos Jaga BJB', '18 - Gudang Reagen', 'B1.01 - RUANG...')
+        if (str_contains($trimmed, ' - ')) {
+            [$code, $name] = explode(' - ', $trimmed, 2);
+            $code = trim($code);
+            $name = trim($name);
+
+            if ($code !== '' && $name !== '') {
+                return static::create([
+                    'kode_ruangan' => $code,
+                    'nama' => $name,
+                ]);
+            }
+        }
+
         // Jika diawali kode ruangan seperti 'B1.01 RUANG ...' atau 'A1.01-00001'
         if (preg_match('/^([A-Za-z]{1,2}(?:\.[A-Za-z]+)?\d*\.\d+)[-\s]+(.*)$/i', $trimmed, $matches)) {
             $code = trim($matches[1]);
