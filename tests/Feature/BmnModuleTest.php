@@ -71,6 +71,35 @@ class BmnModuleTest extends TestCase
         $response->assertSee(route('distribusi.index'));
     }
 
+    public function test_bmn_create_and_edit_page_nip_field_is_readonly_and_automatic(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+        $bmn = Bmn::create([
+            'kode_barang' => 'TEST-NIP-001',
+            'nup' => '1',
+            'nama_barang' => 'Laptop Uji NIP',
+            'jenis' => 'BMN-TIK',
+            'lokasi' => 'Gudang BMN',
+            'penanggungjawab' => 'Siti Fatimah',
+            'penanggungjawab_nip' => '198703202012031003',
+            'kondisi' => 'Baik',
+            'dihapus' => false,
+        ]);
+
+        $responseCreate = $this->actingAs($user)->get(route('bmns.create'));
+        $responseCreate->assertOk();
+        $responseCreate->assertSee('id="penanggungjawab_nip"', false);
+        $responseCreate->assertSee('readonly', false);
+        $responseCreate->assertSee('Otomatis');
+
+        $responseEdit = $this->actingAs($user)->get(route('bmns.edit', $bmn));
+        $responseEdit->assertOk();
+        $responseEdit->assertSee('id="penanggungjawab_nip"', false);
+        $responseEdit->assertSee('readonly', false);
+        $responseEdit->assertSee('198703202012031003');
+        $responseEdit->assertSee('Otomatis');
+    }
+
     public function test_bmn_index_page_is_accessible_by_operator(): void
     {
         $user = User::factory()->create([

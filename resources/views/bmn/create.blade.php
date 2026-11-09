@@ -573,14 +573,19 @@
 
                     {{-- NIP PJ --}}
                     <div>
-                        <x-input-label for="penanggungjawab_nip" value="NIP Penanggung Jawab" />
+                        <div class="flex items-center justify-between mb-1.5">
+                            <x-input-label for="penanggungjawab_nip" value="NIP Penanggung Jawab" class="!mb-0" />
+                            <span class="text-[10px] font-medium text-[#62756A] bg-[#F0F4F1] px-1.5 py-0.5 rounded border border-[#E3ECE6]">Otomatis</span>
+                        </div>
                         <x-text-input
                             id="penanggungjawab_nip"
                             name="penanggungjawab_nip"
                             type="text"
-                            class="w-full font-mono text-xs"
+                            class="w-full font-mono text-xs bg-[#F7FAF8] text-[#4D6357] cursor-not-allowed border-[#E3ECE6] focus:ring-0 focus:border-[#E3ECE6]"
                             :value="old('penanggungjawab_nip', old('penanggungjawab', 'Pengelola BMN') == 'Pengelola BMN' ? '-' : '')"
-                            placeholder="mis. 198501012010121001"
+                            placeholder="Terisi otomatis dari penanggung jawab"
+                            readonly
+                            tabindex="-1"
                         />
                     </div>
 
@@ -644,8 +649,8 @@
         const opt = sel.options[sel.selectedIndex];
         const nip = opt ? (opt.getAttribute('data-nip') || '') : '';
         const nipInput = document.getElementById('penanggungjawab_nip');
-        if (nipInput && nip) {
-            nipInput.value = nip;
+        if (nipInput) {
+            nipInput.value = nip || '-';
         }
     }
 
