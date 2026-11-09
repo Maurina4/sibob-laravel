@@ -46,7 +46,7 @@ class BmnExportFeatureTest extends TestCase
         $response = $this->actingAs($user)->get(route('bmns.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Tarik ke Excel');
+        $response->assertSee('Export Excel');
         $response->assertSee('Tahun Berjalan ('.date('Y').')');
         $response->assertSee('Tahun Sebelumnya ('.(date('Y') - 1).')');
     }

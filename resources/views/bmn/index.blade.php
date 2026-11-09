@@ -14,18 +14,18 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            {{-- TOMBOL TARIK EXCEL MONEV PENGADAAN --}}
+            {{-- TOMBOL EXPORT EXCEL MONEV PENGADAAN --}}
             <div class="relative" x-data="{ open: false }">
                 <div class="inline-flex rounded-xl shadow-2xs">
                     <a
                         href="{{ route('bmns.export', request()->query()) }}"
                         class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-[#107C41] hover:bg-[#0E6B37] active:bg-[#0A4D27] text-white rounded-l-xl text-xs font-semibold tracking-wide transition shrink-0"
-                        title="Tarik data BMN saat ini ke Excel (.xlsx) untuk Monev Pengadaan"
+                        title="Export data BMN saat ini ke Excel (.xlsx) untuk Monev Pengadaan"
                     >
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span>Tarik ke Excel</span>
+                        <span>Export Excel</span>
                     </a>
                     <button
                         type="button"
@@ -238,7 +238,7 @@
     {{-- FILTER BAR --}}
     @include('bmn.partials.filter-bar')
 
-    {{-- INDIKATOR FILTER & SHORTCUT TARIK EXCEL --}}
+    {{-- INDIKATOR FILTER & SHORTCUT EXPORT EXCEL --}}
     @if(request()->hasAny(['tahun', 'search', 'jenis', 'lokasi', 'penanggungjawab', 'kondisi']))
         <div class="flex flex-wrap items-center justify-between gap-3 bg-[#EAF2ED]/80 border border-[#D5E5DA] px-4 py-2.5 rounded-xl text-xs text-[#163828]">
             <div class="flex items-center gap-2">
@@ -266,7 +266,7 @@
                 <svg class="w-3.5 h-3.5 text-[#107C41]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>Tarik Hasil Filter ke Excel</span>
+                <span>Export Hasil Filter ke Excel</span>
             </a>
         </div>
     @endif
