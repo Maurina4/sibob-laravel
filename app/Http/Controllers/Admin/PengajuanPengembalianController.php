@@ -32,10 +32,15 @@ class PengajuanPengembalianController extends Controller
         ]);
     }
 
-    public function setujui(PengajuanPengembalian $pengajuanPengembalian)
+    public function setujui(Request $request, PengajuanPengembalian $pengajuanPengembalian)
     {
         try {
             $this->service->setujui($pengajuanPengembalian, auth()->user());
+
+            if ($request->filled('redirect_to')) {
+                return redirect($request->input('redirect_to'))
+                    ->with('success', 'Pengajuan pengembalian berhasil disetujui. Berita Acara resmi telah diterbitkan dan data barang telah diperbarui.');
+            }
 
             return redirect()
                 ->route('admin.pengajuan-pengembalian.show', $pengajuanPengembalian)

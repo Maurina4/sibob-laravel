@@ -200,20 +200,6 @@
                                 </td>
                                 <td class="py-3 px-4 text-center whitespace-nowrap">
                                     <div class="flex items-center justify-center gap-1.5">
-                                        {{-- TOMBOL TERIMA PENGEMBALIAN (KHUSUS OPERATOR SAAT STATUS DIAJUKAN) --}}
-                                        @if(auth()->check() && auth()->user()->role === 'Operator' && $pengajuan->status === 'diajukan')
-                                            <a
-                                                href="{{ route('admin.pengajuan-pengembalian.show', $pengajuan) }}"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#163828] hover:bg-[#0E281C] text-white text-xs font-semibold shadow-xs transition"
-                                                title="Terima / Verifikasi Pengembalian"
-                                            >
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                <span>Terima</span>
-                                            </a>
-                                        @endif
-
                                         {{-- TOMBOL LIHAT DETAIL --}}
                                         <a
                                             href="{{ auth()->check() && auth()->user()->role === 'Operator' ? route('admin.pengajuan-pengembalian.show', $pengajuan) : route('pengajuan-pengembalian.show', $pengajuan) }}"
@@ -225,6 +211,52 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </a>
+
+                                        {{-- AKSI SAAT DIAJUKAN: TANDA CENTANG (TERIMA) & TANDA SILANG (BATALKAN/TOLAK) --}}
+                                        @if($pengajuan->status === 'diajukan')
+                                            {{-- TANDA CENTANG: TERIMA PENGEMBALIAN LANGSUNG (KHUSUS OPERATOR) --}}
+                                            @if(auth()->check() && auth()->user()->role === 'Operator')
+                                                <form method="POST" action="{{ route('admin.pengajuan-pengembalian.setujui', $pengajuan) }}" onsubmit="return confirm('Apakah Anda yakin ingin menerima pengembalian BMN {{ $pengajuan->nomor_pengajuan }} dan menerbitkan Berita Acara?')">
+                                                    @csrf
+                                                    <input type="hidden" name="redirect_to" value="{{ route('pengajuan-pengembalian.index') }}">
+                                                    <button
+                                                        type="submit"
+                                                        class="p-1.5 rounded-lg border border-[#CDE1D4] bg-[#EAF2ED] hover:bg-[#D5E6DC] text-[#137333] transition cursor-pointer"
+                                                        title="Terima Pengembalian"
+                                                    >
+                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            {{-- TANDA SILANG: BATALKAN ATAU TOLAK --}}
+                                            @if($pengajuan->diajukan_oleh === auth()->id())
+                                                <form method="POST" action="{{ route('pengajuan-pengembalian.batalkan', $pengajuan) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?')">
+                                                    @csrf
+                                                    <button
+                                                        type="submit"
+                                                        class="p-1.5 rounded-lg border border-[#F8D4D0] hover:bg-[#FDF0EE] text-[#9C322C] transition cursor-pointer"
+                                                        title="Batalkan Pengajuan"
+                                                    >
+                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @elseif(auth()->check() && auth()->user()->role === 'Operator')
+                                                <a
+                                                    href="{{ route('admin.pengajuan-pengembalian.show', $pengajuan) }}"
+                                                    class="p-1.5 rounded-lg border border-[#F8D4D0] hover:bg-[#FDF0EE] text-[#9C322C] transition cursor-pointer"
+                                                    title="Tolak Pengajuan"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </a>
+                                            @endif
+                                        @endif
 
                                         {{-- TOMBOL CETAK BERITA ACARA (JIKA DISETUJUI) --}}
                                         @if($pengajuan->status === 'disetujui')
@@ -238,22 +270,6 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                 </svg>
                                             </a>
-                                        @endif
-
-                                        {{-- TOMBOL BATALKAN (HANYA PEMOHON SENDIRI SAAT STATUS DIAJUKAN) --}}
-                                        @if($pengajuan->status === 'diajukan' && $pengajuan->diajukan_oleh === auth()->id())
-                                            <form method="POST" action="{{ route('pengajuan-pengembalian.batalkan', $pengajuan) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?')">
-                                                @csrf
-                                                <button
-                                                    type="submit"
-                                                    class="p-1.5 rounded-lg border border-[#F8D4D0] hover:bg-[#FDF0EE] text-[#9C322C] transition cursor-pointer"
-                                                    title="Batalkan Pengajuan"
-                                                >
-                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
-                                            </form>
                                         @endif
                                     </div>
                                 </td>
