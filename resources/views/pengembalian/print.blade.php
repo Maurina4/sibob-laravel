@@ -262,7 +262,7 @@
 
         /* PARAGRAF PEMBUKA (SPASI 1.15) */
         .opening-paragraph {
-            text-align: left;
+            text-align: justify;
             margin-top: 12px;
             margin-bottom: 12px;
             font-size: 12pt;
@@ -314,7 +314,7 @@
             margin: 12px 0;
             font-size: 12pt;
             line-height: 1.15;
-            text-align: left;
+            text-align: justify;
         }
 
         /* TABEL DAFTAR BARANG (DENGAN KET LOKASI) */
@@ -381,7 +381,7 @@
         }
 
         .closing-paragraph {
-            text-align: left;
+            text-align: justify;
             font-size: 12pt;
             line-height: 1.15;
             margin-bottom: 40px;

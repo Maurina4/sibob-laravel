@@ -3110,11 +3110,10 @@ class BmnModuleTest extends TestCase
         // Setelah penerima ditentukan, baru dapat dicetak
         $ba->update(['pihak_kedua' => 'Yuli Supriyatno, A.Md.']);
 
-        // Cek print view memuat Diajukan Oleh dan Pihak I Pemegang Awal
+        // Cek print view tidak lagi menampilkan Diajukan Oleh dan memuat para pihak
         $printResponse = $this->actingAs($user)->get(route('ba-perpindahan.print', $ba));
         $printResponse->assertOk();
-        $printResponse->assertSee('Diajukan Oleh');
-        $printResponse->assertSee('Ahmad Fauzi, S.Si');
+        $printResponse->assertDontSee('Diajukan Oleh');
         $printResponse->assertSee('Sri Wahyuni, S.Farm');
     }
 
