@@ -57,7 +57,7 @@
                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
                     class="w-full font-mono text-xs"
                     :value="old('kode_barang')"
-                    placeholder="mis. 3090405012 (maksimal 10 angka)"
+                    placeholder="mis. 3090405012"
                     required
                 />
                 <x-input-error :messages="$errors->get('kode_barang')" class="mt-1" />
