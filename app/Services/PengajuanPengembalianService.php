@@ -223,7 +223,7 @@ class PengajuanPengembalianService
                         'nama_barang' => $bmn->nama_barang,
                         'tingkat' => 'Rusak Berat',
                         'deskripsi' => $item->deskripsi_kerusakan ?: 'Barang diajukan rusak berat melalui Berita Acara '.$nomorBa,
-                        'status' => 'Dilaporkan',
+                        'status' => 'Diproses',
                         'sumber' => 'pengajuan',
                         'pengajuan_id' => $locked->id,
                     ]);

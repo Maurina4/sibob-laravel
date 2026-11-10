@@ -201,29 +201,6 @@
                                         </svg>
                                     </a>
 
-                                    {{-- TERIMA LAPORAN CEPAT (OPERATOR) --}}
-                                    @if(auth()->user()->role === 'Operator' && ($item->status ?? 'Dilaporkan') === 'Dilaporkan')
-                                        <form
-                                            method="POST"
-                                            action="{{ route('laporan-kerusakan.update', array_merge(['laporanKerusakan' => $item->id], request()->query())) }}"
-                                            onsubmit="return confirm('Terima laporan kerusakan ini? Kondisi BMN akan otomatis diubah menjadi {{ in_array($item->tingkat, ['Rusak Berat', 'Berat']) ? 'Rusak Berat' : 'Rusak Ringan' }}.')"
-                                            class="inline"
-                                        >
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="Diterima" />
-                                            <input type="hidden" name="tanggapan" value="Laporan telah diverifikasi oleh Operator dan diterima untuk antrean perbaikan teknis." />
-                                            <button
-                                                type="submit"
-                                                class="p-1.5 text-[#1A73E8] hover:text-[#1557B0] hover:bg-[#EBF3FE] rounded-lg transition cursor-pointer"
-                                                title="Terima Laporan (Otomatis ubah kondisi BMN)"
-                                            >
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </button>
-                                        </form>
-                                    @endif
 
                                     {{-- EDIT / TANGGAPI (OPERATOR ATAU SEBELUM DITERIMA) --}}
                                     @if(auth()->user()->role === 'Operator' || ($item->status ?? 'Dilaporkan') === 'Dilaporkan')

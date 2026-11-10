@@ -29,30 +29,7 @@
 
         @if(auth()->user()->role === 'Operator')
             <div class="flex items-center gap-2 shrink-0 flex-wrap">
-                @if($laporanKerusakan->status === 'Dilaporkan')
-                    <form
-                        method="POST"
-                        action="{{ route('laporan-kerusakan.update', $laporanKerusakan) }}"
-                        onsubmit="return confirm('Terima laporan kerusakan ini? Kondisi BMN terkait akan otomatis diubah menjadi {{ in_array($laporanKerusakan->tingkat, ['Rusak Berat', 'Berat']) ? 'Rusak Berat' : 'Rusak Ringan' }}.')"
-                        class="inline"
-                    >
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="status" value="Diterima" />
-                        <input type="hidden" name="redirect_to" value="show" />
-                        <input type="hidden" name="tanggapan" value="Laporan telah diverifikasi oleh Operator dan diterima untuk antrean perbaikan teknis." />
-                        <button
-                            type="submit"
-                            class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1A73E8] hover:bg-[#1557B0] text-white rounded-xl text-xs font-semibold shadow-2xs transition cursor-pointer"
-                            title="Terima Laporan & Otomatis Ubah Kondisi BMN"
-                        >
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Terima Laporan</span>
-                        </button>
-                    </form>
-                @elseif(in_array($laporanKerusakan->status, ['Diterima', 'Diproses']))
+                @if(in_array($laporanKerusakan->status, ['Diterima', 'Diproses']))
                     <form
                         method="POST"
                         action="{{ route('laporan-kerusakan.update', $laporanKerusakan) }}"
