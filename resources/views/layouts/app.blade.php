@@ -124,8 +124,24 @@
             function cleanNumericValue(el) {
                 if (!isNumericInput(el)) return;
                 const oldVal = el.value;
-                if (/[^0-9]/.test(oldVal)) {
-                    el.value = oldVal.replace(/[^0-9]/g, '');
+                let newVal = oldVal;
+                if (/[^0-9]/.test(newVal)) {
+                    newVal = newVal.replace(/[^0-9]/g, '');
+                }
+                const name = (el.name || '').toLowerCase();
+                const id = (el.id || '').toLowerCase();
+                let maxLen = el.getAttribute('maxlength') ? parseInt(el.getAttribute('maxlength'), 10) : null;
+                if (name === 'tahun_perolehan' || id === 'tahun_perolehan' || name === 'tahun' || id === 'tahun') {
+                    if (!maxLen || maxLen > 4) {
+                        maxLen = 4;
+                        el.setAttribute('maxlength', '4');
+                    }
+                }
+                if (maxLen && newVal.length > maxLen) {
+                    newVal = newVal.slice(0, maxLen);
+                }
+                if (newVal !== oldVal) {
+                    el.value = newVal;
                 }
             }
 
@@ -145,6 +161,24 @@
                 if (e.key < '0' || e.key > '9') {
                     e.preventDefault();
                     e.stopPropagation();
+                    return;
+                }
+
+                const name = (el.name || '').toLowerCase();
+                const id = (el.id || '').toLowerCase();
+                let maxLen = el.getAttribute('maxlength') ? parseInt(el.getAttribute('maxlength'), 10) : null;
+                if (name === 'tahun_perolehan' || id === 'tahun_perolehan' || name === 'tahun' || id === 'tahun') {
+                    if (!maxLen || maxLen > 4) {
+                        maxLen = 4;
+                        el.setAttribute('maxlength', '4');
+                    }
+                }
+                if (maxLen) {
+                    const selLen = (el.selectionEnd ?? 0) - (el.selectionStart ?? 0);
+                    if (el.value.length >= maxLen && selLen === 0) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                 }
             }, true);
 
@@ -169,17 +203,32 @@
                 const cleanDigits = text.replace(/[^0-9]/g, '');
                 if (!cleanDigits) return;
 
+                const name = (el.name || '').toLowerCase();
+                const id = (el.id || '').toLowerCase();
+                let maxLen = el.getAttribute('maxlength') ? parseInt(el.getAttribute('maxlength'), 10) : null;
+                if (name === 'tahun_perolehan' || id === 'tahun_perolehan' || name === 'tahun' || id === 'tahun') {
+                    if (!maxLen || maxLen > 4) maxLen = 4;
+                }
+
                 try {
                     const start = el.selectionStart ?? el.value.length;
                     const end = el.selectionEnd ?? el.value.length;
                     const val = el.value || '';
-                    el.value = val.substring(0, start) + cleanDigits + val.substring(end);
-                    const newPos = start + cleanDigits.length;
+                    let combined = val.substring(0, start) + cleanDigits + val.substring(end);
+                    if (maxLen && combined.length > maxLen) {
+                        combined = combined.slice(0, maxLen);
+                    }
+                    el.value = combined;
+                    const newPos = Math.min(combined.length, start + cleanDigits.length);
                     if (el.setSelectionRange) {
                         el.setSelectionRange(newPos, newPos);
                     }
                 } catch (err) {
-                    el.value = (el.value || '') + cleanDigits;
+                    let combined = (el.value || '') + cleanDigits;
+                    if (maxLen && combined.length > maxLen) {
+                        combined = combined.slice(0, maxLen);
+                    }
+                    el.value = combined;
                 }
 
                 el.dispatchEvent(new Event('input', { bubbles: true }));
