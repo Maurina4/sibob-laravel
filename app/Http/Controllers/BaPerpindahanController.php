@@ -39,6 +39,14 @@ class BaPerpindahanController extends Controller
             return strcasecmp(trim($p->nama), trim($user->name)) === 0;
         }) : null;
 
+        if (! $currentPegawai && $user) {
+            if ($user->role === 'Operator') {
+                $currentPegawai = $pegawais->first(fn($p) => str_contains(strtolower($p->jabatan ?? ''), 'operator')) ?? $pegawais->first();
+            } else {
+                $currentPegawai = $pegawais->first(fn($p) => str_contains(strtolower($p->jabatan ?? ''), 'petugas') || str_contains(strtolower($p->jabatan ?? ''), 'distribusi') || str_contains(strtolower($p->nama ?? ''), 'pengaju')) ?? $pegawais->first();
+            }
+        }
+
         return view('ba-perpindahan.create', compact('bmns', 'pegawais', 'lokasis', 'currentPegawai'));
     }
 

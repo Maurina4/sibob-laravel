@@ -445,42 +445,208 @@
 
         @php
             $baPengaju = $baPerpindahan->pengajuPegawai;
-            $baPengajuNama = old('pengaju_nama', $baPengaju?->nama ?: ($baPerpindahan->pengaju_nama ?: auth()->user()->name));
-            $baPengajuNip = $baPengaju?->nip;
-            $baPengajuId = old('pengaju_pegawai_id', old('pegawai_id', $baPerpindahan->pengaju_pegawai_id ?: $baPerpindahan->pegawai_id));
-            $baPengajuJabatan = $baPengaju?->jabatan ?: ($baPengaju?->unit_kerja ?: ($baPerpindahan->pengaju_email ?: 'Pengaju BA'));
+            $selectedPengajuId = (string)old('pengaju_pegawai_id', old('pegawai_id', $baPerpindahan->pengaju_pegawai_id ?: $baPerpindahan->pegawai_id));
+            $foundPengaju = $pegawais->firstWhere('id', $selectedPengajuId);
+            $selectedPengajuNama = old('pengaju_nama', $foundPengaju?->nama ?: ($baPengaju?->nama ?: ($baPerpindahan->pengaju_nama ?: auth()->user()->name)));
+            $selectedPengajuNip = $foundPengaju?->nip ?: ($baPengaju?->nip ?? '');
+            $selectedPengajuJabatan = $foundPengaju?->jabatan ?: ($foundPengaju?->unit_kerja ?: ($baPengaju?->jabatan ?: ($baPengaju?->unit_kerja ?: 'Pegawai')));
         @endphp
 
-        {{-- PEGAWAI PENGAJU (PEMOHON DOKUMEN BA) --}}
+        {{-- PEGAWAI PENGAJU (DARI DATABASE PEGAWAI DENGAN NIP / NUP) --}}
         <div>
-            <x-input-label for="pengaju_display" value="Pegawai Pengaju (Pemohon Perpindahan) *" />
-            <div class="mt-1 flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] text-[#132219]">
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="w-8 h-8 rounded-full bg-[#EAF2ED] text-[#163828] flex items-center justify-center font-bold text-xs shrink-0 border border-[#D5E5DA]">
-                        {{ strtoupper(substr($baPengajuNama, 0, 2)) }}
+            <div class="flex items-center justify-between mb-1">
+                <x-input-label for="pengaju_pegawai_id" value="Pegawai Pengaju (Pemohon Perpindahan — Dari Database Pegawai) *" />
+                <span class="inline-flex items-center gap-1 text-[11px] text-[#163828] font-semibold">
+                    <svg class="w-3.5 h-3.5 text-[#163828]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Sesuai Pemohon: {{ $selectedPengajuNama }}
+                </span>
+            </div>
+
+            <div
+                x-data="{
+                    open: false,
+                    search: '',
+                    selectedId: @js($selectedPengajuId),
+                    selectedNip: @js($selectedPengajuNip),
+                    selectedNama: @js($selectedPengajuNama),
+                    selectedJabatan: @js($selectedPengajuJabatan),
+                    options: @js(($pegawais ?? collect())->map(fn($p) => [
+                        'id' => (string)$p->id,
+                        'nama' => $p->nama,
+                        'nip' => $p->nip ?? '',
+                        'jabatan' => $p->jabatan ?? '',
+                        'unit_kerja' => $p->unit_kerja ?? '',
+                        'label' => $p->nip ? "{$p->nama} (NIP. {$p->nip})" : $p->nama,
+                    ])->values()),
+                    get filtered() {
+                        if (!this.search.trim()) return this.options;
+                        const q = this.search.toLowerCase().trim();
+                        return this.options.filter(o =>
+                            (o.nip && o.nip.toLowerCase().includes(q)) ||
+                            (o.nama && o.nama.toLowerCase().includes(q)) ||
+                            (o.jabatan && o.jabatan.toLowerCase().includes(q)) ||
+                            (o.unit_kerja && o.unit_kerja.toLowerCase().includes(q)) ||
+                            (o.label && o.label.toLowerCase().includes(q))
+                        );
+                    },
+                    select(opt) {
+                        this.selectedId = opt.id;
+                        this.selectedNip = opt.nip;
+                        this.selectedNama = opt.nama;
+                        this.selectedJabatan = opt.jabatan || opt.unit_kerja || 'Pegawai';
+                        this.open = false;
+                        this.search = '';
+                        $nextTick(() => {
+                            if (typeof syncPihakKeduaList === 'function') {
+                                syncPihakKeduaList();
+                            }
+                        });
+                    },
+                    reset() {
+                        this.selectedId = '';
+                        this.selectedNip = '';
+                        this.selectedNama = '';
+                        this.selectedJabatan = '';
+                        this.open = false;
+                        this.search = '';
+                    }
+                }"
+                @click.outside="open = false"
+                @keydown.escape="open = false"
+                class="relative mt-1"
+            >
+                <input type="hidden" id="pengaju_pegawai_id" name="pengaju_pegawai_id" :value="selectedId" required>
+                <input type="hidden" id="pegawai_id" name="pegawai_id" :value="selectedId">
+                <input type="hidden" id="pengaju_nama" name="pengaju_nama" :value="selectedNama">
+
+                {{-- Trigger Button --}}
+                <button
+                    type="button"
+                    @click="open = !open; if(open) { $nextTick(() => $refs.searchPengajuInput.focus()); }"
+                    class="w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-xs text-[#132219] transition cursor-pointer shadow-2xs font-medium text-left"
+                    :class="open ? 'border-[#163828] ring-2 ring-[#163828]/20' : ''"
+                >
+                    <div class="flex items-center gap-2 min-w-0 pr-1 truncate">
+                        <svg class="w-4 h-4 text-[#8D9D95] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <template x-if="selectedNip">
+                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="'NIP. ' + selectedNip"></span>
+                        </template>
+                        <span class="truncate" :class="selectedId ? 'text-[#132219] font-semibold' : 'text-[#8D9D95]'" x-text="selectedNama ? selectedNama + (selectedJabatan ? ' — ' + selectedJabatan : '') : 'Pilih atau cari pegawai pengaju dari database pegawai...'"></span>
                     </div>
-                    <div class="min-w-0 truncate">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-semibold text-[#132219]">{{ $baPengajuNama }}</span>
-                            @if($baPengajuNip)
-                                <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shadow-2xs">
-                                    NIP. {{ $baPengajuNip }}
-                                </span>
-                            @endif
-                        </div>
-                        <div class="text-[11px] text-[#62756A] truncate">
-                            {{ $baPengajuJabatan }}
+                    <div class="flex items-center gap-1 shrink-0">
+                        <template x-if="selectedId">
+                            <span
+                                @click.stop="reset()"
+                                class="p-0.5 text-[#8D9D95] hover:text-[#B22222] transition cursor-pointer"
+                                title="Hapus pilihan"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </span>
+                        </template>
+                        <svg class="w-3.5 h-3.5 text-[#8D9D95] transition-transform duration-150" :class="open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </button>
+
+                {{-- Floating Searchable Panel --}}
+                <div
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-xl border border-[#D5E5DA] p-2 z-50 text-xs"
+                    style="display: none;"
+                >
+                    {{-- Search Input --}}
+                    <div class="relative mb-1.5">
+                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            x-ref="searchPengajuInput"
+                            x-model="search"
+                            placeholder="Ketik nama atau NIP pegawai..."
+                            class="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] focus:bg-white text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                            @keydown.escape="open = false"
+                            @keydown.enter.prevent="if(filtered.length > 0) select(filtered[0])"
+                        >
+                        <button
+                            type="button"
+                            x-show="search"
+                            @click="search = ''; $refs.searchPengajuInput.focus()"
+                            class="absolute inset-y-0 right-0 pr-2 flex items-center text-[#8D9D95] hover:text-[#132219] cursor-pointer"
+                        >
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Option List --}}
+                    <div class="max-h-56 overflow-y-auto space-y-0.5 divide-y divide-[#E3ECE6]/40" style="max-height: 220px; overflow-y: auto; overscroll-behavior: contain;">
+                        <template x-for="opt in filtered" :key="opt.id">
+                            <button
+                                type="button"
+                                @click="select(opt)"
+                                class="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition hover:bg-[#EAF2ED] cursor-pointer group"
+                                :class="selectedId === opt.id ? 'bg-[#EAF2ED] text-[#163828] font-semibold' : 'text-[#132219]'"
+                            >
+                                <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                    <template x-if="opt.nip">
+                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="'NIP. ' + opt.nip"></span>
+                                    </template>
+                                    <div class="truncate">
+                                        <div class="truncate text-xs font-medium" x-text="opt.nama"></div>
+                                        <template x-if="opt.unit_kerja || opt.jabatan">
+                                            <div class="truncate text-[10px] text-[#62756A]" x-text="opt.unit_kerja || opt.jabatan"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                                <span x-show="selectedId === opt.id" class="text-[#163828] font-bold shrink-0 ml-1">✓</span>
+                            </button>
+                        </template>
+                        <div x-show="filtered.length === 0" class="py-4 text-center text-[#8D9D95]">
+                            <p class="text-xs">Tidak ada pegawai cocok di database pegawai</p>
                         </div>
                     </div>
                 </div>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shrink-0">
-                    <span>Pemohon Asli</span>
-                </span>
             </div>
-            <input type="hidden" id="pengaju_pegawai_id" name="pengaju_pegawai_id" value="{{ $baPengajuId ?? '' }}">
-            <input type="hidden" id="pegawai_id" name="pegawai_id" value="{{ $baPengajuId ?? '' }}">
-            <input type="hidden" id="pengaju_nama" name="pengaju_nama" value="{{ $baPengajuNama }}">
-            <p class="text-[11px] text-[#62756A] mt-1">Sesuai dengan akun pemohon yang mengajukan perpindahan ini.</p>
+
+            {{-- Card Identitas Pegawai Terpilih Dari Database --}}
+            <template x-if="selectedNama">
+                <div class="mt-2 flex items-center justify-between gap-3 px-3 py-2 rounded-lg border border-[#D5E5DA] bg-[#EAF2ED]/50 text-[#132219]">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <div class="w-6 h-6 rounded-full bg-[#163828] text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                            ✓
+                        </div>
+                        <div class="min-w-0 truncate text-xs">
+                            <span class="font-semibold text-[#132219]" x-text="selectedNama"></span>
+                            <template x-if="selectedNip">
+                                <span class="text-[#163828] font-mono text-[11px] font-bold ml-1" x-text="'(NIP: ' + selectedNip + ')'"></span>
+                            </template>
+                            <span class="text-[#62756A] text-[11px] ml-1" x-text="selectedJabatan ? '— ' + selectedJabatan : ''"></span>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white text-[#163828] border border-[#D5E5DA] shrink-0 shadow-2xs">
+                        Database Pegawai
+                    </span>
+                </div>
+            </template>
+
+            <p class="text-[11px] text-[#62756A] mt-1">
+                Data pemohon terhubung langsung ke database pegawai lengkap dengan NIP untuk penerbitan Berita Acara resmi.
+            </p>
             <x-input-error :messages="$errors->get('pengaju_pegawai_id')" />
         </div>
 

@@ -4510,6 +4510,13 @@ class BmnModuleTest extends TestCase
 
     public function test_ba_perpindahan_create_view_displays_logged_in_user_as_pengaju(): void
     {
+        $pegawai = Pegawai::create([
+            'nama' => 'Maurin Operator Testing',
+            'nip' => '199501012020012001',
+            'jabatan' => 'Operator BMN',
+            'unit_kerja' => 'Subbag Tata Usaha',
+        ]);
+
         $operator = User::factory()->create([
             'role' => 'Operator',
             'name' => 'Maurin Operator Testing',
@@ -4519,9 +4526,9 @@ class BmnModuleTest extends TestCase
         $response = $this->actingAs($operator)->get(route('ba-perpindahan.create'));
         $response->assertOk();
         $response->assertSee('Maurin Operator Testing');
-        $response->assertSee('Akun Anda');
-        $response->assertSee('Otomatis disesuaikan dengan akun Anda yang sedang login');
-        $response->assertSee('name="pengaju_nama" value="Maurin Operator Testing"', false);
+        $response->assertSee('199501012020012001');
+        $response->assertSee('Database Pegawai');
+        $response->assertSee('Sesuai Akun Login: Maurin Operator Testing');
     }
 
     public function test_ba_perpindahan_store_binds_to_logged_in_user_without_pegawai_record(): void
