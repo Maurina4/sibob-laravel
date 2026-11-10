@@ -176,7 +176,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div class="leading-relaxed">
-                    <strong class="font-semibold">Sinkronisasi Kondisi Otomatis:</strong> Saat status disimpan menjadi <strong>Diterima</strong> atau <strong>Diproses</strong>, kondisi barang BMN pada Master Data & modul terkait akan langsung otomatis diperbarui menjadi kondisi yang dilaporkan (<span class="font-semibold underline">{{ in_array($laporanKerusakan->tingkat, ['Rusak Berat', 'Berat']) ? 'Rusak Berat' : 'Rusak Ringan' }}</span>). Saat status <strong>Selesai</strong> atau <strong>Ditolak</strong>, kondisi BMN otomatis dipulihkan menjadi <span class="font-semibold underline">Baik</span>.
+                    <strong class="font-semibold">Sinkronisasi Kondisi Otomatis:</strong> Saat status disimpan menjadi <strong>Diterima</strong> atau <strong>Diproses</strong>, kondisi barang BMN pada Master Data & modul terkait akan langsung otomatis diperbarui menjadi kondisi yang dilaporkan (<span class="font-semibold underline">Rusak Berat</span>). Saat status <strong>Selesai</strong> atau <strong>Ditolak</strong>, kondisi BMN otomatis dipulihkan menjadi <span class="font-semibold underline">Baik</span>.
                 </div>
             </div>
 

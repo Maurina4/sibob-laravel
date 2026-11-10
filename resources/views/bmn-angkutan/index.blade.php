@@ -353,7 +353,7 @@
                     class="bg-[#F7FAF8] hover:bg-white focus:bg-white border border-[#E3ECE6] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs text-[#132219] py-2 pl-3 pr-9 transition cursor-pointer"
                 >
                     <option value="">Kondisi</option>
-                    @foreach($kondisiFilters ?? ['Baik', 'Rusak Ringan', 'Rusak Berat'] as $kondisiOpt)
+                    @foreach($kondisiFilters ?? ['Baik', 'Rusak Berat'] as $kondisiOpt)
                         <option value="{{ $kondisiOpt }}" @selected(request('kondisi') === $kondisiOpt)>
                             {{ $kondisiOpt }}
                         </option>

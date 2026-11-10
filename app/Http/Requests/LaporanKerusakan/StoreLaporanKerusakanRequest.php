@@ -33,7 +33,7 @@ class StoreLaporanKerusakanRequest extends FormRequest
             'pelapor_email' => ['nullable', 'string', 'max:255'],
             'nama_barang' => ['required', 'string', 'max:255'],
             'lokasi' => ['required', 'string', 'max:255'],
-            'tingkat' => ['required', 'in:Rusak Ringan,Rusak Berat,Ringan,Berat,Sedang'],
+            'tingkat' => ['required', 'in:Rusak Berat,Berat'],
             'deskripsi' => ['required', 'string'],
         ];
     }
@@ -42,7 +42,7 @@ class StoreLaporanKerusakanRequest extends FormRequest
     {
         return [
             'tanggal.before_or_equal' => 'Tanggal temuan kerusakan tidak boleh melebihi tanggal hari ini (tidak bisa memilih tanggal di masa depan).',
-            'tingkat.in' => 'Tingkat kerusakan harus Rusak Ringan atau Rusak Berat.',
+            'tingkat.in' => 'Tingkat kerusakan harus Rusak Berat.',
         ];
     }
 }

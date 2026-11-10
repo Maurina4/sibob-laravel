@@ -345,8 +345,8 @@
                     <span class="text-xs font-semibold text-[#137333]">Baik</span>
                 </label>
                 <label class="flex items-center gap-1.5 p-2 rounded-lg border border-[#E3ECE6] cursor-pointer hover:bg-[#F7FAF8] transition text-center">
-                    <input type="radio" name="kondisi" value="Rusak" class="text-[#163828]" {{ old('kondisi', $bmnsLab->kondisi ?? '') === 'Rusak' ? 'checked' : '' }}>
-                    <span class="text-xs font-semibold text-[#9C322C]">Rusak</span>
+                    <input type="radio" name="kondisi" value="Rusak Berat" class="text-[#163828]" {{ in_array(old('kondisi', $bmnsLab->kondisi ?? ''), ['Rusak', 'Rusak Berat', 'Rusak Ringan']) ? 'checked' : '' }}>
+                    <span class="text-xs font-semibold text-[#9C322C]">Rusak Berat</span>
                 </label>
             </div>
         </div>

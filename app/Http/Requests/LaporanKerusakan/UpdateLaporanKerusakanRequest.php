@@ -23,7 +23,7 @@ class UpdateLaporanKerusakanRequest extends FormRequest
             'pelapor_email' => ['nullable', 'string', 'max:255'],
             'nama_barang' => ['nullable', 'string', 'max:255'],
             'lokasi' => ['nullable', 'string', 'max:255'],
-            'tingkat' => ['nullable', 'in:Rusak Ringan,Rusak Berat,Ringan,Berat,Sedang'],
+            'tingkat' => ['nullable', 'in:Rusak Berat,Berat'],
             'deskripsi' => ['nullable', 'string'],
             'status' => [$isOperator ? 'required' : 'nullable', 'in:Dilaporkan,Diterima,Diproses,Selesai,Ditolak'],
             'tanggapan' => ['nullable', 'string'],
@@ -34,7 +34,7 @@ class UpdateLaporanKerusakanRequest extends FormRequest
     {
         return [
             'tanggal.before_or_equal' => 'Tanggal temuan kerusakan tidak boleh melebihi tanggal hari ini (tidak bisa memilih tanggal di masa depan).',
-            'tingkat.in' => 'Tingkat kerusakan harus Rusak Ringan atau Rusak Berat.',
+            'tingkat.in' => 'Tingkat kerusakan harus Rusak Berat.',
         ];
     }
 }

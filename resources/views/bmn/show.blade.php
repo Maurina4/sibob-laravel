@@ -94,16 +94,12 @@
                             $kondisiLower = strtolower($kondisi);
                             $kondisiStyle = match($kondisiLower) {
                                 'baik' => 'bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]',
-                                'rusak sedang' => 'bg-[#FFF4E5] text-[#B25E00] border-[#FFE2BF]',
-                                'rusak ringan' => 'bg-[#FEF7E0] text-[#B06000] border-[#FEEFC3]',
                                 'rusak', 'rusak berat' => 'bg-[#FDF0EE] text-[#9C322C] border-[#F8D4D0]',
-                                default => 'bg-[#F2F5F3] text-[#4A5D52] border-[#D9E2DC]',
+                                default => 'bg-[#FDF0EE] text-[#9C322C] border-[#F8D4D0]',
                             };
                             $dotColor = match($kondisiLower) {
                                 'baik' => 'bg-[#137333]',
-                                'rusak sedang', 'rusak ringan' => 'bg-[#B06000]',
-                                'rusak', 'rusak berat' => 'bg-[#9C322C]',
-                                default => 'bg-[#4A5D52]',
+                                default => 'bg-[#9C322C]',
                             };
                         @endphp
                         <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold border {{ $kondisiStyle }}">

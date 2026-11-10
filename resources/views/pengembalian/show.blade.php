@@ -201,7 +201,6 @@
 
                             $kondisiKembaliBadge = match($kondisiKembali) {
                                 'Rusak Berat' => 'bg-[#FDF0EE] text-[#9C322C] border-[#F8D4D0]',
-                                'Rusak Ringan', 'Sedang', 'Rusak Sedang' => 'bg-[#FFF4E5] text-[#B25E00] border-[#FFE2BF]',
                                 default => 'bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]',
                             };
                         @endphp
@@ -274,8 +273,7 @@
         {{-- SUMMARY FOOTER --}}
         @php
             $countBaik = $pengembalian->items->filter(fn($i) => ($i->kondisi ?: 'Baik') === 'Baik')->count();
-            $countRusakRingan = $pengembalian->items->filter(fn($i) => in_array($i->kondisi, ['Rusak Ringan', 'Sedang', 'Rusak Sedang']))->count();
-            $countRusakBerat = $pengembalian->items->filter(fn($i) => $i->kondisi === 'Rusak Berat')->count();
+            $countRusakBerat = $pengembalian->items->filter(fn($i) => in_array($i->kondisi, ['Rusak', 'Rusak Berat']))->count();
         @endphp
         <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#E3ECE6] text-xs">
             <div class="text-[#62756A]">
@@ -286,12 +284,6 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span>
                     Baik: <strong>{{ $countBaik }}</strong>
                 </span>
-                @if($countRusakRingan > 0)
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFF4E5] text-[#B25E00] border border-[#FFE2BF] font-medium">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#B25E00]"></span>
-                        Rusak Ringan: <strong>{{ $countRusakRingan }}</strong>
-                    </span>
-                @endif
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FDF0EE] text-[#9C322C] border border-[#F8D4D0] font-medium">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#9C322C]"></span>
                     Rusak Berat: <strong>{{ $countRusakBerat }}</strong>

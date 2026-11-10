@@ -361,11 +361,11 @@
                     <input
                         type="radio"
                         name="kondisi"
-                        value="Rusak"
+                        value="Rusak Berat"
                         class="text-[#163828] focus:ring-[#163828]"
-                        {{ $currentKondisi === 'Rusak' ? 'checked' : '' }}
+                        {{ in_array($currentKondisi, ['Rusak', 'Rusak Berat', 'Rusak Ringan']) ? 'checked' : '' }}
                     >
-                    <span class="text-xs font-semibold text-[#9C322C]">Rusak</span>
+                    <span class="text-xs font-semibold text-[#9C322C]">Rusak Berat</span>
                 </label>
             </div>
             <x-input-error :messages="$errors->get('kondisi')" class="mt-1" />

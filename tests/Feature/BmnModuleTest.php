@@ -979,7 +979,7 @@ class BmnModuleTest extends TestCase
             'bmn_id' => $bmn->id,
             'nama_barang' => 'Spektrofotometer UV-Vis',
             'lokasi' => 'Ruang Laboratorium Uji',
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
             'deskripsi' => 'Lampu deuterium tidak menyala saat inisialisasi alat.',
         ]);
 
@@ -1608,7 +1608,7 @@ class BmnModuleTest extends TestCase
             'bmn_id' => $bmn->id,
             'nama_barang' => 'Spektrofotometer UV-Vis',
             'lokasi' => 'Lab Kimia',
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
             'deskripsi' => 'Lampu tidak menyala',
             'status' => 'Dilaporkan',
             'pelapor_email' => 'pelapor@example.com',
@@ -1628,14 +1628,14 @@ class BmnModuleTest extends TestCase
         $response->assertRedirect(route('laporan-kerusakan.index'));
 
         $this->assertEquals('Diterima', $laporan->fresh()->status);
-        $this->assertEquals('Rusak Sedang', $bmn->fresh()->kondisi);
-        $this->assertEquals('Rusak Sedang', $bmnLab->fresh()->kondisi);
-        $this->assertEquals('Rusak Sedang', $bmnTik->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmn->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmnLab->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmnTik->fresh()->kondisi);
 
-        // Index BMN, BMN TIK, and BMN Lab display Rusak Sedang badge
-        $this->actingAs($operator)->get(route('bmns.index'))->assertOk()->assertSee('Rusak Sedang');
-        $this->actingAs($operator)->get(route('bmns-tik.index'))->assertOk()->assertSee('Rusak Sedang');
-        $this->actingAs($operator)->get(route('bmns-lab.index'))->assertOk()->assertSee('Rusak Sedang');
+        // Index BMN, BMN TIK, and BMN Lab display Rusak Berat badge
+        $this->actingAs($operator)->get(route('bmns.index'))->assertOk()->assertSee('Rusak Berat');
+        $this->actingAs($operator)->get(route('bmns-tik.index'))->assertOk()->assertSee('Rusak Berat');
+        $this->actingAs($operator)->get(route('bmns-lab.index'))->assertOk()->assertSee('Rusak Berat');
     }
 
     public function test_accepting_laporan_kerusakan_ringan_updates_condition_to_rusak_ringan(): void
@@ -1783,7 +1783,7 @@ class BmnModuleTest extends TestCase
             'bmn_id' => null,
             'nama_barang' => 'AC Split 2 PK',
             'lokasi' => 'Ruang TU',
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
             'deskripsi' => 'AC tidak dingin / bocor freon',
             'status' => 'Dilaporkan',
             'pelapor_email' => 'pelapor@example.com',
@@ -1804,7 +1804,7 @@ class BmnModuleTest extends TestCase
 
         $this->assertEquals($bmn->id, $laporan->fresh()->bmn_id);
         $this->assertEquals('Diterima', $laporan->fresh()->status);
-        $this->assertEquals('Rusak Sedang', $bmn->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmn->fresh()->kondisi);
     }
 
     public function test_bmn_edit_and_update_preserves_page_and_filter_query(): void
@@ -2195,7 +2195,7 @@ class BmnModuleTest extends TestCase
             'bmn_id' => $bmn->id,
             'nama_barang' => 'Printer Epson L3110',
             'lokasi' => 'Ruang Keuangan',
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
             'deskripsi' => 'Roller macet dan paper jam berulang kali',
             'status' => 'Selesai',
             'tanggapan' => 'Diselesaikan sendiri',
@@ -2204,7 +2204,7 @@ class BmnModuleTest extends TestCase
         $updateResponse->assertRedirect(route('laporan-kerusakan.index'));
 
         $fresh = $laporan->fresh();
-        $this->assertEquals('Sedang', $fresh->tingkat);
+        $this->assertEquals('Rusak Berat', $fresh->tingkat);
         $this->assertEquals('Roller macet dan paper jam berulang kali', $fresh->deskripsi);
         $this->assertEquals('Dilaporkan', $fresh->status);
         $this->assertNull($fresh->ditanggapi_oleh);
@@ -2904,7 +2904,7 @@ class BmnModuleTest extends TestCase
             'tanggal' => now(),
             'nama_barang' => 'AC Split Panasonic',
             'lokasi' => 'Ruang Rapat',
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
             'deskripsi' => 'Pendingin tidak dingin dan berbunyi bising',
             'status' => 'Dilaporkan',
             'pelapor_nama' => 'Pegawai X',
@@ -3144,7 +3144,7 @@ class BmnModuleTest extends TestCase
             'pelapor_pegawai_id' => $pegawai->id,
             'nama_barang' => 'Laptop Asus ExpertBook',
             'lokasi' => 'Ruang TIK Lt 1',
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
             'deskripsi' => 'Layar berkedip dan adaptor sering panas',
         ]);
 
@@ -3156,7 +3156,7 @@ class BmnModuleTest extends TestCase
             'pelapor_pegawai_id' => $pegawai->id,
             'pelapor_nama' => 'Budi Santoso, S.Kom',
             'pelapor_email' => $operator->email,
-            'tingkat' => 'Sedang',
+            'tingkat' => 'Rusak Berat',
         ]);
 
         $laporan = LaporanKerusakan::where('nomor', 'LK/20261015/001')->firstOrFail();
@@ -3954,7 +3954,7 @@ class BmnModuleTest extends TestCase
     {
         $operator = User::factory()->create(['role' => 'Operator']);
 
-        // 1. Rusak Ringan is valid
+        // 1. Rusak Ringan is rejected (only Rusak Berat accepted)
         $resRingan = $this->actingAs($operator)->post(route('laporan-kerusakan.store'), [
             'nomor' => 'LK-TEST-RR-01',
             'tanggal' => now()->toDateString(),
@@ -3963,11 +3963,7 @@ class BmnModuleTest extends TestCase
             'tingkat' => 'Rusak Ringan',
             'deskripsi' => 'Layar bergaris tipis',
         ]);
-        $resRingan->assertSessionHasNoErrors();
-        $this->assertDatabaseHas('laporan_kerusakans', [
-            'nomor' => 'LK-TEST-RR-01',
-            'tingkat' => 'Rusak Ringan',
-        ]);
+        $resRingan->assertSessionHasErrors('tingkat');
 
         // 2. Rusak Berat is valid
         $resBerat = $this->actingAs($operator)->post(route('laporan-kerusakan.store'), [

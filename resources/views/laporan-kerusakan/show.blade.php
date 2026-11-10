@@ -221,7 +221,7 @@
                 @if($laporanKerusakan->bmn)
                     <div class="flex items-center justify-between pt-2 border-t border-[#E3ECE6]/60 text-xs">
                         <span class="text-[#62756A]">Kondisi BMN di Master Data:</span>
-                        <span class="font-bold {{ in_array($laporanKerusakan->bmn->kondisi, ['Rusak Berat', 'Berat']) ? 'text-[#9C322C]' : (in_array($laporanKerusakan->bmn->kondisi, ['Rusak Ringan', 'Ringan', 'Rusak Sedang', 'Sedang']) ? 'text-[#B25E00]' : 'text-[#137333]') }}">
+                        <span class="font-bold {{ in_array($laporanKerusakan->bmn->kondisi, ['Rusak Berat', 'Berat', 'Rusak']) ? 'text-[#9C322C]' : 'text-[#137333]' }}">
                             {{ $laporanKerusakan->bmn->kondisi ?: 'Baik' }}
                         </span>
                     </div>

@@ -42,7 +42,6 @@ class BmnAngkutanService
                 ->pluck('penanggungjawab'),
             'kondisiFilters' => [
                 'Baik',
-                'Rusak Ringan',
                 'Rusak Berat',
             ],
             'pegawais' => Pegawai::orderBy('nama')->get(),

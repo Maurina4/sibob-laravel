@@ -375,7 +375,7 @@
             @php
                 $curKondisi = old('kondisi', $bmnAngkutan->kondisi ?: 'Baik');
             @endphp
-            <div class="grid grid-cols-3 gap-2 mt-1">
+            <div class="grid grid-cols-2 gap-2 mt-1">
                 <label class="flex items-center gap-2 p-2.5 rounded-lg border border-[#E3ECE6] cursor-pointer hover:bg-[#F7FAF8] transition">
                     <input
                         type="radio"
@@ -390,19 +390,9 @@
                     <input
                         type="radio"
                         name="kondisi"
-                        value="Rusak Ringan"
-                        class="text-[#163828] focus:ring-[#163828]"
-                        {{ $curKondisi === 'Rusak Ringan' ? 'checked' : '' }}
-                    >
-                    <span class="text-xs font-semibold text-[#B25E00]">Rusak Ringan</span>
-                </label>
-                <label class="flex items-center gap-2 p-2.5 rounded-lg border border-[#E3ECE6] cursor-pointer hover:bg-[#F7FAF8] transition">
-                    <input
-                        type="radio"
-                        name="kondisi"
                         value="Rusak Berat"
                         class="text-[#163828] focus:ring-[#163828]"
-                        {{ $curKondisi === 'Rusak Berat' ? 'checked' : '' }}
+                        {{ in_array($curKondisi, ['Rusak', 'Rusak Berat', 'Rusak Ringan']) ? 'checked' : '' }}
                     >
                     <span class="text-xs font-semibold text-[#9C322C]">Rusak Berat</span>
                 </label>
