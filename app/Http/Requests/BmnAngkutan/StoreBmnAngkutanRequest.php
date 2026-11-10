@@ -61,7 +61,7 @@ class StoreBmnAngkutanRequest extends FormRequest
             'no_polisi.required' => 'Nomor Polisi (Plat Nomor) wajib diisi.',
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
-            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3020101001 atau 3.02.01.01.001).',
+            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3020101001).',
             'kode_barang.unique' => 'Kombinasi Kode Barang dan NUP sudah terdaftar dalam sistem. Silakan periksa kembali NUP atau Kode Barang.',
         ];
     }

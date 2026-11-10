@@ -65,7 +65,7 @@ class UpdateBmnTikRequest extends FormRequest
         return [
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
-            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3090405012 atau 3.09.04.05.012).',
+            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3090405012).',
             'kode_barang.unique' => 'Kombinasi Kode Barang dan NUP sudah terdaftar dalam sistem. Silakan periksa kembali NUP atau Kode Barang.',
         ];
     }

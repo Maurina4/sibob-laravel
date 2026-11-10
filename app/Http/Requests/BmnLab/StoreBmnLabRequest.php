@@ -60,7 +60,7 @@ class StoreBmnLabRequest extends FormRequest
             'tanggal_kalibrasi.before_or_equal' => 'Tanggal kalibrasi tidak boleh melebihi tanggal hari ini (tidak bisa memilih tanggal di masa depan).',
             'tahun_perolehan.max' => 'Tahun perolehan tidak boleh melebihi tahun saat ini ('.date('Y').').',
             'kode_barang.required' => 'Kode Barang wajib diisi.',
-            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3080101005 atau 3.08.01.01.005).',
+            'kode_barang.digits' => 'Kode Barang harus berupa 10 digit angka (contoh: 3080101005).',
             'kode_barang.unique' => 'Kombinasi Kode Barang dan NUP sudah terdaftar dalam sistem. Silakan periksa kembali NUP atau Kode Barang.',
         ];
     }
