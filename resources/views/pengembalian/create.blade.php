@@ -21,6 +21,28 @@
         <p class="text-xs text-[#62756A] mt-0.5">Catat penyerahan kembali barang milik negara yang selesai digunakan.</p>
     </div>
 
+    {{-- INFO ALUR PENGEMBALIAN TERINTEGRASI --}}
+    <div class="p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-amber-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+                <strong class="font-semibold block mb-0.5">Alur Berita Acara Otomatis</strong>
+                <span>Berita Acara Pengembalian diterbitkan secara otomatis saat <strong>Pengajuan Pengembalian BMN</strong> disetujui oleh Pengelola BMN. Anda tidak perlu lagi mengisi form Berita Acara secara manual di sini.</span>
+            </div>
+        </div>
+        <a
+            href="{{ route('pengajuan-pengembalian.create') }}"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163828] text-white rounded-lg text-xs font-semibold hover:bg-[#1E4834] transition shrink-0 whitespace-nowrap shadow-2xs"
+        >
+            <span>Buka Pengajuan Pengembalian</span>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </a>
+    </div>
+
     {{-- ERROR VALIDASI --}}
     @if ($errors->any())
         <div class="p-4 rounded-xl border border-[#F8D4D0] bg-[#FDF0EE] text-[#9C322C] text-xs">

@@ -14,15 +14,14 @@
             <p class="text-xs text-[#62756A] mt-0.5">Pencatatan dan penerbitan Berita Acara Serah Terima (BAST) pengembalian barang milik negara.</p>
         </div>
 
-        <a
-            href="{{ route('pengembalians.create') }}"
-            class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#163828] hover:bg-[#1E4834] active:bg-[#0E281C] text-white rounded-xl text-xs font-semibold tracking-wide shadow-2xs transition shrink-0"
-        >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Buat BA Pengembalian</span>
-        </a>
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA]">
+                <svg class="w-3.5 h-3.5 text-[#163828]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Diterbitkan Otomatis dari Pengajuan Disetujui</span>
+            </span>
+        </div>
     </div>
 
     {{-- FILTER BAR --}}
@@ -291,13 +290,13 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                                         </svg>
                                     </div>
-                                    <div class="text-sm font-semibold text-[#132219]">Belum Ada Pengembalian BMN</div>
-                                    <p class="text-xs text-[#62756A]">Belum ada data penyerahan kembali aset inventaris yang tercatat.</p>
+                                    <div class="text-sm font-semibold text-[#132219]">Belum Ada Berita Acara Pengembalian</div>
+                                    <p class="text-xs text-[#62756A]">Dokumen Berita Acara diterbitkan secara otomatis setelah Pengajuan Pengembalian disetujui oleh Pengelola BMN.</p>
                                     <a
-                                        href="{{ route('pengembalians.create') }}"
+                                        href="{{ route('pengajuan-pengembalian.index') }}"
                                         class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#163828] text-white rounded-lg text-xs font-semibold hover:bg-[#1E4834] transition shadow-2xs"
                                     >
-                                        + Ajukan Pengembalian Baru
+                                        Lihat Daftar Pengajuan Pengembalian &rarr;
                                     </a>
                                 </div>
                             </td>

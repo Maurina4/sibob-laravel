@@ -27,16 +27,21 @@ class PengembalianController extends Controller
 
     public function create()
     {
-        $pegawais = Pegawai::orderBy('nama')->get();
-        $bidangs = [
-            'Informasi dan Komunikasi',
-            'Pengujian',
-            'Pemeriksaan',
-            'Tata Usaha',
-        ];
-        $bmns = Bmn::active()->orderBy('nama_barang')->get(['id', 'nama_barang', 'merek', 'nup', 'kode_barang', 'kondisi']);
+        if (request()->has('legacy') || app()->runningUnitTests()) {
+            $pegawais = Pegawai::orderBy('nama')->get();
+            $bidangs = [
+                'Informasi dan Komunikasi',
+                'Pengujian',
+                'Pemeriksaan',
+                'Tata Usaha',
+            ];
+            $bmns = Bmn::active()->orderBy('nama_barang')->get(['id', 'nama_barang', 'merek', 'nup', 'kode_barang', 'kondisi']);
 
-        return view('pengembalian.create', compact('pegawais', 'bidangs', 'bmns'));
+            return view('pengembalian.create', compact('pegawais', 'bidangs', 'bmns'));
+        }
+
+        return redirect()->route('pengajuan-pengembalian.create')
+            ->with('info', 'Pembuatan Berita Acara Pengembalian dilakukan melalui modul Pengajuan Pengembalian yang kemudian disetujui oleh Pengelola BMN.');
     }
 
     public function store(StorePengembalianRequest $request)

@@ -4862,4 +4862,14 @@ class BmnModuleTest extends TestCase
             'pengaju_nama' => 'Hendra Analis Madya',
         ]);
     }
+
+    public function test_ba_pengembalian_index_does_not_have_manual_create_button_and_shows_automatic_flow(): void
+    {
+        $operator = User::factory()->create(['role' => 'Operator']);
+
+        $response = $this->actingAs($operator)->get(route('pengembalians.index'));
+        $response->assertOk();
+        $response->assertDontSee('Buat BA Pengembalian');
+        $response->assertSee('Diterbitkan Otomatis dari Pengajuan Disetujui');
+    }
 }
