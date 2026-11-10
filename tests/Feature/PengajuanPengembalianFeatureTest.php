@@ -390,13 +390,24 @@ class PengajuanPengembalianFeatureTest extends TestCase
 
         $response = $this->actingAs($this->operator)->post(route('admin.pengajuan-pengembalian.setujui', $pengajuan));
 
-        $response->assertRedirect(route('admin.pengajuan-pengembalian.show', $pengajuan));
+        $response->assertRedirect(route('pengembalians.index'));
 
         $pengajuan->refresh();
         $this->assertEquals('disetujui', $pengajuan->status);
         $this->assertEquals($this->operator->id, $pengajuan->disetujui_oleh);
         $this->assertNotNull($pengajuan->disetujui_pada);
         $this->assertStringStartsWith('BA-PGM/', $pengajuan->nomor_ba);
+
+        // Verifikasi otomatis tercatat di BA Pengembalian
+        $this->assertDatabaseHas('pengembalians', [
+            'pengajuan_id' => $pengajuan->id,
+            'nomor_pengajuan' => $pengajuan->nomor_ba,
+            'status' => 'Disetujui',
+        ]);
+        $this->assertDatabaseHas('pengembalian_items', [
+            'bmn_id' => $bmn->id,
+            'nama_barang_snapshot' => $bmn->nama_barang,
+        ]);
 
         // Verifikasi mutasi BMN
         $bmn->refresh();
@@ -434,11 +445,18 @@ class PengajuanPengembalianFeatureTest extends TestCase
 
         $response = $this->actingAs($this->operator)->post(route('admin.pengajuan-pengembalian.setujui', $pengajuan));
 
-        $response->assertRedirect(route('admin.pengajuan-pengembalian.show', $pengajuan));
+        $response->assertRedirect(route('pengembalians.index'));
 
         $pengajuan->refresh();
         $this->assertEquals('disetujui', $pengajuan->status);
         $this->assertStringStartsWith('BA-RB/', $pengajuan->nomor_ba);
+
+        // Verifikasi otomatis tercatat di BA Pengembalian
+        $this->assertDatabaseHas('pengembalians', [
+            'pengajuan_id' => $pengajuan->id,
+            'nomor_pengajuan' => $pengajuan->nomor_ba,
+            'kondisi_pengembalian' => 'Rusak Berat',
+        ]);
 
         // Verifikasi mutasi BMN
         $bmn->refresh();
@@ -628,6 +646,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $this->assertEquals('Gudang BMN', $bmn->lokasi);
         $this->assertEquals('Rusak Berat', $bmn->kondisi);
         $this->assertTrue($bmn->is_dikembalikan);
+        $this->assertDatabaseHas('pengembalians', ['pengajuan_id' => $pengajuan->id]);
 
         // 2. Batalkan persetujuan oleh operator
         $cancelResponse = $this->actingAs($this->operator)->post(route('pengajuan-pengembalian.batalkan', $pengajuan));
@@ -641,6 +660,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $this->assertEquals('Baik', $bmn->kondisi);
         $this->assertEquals('Siti Aminah', $bmn->penanggungjawab);
         $this->assertFalse($bmn->is_dikembalikan);
+        $this->assertDatabaseMissing('pengembalians', ['pengajuan_id' => $pengajuan->id]);
 
         // Laporan Kerusakan otomatis harus ditolak / dihapus
         $item->refresh();

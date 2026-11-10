@@ -11,6 +11,7 @@ use App\Models\Lokasi;
 use App\Models\Pegawai;
 use App\Models\PengajuanPengembalian;
 use App\Models\PengajuanPengembalianItem;
+use App\Models\Pengembalian;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -296,6 +297,35 @@ class PengajuanPengembalianService
                 'disetujui_pada' => now(),
             ]);
 
+            // 5. Sinkronisasi otomatis ke Berita Acara Pengembalian (BA Pengembalian)
+            $pengembalian = Pengembalian::updateOrCreate(
+                ['pengajuan_id' => $locked->id],
+                [
+                    'nomor_pengajuan' => $nomorBa,
+                    'tanggal' => $locked->tanggal,
+                    'pengaju_id' => $locked->pegawai_id,
+                    'nama_pengaju' => $locked->nama_pegawai,
+                    'bidang' => $locked->bidang,
+                    'kondisi_pengembalian' => $locked->alasan === 'rusak_berat' ? 'Rusak Berat' : 'Baik',
+                    'status' => 'Disetujui',
+                    'dihapus' => false,
+                    'dihapus_pada' => null,
+                    'dihapus_oleh' => null,
+                ]
+            );
+
+            // Bersihkan item lama jika ada lalu isi ulang
+            $pengembalian->items()->delete();
+            foreach ($items as $item) {
+                $pengembalian->items()->create([
+                    'bmn_id' => $item->bmn_id,
+                    'nama_barang_snapshot' => $item->nama_barang,
+                    'kondisi_awal' => $item->kondisi_awal ?: 'Baik',
+                    'kondisi' => $item->kondisi ?: ($locked->alasan === 'rusak_berat' ? 'Rusak Berat' : 'Baik'),
+                    'keterangan' => $item->keterangan,
+                ]);
+            }
+
             return true;
         });
     }
@@ -438,6 +468,13 @@ class PengajuanPengembalianService
                     'nomor_ba' => null,
                     'catatan_penolakan' => 'Persetujuan dan Berita Acara ' . ($nomorBaLama ? "({$nomorBaLama}) " : '') . 'dibatalkan oleh ' . ($user->name ?? 'Operator'),
                 ]);
+
+                // Hapus sinkronisasi di BA Pengembalian
+                $pengembalianTerkait = Pengembalian::where('pengajuan_id', $locked->id)->first();
+                if ($pengembalianTerkait) {
+                    $pengembalianTerkait->items()->delete();
+                    $pengembalianTerkait->forceDelete();
+                }
 
                 return 'Persetujuan pengembalian berhasil dibatalkan. Berita Acara dicabut dan aset BMN dikembalikan ke penanggung jawab semula.';
             }

@@ -103,11 +103,18 @@
                                 {{ $pengembalians->firstItem() + $index }}
                             </td>
 
-                            {{-- NOMOR PENGAJUAN --}}
+                            {{-- NOMOR PENGAJUAN / NOMOR BA --}}
                             <td class="py-3.5 px-4">
-                                <span class="font-mono text-[11px] font-semibold text-[#163828] bg-[#EAF2ED] px-2 py-0.5 rounded border border-[#D5E5DA]">
-                                    {{ $pengembalian->nomor_pengajuan }}
-                                </span>
+                                <div class="space-y-0.5">
+                                    <span class="font-mono text-[11px] font-semibold text-[#163828] bg-[#EAF2ED] px-2 py-0.5 rounded border border-[#D5E5DA] inline-block">
+                                        {{ $pengembalian->nomor_pengajuan }}
+                                    </span>
+                                    @if ($pengembalian->pengajuan && $pengembalian->pengajuan->nomor_pengajuan !== $pengembalian->nomor_pengajuan)
+                                        <div class="text-[10px] text-[#62756A] font-mono">
+                                            Ref: {{ $pengembalian->pengajuan->nomor_pengajuan }}
+                                        </div>
+                                    @endif
+                                </div>
                             </td>
 
                             {{-- TANGGAL --}}
@@ -226,8 +233,13 @@
                                     </a>
 
                                     {{-- CETAK --}}
+                                    @php
+                                        $printUrl = $pengembalian->pengajuan_id
+                                            ? route('pengajuan-pengembalian.cetak-ba', $pengembalian->pengajuan_id)
+                                            : route('pengembalians.print', $pengembalian);
+                                    @endphp
                                     <a
-                                        href="{{ route('pengembalians.print', $pengembalian) }}"
+                                        href="{{ $printUrl }}"
                                         target="_blank"
                                         class="p-1.5 text-[#4D6357] hover:text-[#163828] hover:bg-[#EAF2ED] rounded-lg transition"
                                         title="Cetak Berita Acara"

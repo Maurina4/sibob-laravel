@@ -39,12 +39,14 @@ class PengajuanPengembalianController extends Controller
 
             if ($request->filled('redirect_to')) {
                 return redirect($request->input('redirect_to'))
-                    ->with('success', 'Pengajuan pengembalian berhasil disetujui. Berita Acara resmi telah diterbitkan dan data barang telah diperbarui.');
+                    ->with('success', 'Pengajuan pengembalian berhasil disetujui. Berita Acara resmi telah diterbitkan dan langsung masuk ke BA Pengembalian.');
             }
 
+            $nomorBa = $pengajuanPengembalian->fresh()->nomor_ba;
+
             return redirect()
-                ->route('admin.pengajuan-pengembalian.show', $pengajuanPengembalian)
-                ->with('success', 'Pengajuan pengembalian berhasil disetujui. Berita Acara resmi telah diterbitkan dan data barang telah diperbarui.');
+                ->route('pengembalians.index')
+                ->with('success', "Pengajuan pengembalian berhasil disetujui. Berita Acara resmi ({$nomorBa}) telah diterbitkan dan langsung masuk ke BA Pengembalian.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

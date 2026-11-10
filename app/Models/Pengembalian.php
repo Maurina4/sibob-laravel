@@ -16,6 +16,7 @@ class Pengembalian extends Model
     protected $table = 'pengembalians';
 
     protected $fillable = [
+        'pengajuan_id',
         'nomor_pengajuan',
         'tanggal',
         'pengaju_id',
@@ -45,6 +46,11 @@ class Pengembalian extends Model
         return $this->belongsTo(Pegawai::class, 'pengaju_id');
     }
 
+    public function pengajuan(): BelongsTo
+    {
+        return $this->belongsTo(PengajuanPengembalian::class, 'pengajuan_id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->whereNull('deleted_at')->where('dihapus', false);
@@ -62,6 +68,9 @@ class Pengembalian extends Model
                 $q->where('nomor_pengajuan', 'like', "%{$search}%")
                     ->orWhere('nama_pengaju', 'like', "%{$search}%")
                     ->orWhere('bidang', 'like', "%{$search}%")
+                    ->orWhereHas('pengajuan', function (Builder $pq) use ($search) {
+                        $pq->where('nomor_pengajuan', 'like', "%{$search}%");
+                    })
                     ->orWhereHas('items', function (Builder $iq) use ($search, $concatExpr) {
                         $iq->where('nama_barang_snapshot', 'like', "%{$search}%")
                             ->orWhere('keterangan', 'like', "%{$search}%")

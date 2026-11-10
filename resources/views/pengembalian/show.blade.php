@@ -23,14 +23,27 @@
                 <span class="font-mono text-xs font-semibold text-[#163828] bg-[#EAF2ED] px-2.5 py-1 rounded-lg border border-[#D5E5DA]">
                     {{ $pengembalian->nomor_pengajuan }}
                 </span>
+                @if ($pengembalian->pengajuan)
+                    <a
+                        href="{{ route('admin.pengajuan-pengembalian.show', $pengembalian->pengajuan) }}"
+                        class="text-[11px] font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition"
+                    >
+                        Ref Pengajuan: {{ $pengembalian->pengajuan->nomor_pengajuan }} &rarr;
+                    </a>
+                @endif
             </div>
             <p class="text-xs text-[#62756A] mt-0.5">Dokumen resmi penyerahan kembali aset Barang Milik Negara ke Subbag Tata Usaha BBPOM di Banjarbaru.</p>
         </div>
 
         <div class="flex items-center gap-2 shrink-0 flex-wrap">
             {{-- TOMBOL CETAK BA --}}
+            @php
+                $printUrl = $pengembalian->pengajuan_id
+                    ? route('pengajuan-pengembalian.cetak-ba', $pengembalian->pengajuan_id)
+                    : route('pengembalians.print', $pengembalian);
+            @endphp
             <a
-                href="{{ route('pengembalians.print', $pengembalian) }}"
+                href="{{ $printUrl }}"
                 target="_blank"
                 class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#132219] rounded-xl text-xs font-semibold shadow-2xs transition"
                 title="Cetak Berita Acara Pengembalian BMN"

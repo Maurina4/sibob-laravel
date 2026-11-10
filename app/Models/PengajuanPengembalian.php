@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PengajuanPengembalian extends Model
@@ -55,6 +56,11 @@ class PengajuanPengembalian extends Model
     public function penyetujuUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'disetujui_oleh');
+    }
+
+    public function pengembalian(): HasOne
+    {
+        return $this->hasOne(Pengembalian::class, 'pengajuan_id');
     }
 
     public function scopeMilikhak(Builder $query, int $userId): Builder
