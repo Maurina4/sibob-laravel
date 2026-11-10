@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnDokumen;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
@@ -331,6 +332,7 @@ class BmnService
 
         $createTik = false;
         $createLab = false;
+        $createAngkutan = false;
 
         if ($isPureTik && $isLab) {
             $standarJenis = 'BMN-TIK & LAB';
@@ -345,6 +347,10 @@ class BmnService
             $standarJenis = 'BMN-LAB';
             $kategoriId = 2;
             $createLab = true;
+        } elseif (str_contains($rawJenis, 'ANGKUTAN') || str_contains($rawJenis, 'KENDARAAN') || ! empty($validated['no_polisi'])) {
+            $standarJenis = 'BMN-ANGKUTAN';
+            $kategoriId = 1;
+            $createAngkutan = true;
         } else {
             $standarJenis = 'BMN-NON TIK';
             $kategoriId = 1;
@@ -389,6 +395,7 @@ class BmnService
             'no_seri' => $validated['no_seri'] ?? null,
             'nama_barang' => $validated['nama_barang'],
             'merek' => $validated['merek'] ?? null,
+            'no_polisi' => $validated['no_polisi'] ?? null,
             'tahun_perolehan' => $validated['tahun_perolehan'] ?? null,
             'nilai_perolehan' => $validated['nilai_perolehan'] ?? null,
             'tanggal_terima' => $validated['tanggal_terima'] ?? null,
@@ -441,6 +448,23 @@ class BmnService
                 'penanggungjawab' => $bmn->penanggungjawab,
                 'kondisi' => $bmn->kondisi ?? 'Baik',
                 'status_kalibrasi' => 'Belum Dikalibrasi',
+                'dihapus' => false,
+            ]);
+        }
+
+        if ($createAngkutan) {
+            BmnAngkutan::create([
+                'bmn_id' => $bmn->id,
+                'kode_barang' => $bmn->kode_barang,
+                'nup' => (int) $bmn->nup,
+                'nama_barang' => $bmn->nama_barang,
+                'merek' => $bmn->merek,
+                'no_polisi' => $bmn->no_polisi,
+                'tahun_perolehan' => $bmn->tahun_perolehan,
+                'nilai_perolehan' => $bmn->nilai_perolehan,
+                'lokasi' => $bmn->lokasi,
+                'penanggungjawab' => $bmn->penanggungjawab,
+                'kondisi' => $bmn->kondisi ?? 'Baik',
                 'dihapus' => false,
             ]);
         }
