@@ -92,7 +92,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
         static $counter = 1;
 
         return PengajuanPengembalian::create(array_merge([
-            'nomor_pengajuan' => 'PGM-'.now()->format('Ymd').'-'.str_pad((string) $counter++, 3, '0', STR_PAD_LEFT),
+            'nomor_pengajuan' => 'BMN-'.now()->format('Y').str_pad((string) $counter++, 4, '0', STR_PAD_LEFT),
             'diajukan_oleh' => $this->regularUser->id,
             'pegawai_id' => $this->pegawaiUser->id,
             'nama_pegawai' => $this->regularUser->name,
@@ -113,14 +113,14 @@ class PengajuanPengembalianFeatureTest extends TestCase
     public function test_user_can_view_only_their_own_pengajuan(): void
     {
         $this->createPengajuan([
-            'nomor_pengajuan' => 'PGM-20261101-001',
+            'nomor_pengajuan' => 'BMN-20260001',
             'diajukan_oleh' => $this->regularUser->id,
             'nama_pegawai' => $this->regularUser->name,
             'bidang' => 'Pengujian',
         ]);
 
         $this->createPengajuan([
-            'nomor_pengajuan' => 'PGM-20261101-002',
+            'nomor_pengajuan' => 'BMN-20260002',
             'diajukan_oleh' => $this->otherUser->id,
             'nama_pegawai' => $this->otherUser->name,
             'bidang' => 'Tata Usaha',
@@ -129,8 +129,8 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $response = $this->actingAs($this->regularUser)->get(route('pengajuan-pengembalian.index'));
 
         $response->assertOk();
-        $response->assertSee('PGM-20261101-001');
-        $response->assertDontSee('PGM-20261101-002');
+        $response->assertSee('BMN-20260001');
+        $response->assertDontSee('BMN-20260002');
     }
 
     public function test_regular_user_cannot_access_admin_verifikasi(): void
@@ -149,7 +149,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
     public function test_operator_can_see_incoming_pengembalian_and_terima_button_on_main_index(): void
     {
         $pengajuan = $this->createPengajuan([
-            'nomor_pengajuan' => 'PGM-20261109-777',
+            'nomor_pengajuan' => 'BMN-20260777',
             'diajukan_oleh' => $this->regularUser->id,
             'nama_pegawai' => $this->regularUser->name,
             'bidang' => 'Tata Usaha',
@@ -158,7 +158,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
 
         $response = $this->actingAs($this->operator)->get(route('pengajuan-pengembalian.index'));
         $response->assertOk();
-        $response->assertSee('PGM-20261109-777');
+        $response->assertSee('BMN-20260777');
         $response->assertSee('Terima');
         $response->assertSee(route('admin.pengajuan-pengembalian.show', $pengajuan));
     }
@@ -166,7 +166,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
     public function test_operator_visiting_user_show_is_redirected_to_admin_verification(): void
     {
         $pengajuan = $this->createPengajuan([
-            'nomor_pengajuan' => 'PGM-20261109-888',
+            'nomor_pengajuan' => 'BMN-20260888',
             'diajukan_oleh' => $this->regularUser->id,
             'nama_pegawai' => $this->regularUser->name,
             'bidang' => 'Tata Usaha',
@@ -206,7 +206,8 @@ class PengajuanPengembalianFeatureTest extends TestCase
         ]);
 
         $pengajuan = PengajuanPengembalian::latest('id')->first();
-        $this->assertStringStartsWith('PGM-', $pengajuan->nomor_pengajuan);
+        $this->assertStringStartsWith('BMN-', $pengajuan->nomor_pengajuan);
+        $this->assertMatchesRegularExpression('/^BMN-\d{4}\d{4}$/', $pengajuan->nomor_pengajuan);
 
         $this->assertDatabaseHas('pengajuan_pengembalian_items', [
             'pengajuan_id' => $pengajuan->id,

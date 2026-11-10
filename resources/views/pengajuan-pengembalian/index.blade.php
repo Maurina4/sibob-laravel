@@ -85,7 +85,7 @@
                         type="text"
                         name="search"
                         value="{{ request('search') }}"
-                        placeholder="Cari SIPANDA / No. BA..."
+                        placeholder="Cari No. Pengajuan / SIPANDA / No. BA..."
                         class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828]"
                     >
                     <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">

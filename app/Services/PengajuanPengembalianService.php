@@ -112,13 +112,15 @@ class PengajuanPengembalianService
         return DB::transaction(function () use ($validated, $user) {
             $pegawai = Pegawai::where('nama', $user->name)->first();
 
-            $prefix = 'PGM';
-            $datePart = now()->format('Ymd');
-            $countToday = PengajuanPengembalian::where('nomor_pengajuan', 'like', "{$prefix}-{$datePart}-%")->count() + 1;
-            $nomorPengajuan = "{$prefix}-{$datePart}-".str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
-            while (PengajuanPengembalian::where('nomor_pengajuan', $nomorPengajuan)->exists()) {
-                $countToday++;
-                $nomorPengajuan = "{$prefix}-{$datePart}-".str_pad((string) $countToday, 3, '0', STR_PAD_LEFT);
+            $year = ! empty($validated['tanggal']) ? date('Y', strtotime($validated['tanggal'])) : now()->format('Y');
+            $prefix = "BMN-{$year}";
+            $countThisYear = PengajuanPengembalian::withTrashed()
+                ->where('nomor_pengajuan', 'like', "{$prefix}%")
+                ->count() + 1;
+            $nomorPengajuan = "{$prefix}".str_pad((string) $countThisYear, 4, '0', STR_PAD_LEFT);
+            while (PengajuanPengembalian::withTrashed()->where('nomor_pengajuan', $nomorPengajuan)->exists()) {
+                $countThisYear++;
+                $nomorPengajuan = "{$prefix}".str_pad((string) $countThisYear, 4, '0', STR_PAD_LEFT);
             }
 
             $pengajuan = PengajuanPengembalian::create([

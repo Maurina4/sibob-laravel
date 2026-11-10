@@ -67,7 +67,8 @@ class PengajuanPengembalian extends Model
         if (! empty($filters['search'])) {
             $search = trim($filters['search']);
             $query->where(function (Builder $q) use ($search) {
-                $q->where('nomor_sipanda', 'like', "%{$search}%")
+                $q->where('nomor_pengajuan', 'like', "%{$search}%")
+                    ->orWhere('nomor_sipanda', 'like', "%{$search}%")
                     ->orWhere('nomor_ba', 'like', "%{$search}%")
                     ->orWhere('nama_pegawai', 'like', "%{$search}%")
                     ->orWhere('nip_pegawai', 'like', "%{$search}%");
