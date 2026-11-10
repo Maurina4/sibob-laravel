@@ -46,6 +46,27 @@
         {{-- ACTION BUTTONS --}}
         <div class="flex items-center gap-2">
             @if ($pengajuan->status === 'disetujui')
+                @if (auth()->check() && auth()->user()->role === 'Operator')
+                    <form
+                        method="POST"
+                        action="{{ route('pengajuan-pengembalian.batalkan', $pengajuan) }}"
+                        onsubmit="return confirm('Apakah Anda yakin ingin membatalkan persetujuan pengembalian BMN ini? Status akan diubah menjadi Dibatalkan, Berita Acara dicabut, dan aset BMN dikembalikan ke kondisi/penanggung jawab semula.')"
+                        class="inline"
+                    >
+                        @csrf
+                        <button
+                            type="submit"
+                            class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#9C322C] text-[#9C322C] hover:bg-[#FDF0EE] text-xs font-semibold transition cursor-pointer"
+                            title="Batalkan Persetujuan"
+                        >
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>Batalkan Persetujuan</span>
+                        </button>
+                    </form>
+                @endif
+
                 <a
                     href="{{ route('pengajuan-pengembalian.cetak-ba', $pengajuan) }}"
                     target="_blank"
@@ -56,9 +77,28 @@
                     </svg>
                     <span>Cetak Berita Acara</span>
                 </a>
+            @elseif ($pengajuan->status === 'dibatalkan' && ($pengajuan->diajukan_oleh === auth()->id() || (auth()->check() && auth()->user()->role === 'Operator')))
+                <form
+                    method="POST"
+                    action="{{ route('pengajuan-pengembalian.batalkan', $pengajuan) }}"
+                    onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pembatalan pengajuan ini? Status pengajuan akan kembali menjadi Diajukan.')"
+                    class="inline"
+                >
+                    @csrf
+                    <button
+                        type="submit"
+                        class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#163828] bg-[#EAF2ED] hover:bg-[#D5E6DC] text-[#163828] text-xs font-semibold transition cursor-pointer"
+                        title="Batalkan Pembatalan (Kembalikan ke Diajukan)"
+                    >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Batalkan Pembatalan (Aktifkan Kembali)</span>
+                    </button>
+                </form>
             @endif
 
-            @if ($pengajuan->status === 'diajukan' && $pengajuan->diajukan_oleh === auth()->id())
+            @if ($pengajuan->status === 'diajukan' && ($pengajuan->diajukan_oleh === auth()->id() || (auth()->check() && auth()->user()->role === 'Operator')))
                 <form
                     method="POST"
                     action="{{ route('pengajuan-pengembalian.batalkan', $pengajuan) }}"

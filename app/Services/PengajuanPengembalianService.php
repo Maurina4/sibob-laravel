@@ -324,28 +324,137 @@ class PengajuanPengembalianService
     }
 
     /**
-     * Membatalkan pengajuan oleh pemohon selama berstatus 'diajukan'.
+     * Membatalkan pengajuan (diajukan -> dibatalkan, disetujui -> dibatalkan dengan revert BMN/BA, atau dibatalkan -> diajukan kembali).
      */
-    public function batalkan(PengajuanPengembalian $pengajuan, User $user): bool
+    public function batalkan(PengajuanPengembalian $pengajuan, User $user): string
     {
         return DB::transaction(function () use ($pengajuan, $user) {
+            /** @var PengajuanPengembalian $locked */
             $locked = PengajuanPengembalian::where('id', $pengajuan->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($locked->diajukan_oleh !== $user->id && $user->role !== 'Operator') {
-                throw new Exception('Anda tidak memiliki hak untuk membatalkan pengajuan ini.');
+            // KASUS 1: Status Diajukan -> Dibatalkan
+            if ($locked->status === 'diajukan') {
+                if ($locked->diajukan_oleh !== $user->id && $user->role !== 'Operator') {
+                    throw new Exception('Anda tidak memiliki hak untuk membatalkan pengajuan ini.');
+                }
+
+                $locked->update([
+                    'status' => 'dibatalkan',
+                ]);
+
+                return 'Pengajuan pengembalian berhasil dibatalkan.';
             }
 
-            if ($locked->status !== 'diajukan') {
-                throw new Exception("Pengajuan berstatus '{$locked->status}' tidak dapat dibatalkan.");
+            // KASUS 2: Status Disetujui -> Dibatalkan (Batalkan Persetujuan & Revert BMN/BA)
+            if ($locked->status === 'disetujui') {
+                if ($user->role !== 'Operator') {
+                    throw new Exception('Hanya Operator yang berhak membatalkan persetujuan pengembalian BMN.');
+                }
+
+                $items = $locked->items()->with('bmn')->get();
+
+                foreach ($items as $item) {
+                    /** @var Bmn $bmn */
+                    $bmn = Bmn::where('id', $item->bmn_id)->lockForUpdate()->first();
+                    if (! $bmn) {
+                        continue;
+                    }
+
+                    $lokasiAsal = $item->lokasi_awal ?: 'Gudang BMN';
+                    $lokasiModel = Lokasi::where('nama', $lokasiAsal)->first();
+                    $kondisiAsal = $item->kondisi_awal ?: 'Baik';
+                    $namaPegawai = $locked->nama_pegawai;
+                    $nipPegawai = $locked->nip_pegawai ?: ($locked->pegawai?->nip ?: '-');
+                    $pegawaiId = $locked->pegawai_id;
+
+                    $bmn->update([
+                        'kondisi' => $kondisiAsal,
+                        'lokasi' => $lokasiAsal,
+                        'lokasi_id' => $lokasiModel?->id,
+                        'penanggungjawab' => $namaPegawai,
+                        'penanggungjawab_nip' => $nipPegawai,
+                        'penanggung_jawab_id' => $pegawaiId,
+                        'is_dikembalikan' => false,
+                    ]);
+
+                    // Sinkronisasi BMN-TIK
+                    if ($bmn->jenis === 'BMN-TIK' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->tik) {
+                        BmnTik::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $lokasiAsal,
+                                'penanggungjawab' => $namaPegawai,
+                                'kondisi' => $kondisiAsal,
+                                'is_dikembalikan' => false,
+                            ]);
+                    }
+
+                    // Sinkronisasi BMN-LAB
+                    if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
+                        BmnLab::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $lokasiAsal,
+                                'penanggungjawab' => $namaPegawai,
+                                'kondisi' => $kondisiAsal,
+                                'is_dikembalikan' => false,
+                            ]);
+                    }
+
+                    // Sinkronisasi BMN-ANGKUTAN
+                    if ($bmn->jenis === 'BMN-ANGKUTAN' || $bmn->angkutan) {
+                        BmnAngkutan::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $lokasiAsal,
+                                'penanggungjawab' => $namaPegawai,
+                                'kondisi' => $kondisiAsal,
+                                'is_dikembalikan' => false,
+                            ]);
+                    }
+
+                    // Hapus / tolak LaporanKerusakan jika ada
+                    if ($item->laporan_kerusakan_id) {
+                        $lk = LaporanKerusakan::find($item->laporan_kerusakan_id);
+                        if ($lk) {
+                            $lk->update([
+                                'status' => 'Ditolak',
+                                'dihapus' => true,
+                                'dihapus_pada' => now(),
+                                'dihapus_oleh' => $user->email ?? 'Operator',
+                                'tanggapan' => 'Persetujuan Berita Acara pengembalian dibatalkan oleh Operator.',
+                            ]);
+                        }
+                    }
+                }
+
+                $nomorBaLama = $locked->nomor_ba;
+                $locked->update([
+                    'status' => 'dibatalkan',
+                    'nomor_ba' => null,
+                    'catatan_penolakan' => 'Persetujuan dan Berita Acara ' . ($nomorBaLama ? "({$nomorBaLama}) " : '') . 'dibatalkan oleh ' . ($user->name ?? 'Operator'),
+                ]);
+
+                return 'Persetujuan pengembalian berhasil dibatalkan. Berita Acara dicabut dan aset BMN dikembalikan ke penanggung jawab semula.';
             }
 
-            $locked->update([
-                'status' => 'dibatalkan',
-            ]);
+            // KASUS 3: Status Dibatalkan -> Diajukan (Batalkan Pembatalan / Aktifkan Kembali)
+            if ($locked->status === 'dibatalkan') {
+                if ($locked->diajukan_oleh !== $user->id && $user->role !== 'Operator') {
+                    throw new Exception('Anda tidak memiliki hak untuk membatalkan pembatalan pengajuan ini.');
+                }
 
-            return true;
+                $locked->update([
+                    'status' => 'diajukan',
+                    'catatan_penolakan' => null,
+                ]);
+
+                return 'Pembatalan telah dibatalkan. Status pengajuan kembali menjadi Diajukan.';
+            }
+
+            throw new Exception("Pengajuan berstatus '{$locked->status}' tidak dapat dibatalkan.");
         });
     }
 }

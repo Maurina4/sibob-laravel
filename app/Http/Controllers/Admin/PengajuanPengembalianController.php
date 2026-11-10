@@ -63,6 +63,17 @@ class PengajuanPengembalianController extends Controller
         }
     }
 
+    public function batalkan(Request $request, PengajuanPengembalian $pengajuanPengembalian)
+    {
+        try {
+            $msg = $this->service->batalkan($pengajuanPengembalian, auth()->user());
+
+            return back()->with('success', $msg);
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     public function cetakBa(PengajuanPengembalian $pengajuanPengembalian)
     {
         abort_if($pengajuanPengembalian->status !== 'disetujui', 403, 'Berita Acara hanya dapat dicetak setelah pengajuan disetujui oleh pengelola BMN.');

@@ -22,6 +22,7 @@ if (config('fitur.pengajuan_pengembalian', true)) {
         Route::get('/{pengajuanPengembalian}', [AdminPengajuanPengembalianController::class, 'show'])->name('show');
         Route::post('/{pengajuanPengembalian}/setujui', [AdminPengajuanPengembalianController::class, 'setujui'])->name('setujui');
         Route::post('/{pengajuanPengembalian}/tolak', [AdminPengajuanPengembalianController::class, 'tolak'])->name('tolak');
+        Route::post('/{pengajuanPengembalian}/batalkan', [AdminPengajuanPengembalianController::class, 'batalkan'])->name('batalkan');
         Route::get('/{pengajuanPengembalian}/cetak-ba', [AdminPengajuanPengembalianController::class, 'cetakBa'])->name('cetak-ba');
     });
 }

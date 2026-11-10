@@ -587,4 +587,94 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $myEntry = collect($data)->firstWhere('id', $myBmn->id);
         $this->assertTrue($myEntry['is_mine']);
     }
+
+    public function test_operator_can_cancel_approved_pengajuan_and_reverts_bmn_assets(): void
+    {
+        $bmn = $this->createSampleBmn([
+            'ruangan' => 'Ruang Laboratorium Kimia',
+            'penanggungjawab' => 'Siti Aminah',
+            'kondisi' => 'Baik',
+            'is_dikembalikan' => false,
+        ]);
+
+        $pengajuan = $this->createPengajuan([
+            'diajukan_oleh' => $this->regularUser->id,
+            'nama_pegawai' => 'Siti Aminah',
+            'nip_pegawai' => '198501012010012001',
+            'status' => 'diajukan',
+            'alasan' => 'rusak_berat',
+        ]);
+
+        $item = PengajuanPengembalianItem::create([
+            'pengajuan_id' => $pengajuan->id,
+            'bmn_id' => $bmn->id,
+            'kode_barang' => $bmn->kode_barang,
+            'nup' => (int) $bmn->nup,
+            'nama_barang' => $bmn->nama_barang,
+            'lokasi_awal' => 'Ruang Laboratorium Kimia',
+            'kondisi_awal' => 'Baik',
+            'kondisi' => 'Rusak Berat',
+            'tanggal_temuan' => now()->toDateString(),
+            'deskripsi_kerusakan' => 'Konsleting komponen utama',
+        ]);
+
+        // 1. Setujui oleh operator
+        $this->actingAs($this->operator)->post(route('admin.pengajuan-pengembalian.setujui', $pengajuan));
+
+        $pengajuan->refresh();
+        $bmn->refresh();
+        $this->assertEquals('disetujui', $pengajuan->status);
+        $this->assertEquals('Gudang BMN', $bmn->lokasi);
+        $this->assertEquals('Rusak Berat', $bmn->kondisi);
+        $this->assertTrue($bmn->is_dikembalikan);
+
+        // 2. Batalkan persetujuan oleh operator
+        $cancelResponse = $this->actingAs($this->operator)->post(route('pengajuan-pengembalian.batalkan', $pengajuan));
+        $cancelResponse->assertSessionHas('success');
+
+        $pengajuan->refresh();
+        $bmn->refresh();
+        $this->assertEquals('dibatalkan', $pengajuan->status);
+        $this->assertNull($pengajuan->nomor_ba);
+        $this->assertEquals('Ruang Laboratorium Kimia', $bmn->lokasi);
+        $this->assertEquals('Baik', $bmn->kondisi);
+        $this->assertEquals('Siti Aminah', $bmn->penanggungjawab);
+        $this->assertFalse($bmn->is_dikembalikan);
+
+        // Laporan Kerusakan otomatis harus ditolak / dihapus
+        $item->refresh();
+        if ($item->laporan_kerusakan_id) {
+            $lk = LaporanKerusakan::find($item->laporan_kerusakan_id);
+            $this->assertTrue($lk->dihapus || $lk->status === 'Ditolak');
+        }
+    }
+
+    public function test_user_or_operator_can_uncancel_dibatalkan_pengajuan_restoring_to_diajukan(): void
+    {
+        $pengajuan = $this->createPengajuan([
+            'diajukan_oleh' => $this->regularUser->id,
+            'nama_pegawai' => $this->regularUser->name,
+            'status' => 'dibatalkan',
+        ]);
+
+        // Batalkan pembatalan (kembali ke diajukan)
+        $response = $this->actingAs($this->regularUser)->post(route('pengajuan-pengembalian.batalkan', $pengajuan));
+        $response->assertSessionHas('success');
+
+        $this->assertEquals('diajukan', $pengajuan->fresh()->status);
+    }
+
+    public function test_regular_user_cannot_cancel_approved_pengajuan(): void
+    {
+        $pengajuan = $this->createPengajuan([
+            'diajukan_oleh' => $this->regularUser->id,
+            'status' => 'disetujui',
+            'nomor_ba' => 'BA-PGM/20261110/001',
+        ]);
+
+        $response = $this->actingAs($this->regularUser)->post(route('pengajuan-pengembalian.batalkan', $pengajuan));
+        $response->assertSessionHas('error');
+
+        $this->assertEquals('disetujui', $pengajuan->fresh()->status);
+    }
 }

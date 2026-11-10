@@ -77,9 +77,9 @@ class PengajuanPengembalianController extends Controller
     public function batalkan(PengajuanPengembalian $pengajuanPengembalian)
     {
         try {
-            $this->service->batalkan($pengajuanPengembalian, auth()->user());
+            $msg = $this->service->batalkan($pengajuanPengembalian, auth()->user());
 
-            return back()->with('success', 'Pengajuan pengembalian berhasil dibatalkan.');
+            return back()->with('success', $msg);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
