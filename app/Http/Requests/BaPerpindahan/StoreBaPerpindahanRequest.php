@@ -63,12 +63,16 @@ class StoreBaPerpindahanRequest extends FormRequest
                 $pengaju = Pegawai::find($pengajuPegawaiId);
                 $pengajuNama = $pengaju?->nama;
             }
-            if (empty($pengajuNama) && empty($pengajuPegawaiId) && auth()->user()) {
+            if ((empty($pengajuNama) || empty($pengajuPegawaiId)) && auth()->user()) {
                 $matchedPegawai = Pegawai::where('nama', auth()->user()->name)
-                    ->orWhere('email', auth()->user()->email)
+                    ->orWhereRaw('LOWER(TRIM(nama)) = ?', [strtolower(trim(auth()->user()->name))])
                     ->first();
-                $pengajuNama = $matchedPegawai?->nama ?: auth()->user()->name;
-                $pengajuPegawaiId = $matchedPegawai?->id;
+                if (empty($pengajuNama)) {
+                    $pengajuNama = $matchedPegawai?->nama ?: auth()->user()->name;
+                }
+                if (empty($pengajuPegawaiId)) {
+                    $pengajuPegawaiId = $matchedPegawai?->id;
+                }
             }
 
             if (BaPerpindahan::isSamePerson($pengajuNama, $pihakKedua, $pengajuPegawaiId ? (int) $pengajuPegawaiId : null)) {

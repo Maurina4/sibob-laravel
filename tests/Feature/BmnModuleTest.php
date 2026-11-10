@@ -4507,4 +4507,113 @@ class BmnModuleTest extends TestCase
         $editResponse->assertSee('A1.01');
         $editResponse->assertSee('RUANG DISKUSI LAB KIMIA');
     }
+
+    public function test_ba_perpindahan_create_view_displays_logged_in_user_as_pengaju(): void
+    {
+        $operator = User::factory()->create([
+            'role' => 'Operator',
+            'name' => 'Maurin Operator Testing',
+            'email' => 'maurin@example.com',
+        ]);
+
+        $response = $this->actingAs($operator)->get(route('ba-perpindahan.create'));
+        $response->assertOk();
+        $response->assertSee('Maurin Operator Testing');
+        $response->assertSee('Akun Anda');
+        $response->assertSee('Otomatis disesuaikan dengan akun Anda yang sedang login');
+        $response->assertSee('name="pengaju_nama" value="Maurin Operator Testing"', false);
+    }
+
+    public function test_ba_perpindahan_store_binds_to_logged_in_user_without_pegawai_record(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'User',
+            'name' => 'Pengaju Akun Khusus',
+            'email' => 'pengaju_khusus@example.com',
+        ]);
+
+        $bmn = Bmn::create([
+            'kode_barang' => 'BMN-MUT-999',
+            'nup' => '1',
+            'nama_barang' => 'Scanner Canon Lide',
+            'lokasi' => 'Ruang Administrasi',
+            'penanggungjawab' => 'Staf Gudang',
+            'jenis' => 'BMN Umum',
+            'kondisi' => 'Baik',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('ba-perpindahan.store'), [
+            'nomor_ba' => 'BA-MUT/TEST/USER-BIND-01',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $bmn->id,
+            'nama_barang' => 'Scanner Canon Lide',
+            'dari' => 'Ruang Administrasi',
+            'ke' => 'Ruang Rapat Utama',
+            'alasan' => 'Dipindahkan untuk kebutuhan rapat',
+            'pengaju_nama' => 'Pengaju Akun Khusus',
+        ]);
+
+        $response->assertRedirect(route('ba-perpindahan.index'));
+
+        $this->assertDatabaseHas('ba_perpindahans', [
+            'nomor_ba' => 'BA-MUT/TEST/USER-BIND-01',
+            'bmn_id' => $bmn->id,
+            'pengaju_nama' => 'Pengaju Akun Khusus',
+            'pengaju_id' => $user->id,
+            'pengaju_email' => 'pengaju_khusus@example.com',
+            'pengaju_pegawai_id' => null,
+            'status' => 'Diajukan',
+        ]);
+    }
+
+    public function test_ba_perpindahan_store_binds_to_logged_in_user_with_pegawai_record(): void
+    {
+        $pegawai = Pegawai::create([
+            'nama' => 'Bambang Supriyadi, S.E.',
+            'nip' => '198501012010011005',
+            'jabatan' => 'Pengelola BMN',
+            'unit_kerja' => 'Subbag Tata Usaha',
+        ]);
+
+        $user = User::factory()->create([
+            'role' => 'Operator',
+            'name' => 'Bambang Supriyadi, S.E.',
+            'email' => 'bambang@example.com',
+        ]);
+
+        $bmn = Bmn::create([
+            'kode_barang' => 'BMN-MUT-998',
+            'nup' => '2',
+            'nama_barang' => 'Laptop Lenovo ThinkPad',
+            'lokasi' => 'Ruang Arsip',
+            'penanggungjawab' => 'Staf Arsip',
+            'jenis' => 'BMN-TIK',
+            'kondisi' => 'Baik',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('ba-perpindahan.store'), [
+            'nomor_ba' => 'BA-MUT/TEST/USER-BIND-02',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $bmn->id,
+            'nama_barang' => 'Laptop Lenovo ThinkPad',
+            'dari' => 'Ruang Arsip',
+            'ke' => 'Ruang IT',
+            'alasan' => 'Peremajaan perangkat',
+            'pengaju_nama' => 'Bambang Supriyadi, S.E.',
+            'pengaju_pegawai_id' => $pegawai->id,
+        ]);
+
+        $response->assertRedirect(route('ba-perpindahan.index'));
+
+        $this->assertDatabaseHas('ba_perpindahans', [
+            'nomor_ba' => 'BA-MUT/TEST/USER-BIND-02',
+            'bmn_id' => $bmn->id,
+            'pengaju_nama' => 'Bambang Supriyadi, S.E.',
+            'pengaju_pegawai_id' => $pegawai->id,
+            'pegawai_id' => $pegawai->id,
+            'pengaju_id' => $user->id,
+            'pengaju_email' => 'bambang@example.com',
+            'status' => 'Diajukan',
+        ]);
+    }
 }

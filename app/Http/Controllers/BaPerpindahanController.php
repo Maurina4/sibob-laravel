@@ -27,6 +27,7 @@ class BaPerpindahanController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
         $bmns = Bmn::active()
             ->orderBy('kode_barang')
             ->orderBy('nup')
@@ -34,7 +35,11 @@ class BaPerpindahanController extends Controller
         $pegawais = Pegawai::orderBy('nama')->get(['id', 'nama', 'nip', 'jabatan', 'unit_kerja']);
         $lokasis = Lokasi::orderedByGedung()->get(['id', 'kode_ruangan', 'nama']);
 
-        return view('ba-perpindahan.create', compact('bmns', 'pegawais', 'lokasis'));
+        $currentPegawai = $user ? $pegawais->first(function ($p) use ($user) {
+            return strcasecmp(trim($p->nama), trim($user->name)) === 0;
+        }) : null;
+
+        return view('ba-perpindahan.create', compact('bmns', 'pegawais', 'lokasis', 'currentPegawai'));
     }
 
     public function store(StoreBaPerpindahanRequest $request)

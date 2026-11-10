@@ -47,14 +47,16 @@ class BaPerpindahanService
             }
         }
 
-        // Resolusi Pegawai Pengaju (berelasi langsung ke tabel pegawais)
+        // Resolusi Pegawai Pengaju (berelasi langsung ke tabel pegawais / akun login)
         $pengajuPegawai = null;
         if (! empty($validated['pengaju_pegawai_id'])) {
             $pengajuPegawai = Pegawai::find($validated['pengaju_pegawai_id']);
         } elseif (! empty($validated['pegawai_id'])) {
             $pengajuPegawai = Pegawai::find($validated['pegawai_id']);
         } elseif (! empty($validated['pengaju_nama'])) {
-            $pengajuPegawai = Pegawai::where('nama', $validated['pengaju_nama'])->first();
+            $pengajuPegawai = Pegawai::where('nama', $validated['pengaju_nama'])
+                ->orWhereRaw('LOWER(TRIM(nama)) = ?', [strtolower(trim($validated['pengaju_nama']))])
+                ->first();
         }
 
         if ($pengajuPegawai) {
@@ -62,17 +64,19 @@ class BaPerpindahanService
             $validated['pegawai_id'] = $pengajuPegawai->id;
             $validated['pengaju_nama'] = $pengajuPegawai->nama;
         } elseif (! empty($validated['pengaju_nama'])) {
-            // Pengaju nama telah diberikan eksplisit
             $validated['pengaju_nama'] = $validated['pengaju_nama'];
         } else {
-            // Coba cocokkan user login dengan pegawai
-            $matchedPegawai = Pegawai::where('nama', $user?->name)->orWhere('email', $user?->email)->first();
+            // Cocokkan dari user login jika belum terisi
+            $matchedPegawai = $user ? Pegawai::where('nama', $user->name)
+                ->orWhereRaw('LOWER(TRIM(nama)) = ?', [strtolower(trim($user->name))])
+                ->first() : null;
+
             if ($matchedPegawai) {
                 $validated['pengaju_pegawai_id'] = $matchedPegawai->id;
                 $validated['pegawai_id'] = $matchedPegawai->id;
                 $validated['pengaju_nama'] = $matchedPegawai->nama;
             } elseif (! empty($validated['pihak_pertama'])) {
-                // Fallback untuk backward compatibility jika tidak ada pengaju eksplisit
+                // Fallback backward compatibility
                 $validated['pengaju_nama'] = $validated['pihak_pertama'];
                 $validated['pengaju_pegawai_id'] = $validated['pihak_pertama_id'] ?? null;
                 $validated['pegawai_id'] = $validated['pihak_pertama_id'] ?? null;
