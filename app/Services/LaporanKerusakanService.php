@@ -31,28 +31,42 @@ class LaporanKerusakanService
         $validated['pelapor_id'] = $user?->id;
         $validated['status'] = $validated['status'] ?? 'Dilaporkan';
 
-        if (! empty($validated['pelapor_pegawai_id'])) {
-            $pegawai = Pegawai::find($validated['pelapor_pegawai_id']);
-            if ($pegawai) {
-                $validated['pelapor_nama'] = $pegawai->nama;
+        if ($user && $user->role !== 'Operator') {
+            $userPegawai = $user->pegawai ?? Pegawai::where('nama', $user->name)->first();
+            if ($userPegawai) {
+                $validated['pelapor_pegawai_id'] = $userPegawai->id;
+                $validated['pelapor_nama'] = $userPegawai->nama;
+            } else {
+                $validated['pelapor_nama'] = $user->name;
             }
-        }
-
-        if (empty($validated['pelapor_nama'])) {
-            $validated['pelapor_nama'] = $user?->name;
-        }
-        if (empty($validated['pelapor_email'])) {
-            $validated['pelapor_email'] = $user?->email;
-        }
-
-        if (empty($validated['pelapor_pegawai_id']) && $user) {
-            $pegawai = Pegawai::where('nama', $user->name)->first();
-            if ($pegawai) {
-                $validated['pelapor_pegawai_id'] = $pegawai->id;
-                if (empty($validated['pelapor_nama'])) {
+        } else {
+            if (! empty($validated['pelapor_pegawai_id'])) {
+                $pegawai = Pegawai::find($validated['pelapor_pegawai_id']);
+                if ($pegawai) {
                     $validated['pelapor_nama'] = $pegawai->nama;
                 }
             }
+
+            if (empty($validated['pelapor_nama'])) {
+                $validated['pelapor_nama'] = $user?->name;
+            }
+            if (empty($validated['pelapor_email'])) {
+                $validated['pelapor_email'] = $user?->email;
+            }
+
+            if (empty($validated['pelapor_pegawai_id']) && $user) {
+                $pegawai = $user->pegawai ?? Pegawai::where('nama', $user->name)->first();
+                if ($pegawai) {
+                    $validated['pelapor_pegawai_id'] = $pegawai->id;
+                    if (empty($validated['pelapor_nama'])) {
+                        $validated['pelapor_nama'] = $pegawai->nama;
+                    }
+                }
+            }
+        }
+
+        if (empty($validated['pelapor_email']) && $user) {
+            $validated['pelapor_email'] = $user->email;
         }
 
         if (! empty($validated['lokasi'])) {

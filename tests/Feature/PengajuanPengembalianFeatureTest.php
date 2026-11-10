@@ -597,9 +597,10 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $data = $response->json();
 
         // Monitor Samsung yang sedang pending TIDAK boleh muncul
+        // BMN milik orang lain TIDAK boleh muncul untuk user biasa
         $bmnIds = array_column($data, 'id');
         $this->assertContains($myBmn->id, $bmnIds);
-        $this->assertContains($otherBmn->id, $bmnIds);
+        $this->assertNotContains($otherBmn->id, $bmnIds);
         $this->assertNotContains($pendingBmn->id, $bmnIds);
 
         // BMN milik saya memiliki is_mine = true

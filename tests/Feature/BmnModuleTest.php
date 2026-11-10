@@ -1290,7 +1290,7 @@ class BmnModuleTest extends TestCase
 
     public function test_ba_perpindahan_auto_fills_pihak_pertama_from_selected_bmn(): void
     {
-        $user = User::factory()->create(['role' => 'User']);
+        $user = User::factory()->create(['role' => 'User', 'name' => 'Sri Wahyuni, S.Farm']);
         $pegawai = Pegawai::create([
             'nama' => 'Sri Wahyuni, S.Farm',
             'nip' => '199002022015022001',
@@ -4002,7 +4002,7 @@ class BmnModuleTest extends TestCase
     public function test_bmn_kondisi_automatically_updates_when_laporan_kerusakan_is_accepted_and_restores_on_complete(): void
     {
         $operator = User::factory()->create(['role' => 'Operator']);
-        $user = User::factory()->create(['role' => 'User']);
+        $user = User::factory()->create(['role' => 'User', 'name' => 'Staff IT']);
 
         $bmn = Bmn::create([
             'kode_barang' => 'TEST-BMN-SYNC-01',
@@ -4544,7 +4544,7 @@ class BmnModuleTest extends TestCase
             'nup' => '1',
             'nama_barang' => 'Scanner Canon Lide',
             'lokasi' => 'Ruang Administrasi',
-            'penanggungjawab' => 'Staf Gudang',
+            'penanggungjawab' => 'Pengaju Akun Khusus',
             'jenis' => 'BMN Umum',
             'kondisi' => 'Baik',
         ]);
@@ -4621,6 +4621,245 @@ class BmnModuleTest extends TestCase
             'pengaju_id' => $user->id,
             'pengaju_email' => 'bambang@example.com',
             'status' => 'Diajukan',
+        ]);
+    }
+
+    public function test_user_can_only_see_their_own_bmn_in_three_transaction_modules(): void
+    {
+        $pegawaiUser = Pegawai::create([
+            'nama' => 'Rina Staff Laboratorium',
+            'nip' => '199304152019032005',
+            'jabatan' => 'Pranata Lab',
+            'unit_kerja' => 'Laboratorium Mikrobiologi',
+        ]);
+
+        $user = User::factory()->create([
+            'role' => 'User',
+            'name' => 'Rina Staff Laboratorium',
+            'email' => 'rina@pom.go.id',
+        ]);
+
+        // BMN milik user Rina
+        $myBmn = Bmn::create([
+            'kode_barang' => 'BMN-OWNED-01',
+            'nup' => '1',
+            'nama_barang' => 'Autoclave Portable Mikrobiologi',
+            'lokasi' => 'Ruang Lab Mikrobiologi',
+            'penanggungjawab' => 'Rina Staff Laboratorium',
+            'penanggung_jawab_id' => $pegawaiUser->id,
+            'penanggungjawab_nip' => $pegawaiUser->nip,
+            'jenis' => 'BMN Lab',
+            'kondisi' => 'Baik',
+        ]);
+
+        // BMN milik orang lain
+        $otherBmn = Bmn::create([
+            'kode_barang' => 'BMN-OTHER-01',
+            'nup' => '2',
+            'nama_barang' => 'Komputer Server TIK',
+            'lokasi' => 'Ruang Server TIK',
+            'penanggungjawab' => 'Staff TIK Lain',
+            'jenis' => 'BMN-TIK',
+            'kondisi' => 'Baik',
+        ]);
+
+        // 1. Pengajuan Pengembalian create view
+        $resPengembalian = $this->actingAs($user)->get(route('pengajuan-pengembalian.create'));
+        $resPengembalian->assertOk();
+        $bmnsPengembalian = $resPengembalian->viewData('initialBmns');
+        $this->assertTrue($bmnsPengembalian->contains('id', $myBmn->id));
+        $this->assertFalse($bmnsPengembalian->contains('id', $otherBmn->id));
+
+        // 2. Laporan Kerusakan create view
+        $resKerusakan = $this->actingAs($user)->get(route('laporan-kerusakan.create'));
+        $resKerusakan->assertOk();
+        $bmnsKerusakan = $resKerusakan->viewData('bmns');
+        $this->assertTrue($bmnsKerusakan->contains('id', $myBmn->id));
+        $this->assertFalse($bmnsKerusakan->contains('id', $otherBmn->id));
+        $resKerusakan->assertSee('Rina Staff Laboratorium');
+        $resKerusakan->assertSee('199304152019032005');
+
+        // 3. BA Perpindahan create view
+        $resPerpindahan = $this->actingAs($user)->get(route('ba-perpindahan.create'));
+        $resPerpindahan->assertOk();
+        $bmnsPerpindahan = $resPerpindahan->viewData('bmns');
+        $this->assertTrue($bmnsPerpindahan->contains('id', $myBmn->id));
+        $this->assertFalse($bmnsPerpindahan->contains('id', $otherBmn->id));
+        $resPerpindahan->assertSee('Rina Staff Laboratorium');
+        $resPerpindahan->assertSee('199304152019032005');
+    }
+
+    public function test_user_cannot_submit_transactions_for_bmn_owned_by_others(): void
+    {
+        $pegawaiUser = Pegawai::create([
+            'nama' => 'Joko Petugas Biasa',
+            'nip' => '199105202015031002',
+            'jabatan' => 'Petugas Administrasi',
+            'unit_kerja' => 'Tata Usaha',
+        ]);
+
+        $user = User::factory()->create([
+            'role' => 'User',
+            'name' => 'Joko Petugas Biasa',
+            'email' => 'joko@pom.go.id',
+        ]);
+
+        $otherPegawai = Pegawai::create([
+            'nama' => 'Drs. Kepala Balai, Apt.',
+            'nip' => '197001011995031001',
+            'jabatan' => 'Kepala Balai',
+        ]);
+
+        // BMN milik orang lain
+        $otherBmn = Bmn::create([
+            'kode_barang' => 'BMN-OTHER-02',
+            'nup' => '1',
+            'nama_barang' => 'Mobil Dinas Pimpinan',
+            'lokasi' => 'Garasi',
+            'penanggungjawab' => 'Drs. Kepala Balai, Apt.',
+            'penanggung_jawab_id' => $otherPegawai->id,
+            'jenis' => 'BMN Angkutan',
+            'kondisi' => 'Baik',
+        ]);
+
+        // A. Pengajuan Pengembalian ditolak
+        $resPengembalian = $this->actingAs($user)->post(route('pengajuan-pengembalian.store'), [
+            'alasan' => 'pengembalian_biasa',
+            'bidang' => 'Tata Usaha',
+            'tanggal' => now()->toDateString(),
+            'items' => [
+                ['bmn_id' => $otherBmn->id],
+            ],
+        ]);
+        $resPengembalian->assertSessionHasErrors(['items.0.bmn_id']);
+
+        // B. Laporan Kerusakan ditolak
+        $resKerusakan = $this->actingAs($user)->post(route('laporan-kerusakan.store'), [
+            'nomor' => 'LK/DENIED/001',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $otherBmn->id,
+            'nama_barang' => 'Mobil Dinas Pimpinan',
+            'lokasi' => 'Garasi',
+            'tingkat' => 'Rusak Berat',
+            'deskripsi' => 'Kerusakan transmisi berat',
+        ]);
+        $resKerusakan->assertSessionHasErrors(['bmn_id']);
+
+        // C. BA Perpindahan ditolak
+        $resPerpindahan = $this->actingAs($user)->post(route('ba-perpindahan.store'), [
+            'nomor_ba' => 'BA-MUT/DENIED/001',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $otherBmn->id,
+            'nama_barang' => 'Mobil Dinas Pimpinan',
+            'dari' => 'Garasi',
+            'ke' => 'Bengkel',
+            'alasan' => 'Pindah kendaraan',
+        ]);
+        $resPerpindahan->assertSessionHasErrors(['bmn_id']);
+    }
+
+    public function test_user_can_successfully_submit_all_three_modules_for_their_own_bmn_with_nip(): void
+    {
+        $pegawaiUser = Pegawai::create([
+            'nama' => 'Hendra Analis Madya',
+            'nip' => '198603122009021003',
+            'jabatan' => 'Analis Kebijakan',
+            'unit_kerja' => 'Tata Usaha',
+        ]);
+
+        $user = User::factory()->create([
+            'role' => 'User',
+            'name' => 'Hendra Analis Madya',
+            'email' => 'hendra@pom.go.id',
+        ]);
+
+        $bmn1 = Bmn::create([
+            'kode_barang' => 'BMN-HND-01',
+            'nup' => '1',
+            'nama_barang' => 'Laptop Kedinasan Hendra',
+            'lokasi' => 'Ruang TU',
+            'penanggungjawab' => 'Hendra Analis Madya',
+            'penanggung_jawab_id' => $pegawaiUser->id,
+            'penanggungjawab_nip' => $pegawaiUser->nip,
+            'jenis' => 'BMN-TIK',
+            'kondisi' => 'Baik',
+        ]);
+
+        $bmn2 = Bmn::create([
+            'kode_barang' => 'BMN-HND-02',
+            'nup' => '2',
+            'nama_barang' => 'Printer Meja Hendra',
+            'lokasi' => 'Ruang TU',
+            'penanggungjawab' => 'Hendra Analis Madya',
+            'penanggung_jawab_id' => $pegawaiUser->id,
+            'penanggungjawab_nip' => $pegawaiUser->nip,
+            'jenis' => 'BMN Umum',
+            'kondisi' => 'Baik',
+        ]);
+
+        $bmn3 = Bmn::create([
+            'kode_barang' => 'BMN-HND-03',
+            'nup' => '3',
+            'nama_barang' => 'Scanner Dokumen Hendra',
+            'lokasi' => 'Ruang TU',
+            'penanggungjawab' => 'Hendra Analis Madya',
+            'penanggung_jawab_id' => $pegawaiUser->id,
+            'penanggungjawab_nip' => $pegawaiUser->nip,
+            'jenis' => 'BMN Umum',
+            'kondisi' => 'Baik',
+        ]);
+
+        // 1. Pengajuan Pengembalian
+        $resPengembalian = $this->actingAs($user)->post(route('pengajuan-pengembalian.store'), [
+            'alasan' => 'pengembalian_biasa',
+            'bidang' => 'Tata Usaha',
+            'tanggal' => now()->toDateString(),
+            'items' => [
+                ['bmn_id' => $bmn1->id],
+            ],
+        ]);
+        $resPengembalian->assertRedirect();
+        $this->assertDatabaseHas('pengajuan_pengembalians', [
+            'diajukan_oleh' => $user->id,
+            'pegawai_id' => $pegawaiUser->id,
+            'nama_pegawai' => 'Hendra Analis Madya',
+            'nip_pegawai' => '198603122009021003',
+        ]);
+
+        // 2. Laporan Kerusakan
+        $resKerusakan = $this->actingAs($user)->post(route('laporan-kerusakan.store'), [
+            'nomor' => 'LK/HND/001',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $bmn2->id,
+            'nama_barang' => 'Printer Meja Hendra',
+            'lokasi' => 'Ruang TU',
+            'tingkat' => 'Rusak Berat',
+            'deskripsi' => 'Kerusakan mekanik roller',
+        ]);
+        $resKerusakan->assertRedirect(route('laporan-kerusakan.index'));
+        $this->assertDatabaseHas('laporan_kerusakans', [
+            'bmn_id' => $bmn2->id,
+            'pelapor_id' => $user->id,
+            'pelapor_pegawai_id' => $pegawaiUser->id,
+            'pelapor_nama' => 'Hendra Analis Madya',
+        ]);
+
+        // 3. BA Perpindahan
+        $resPerpindahan = $this->actingAs($user)->post(route('ba-perpindahan.store'), [
+            'nomor_ba' => 'BA-MUT/HND/001',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $bmn3->id,
+            'nama_barang' => 'Scanner Dokumen Hendra',
+            'dari' => 'Ruang TU',
+            'ke' => 'Ruang Keuangan',
+            'alasan' => 'Dipindahtugaskan',
+        ]);
+        $resPerpindahan->assertRedirect(route('ba-perpindahan.index'));
+        $this->assertDatabaseHas('ba_perpindahans', [
+            'bmn_id' => $bmn3->id,
+            'pengaju_id' => $user->id,
+            'pengaju_pegawai_id' => $pegawaiUser->id,
+            'pengaju_nama' => 'Hendra Analis Madya',
         ]);
     }
 }

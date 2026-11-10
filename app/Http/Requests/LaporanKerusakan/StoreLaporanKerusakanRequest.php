@@ -38,6 +38,19 @@ class StoreLaporanKerusakanRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $user = auth()->user();
+            if ($user && $user->role !== 'Operator' && $this->filled('bmn_id')) {
+                $bmn = \App\Models\Bmn::find($this->input('bmn_id'));
+                if ($bmn && ! $bmn->isOwnedBy($user, false, $this->input('pelapor_pegawai_id') ? (int) $this->input('pelapor_pegawai_id') : null)) {
+                    $validator->errors()->add('bmn_id', 'Anda hanya dapat melaporkan kerusakan untuk BMN yang menjadi tanggung jawab Anda.');
+                }
+            }
+        });
+    }
+
     public function messages(): array
     {
         return [

@@ -26,13 +26,23 @@ class LaporanKerusakanController extends Controller
 
     public function create()
     {
-        $bmns = Bmn::active()
+        $user = auth()->user();
+        $bmnQuery = Bmn::active()
             ->orderBy('kode_barang')
-            ->orderBy('nup')
-            ->get(['id', 'kode_barang', 'nup', 'nama_barang', 'lokasi', 'lokasi_id']);
+            ->orderBy('nup');
+
+        if ($user && $user->role !== 'Operator') {
+            $bmnQuery->ownedBy($user);
+        }
+
+        $bmns = $bmnQuery->get(['id', 'kode_barang', 'nup', 'nama_barang', 'lokasi', 'lokasi_id', 'penanggungjawab', 'penanggung_jawab_id', 'penanggungjawab_nip', 'kondisi']);
         $pegawais = Pegawai::orderBy('nama')->get(['id', 'nama', 'nip', 'jabatan', 'unit_kerja']);
 
-        return view('laporan-kerusakan.create', compact('bmns', 'pegawais'));
+        $currentPegawai = $user ? ($user->pegawai ?? $pegawais->first(function ($p) use ($user) {
+            return strcasecmp(trim($p->nama), trim($user->name)) === 0;
+        })) : null;
+
+        return view('laporan-kerusakan.create', compact('bmns', 'pegawais', 'currentPegawai'));
     }
 
     public function store(StoreLaporanKerusakanRequest $request)

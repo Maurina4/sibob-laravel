@@ -40,7 +40,7 @@ class PengajuanPengembalianController extends Controller
     public function create()
     {
         $user = auth()->user();
-        $pegawai = Pegawai::where('nama', $user->name)->first();
+        $pegawai = $user ? ($user->pegawai ?? Pegawai::where('nama', $user->name)->first()) : null;
         $bidangs = self::BIDANGS;
         $initialBmns = $this->service->getAvailableBmns($user, old('alasan', 'pengembalian_biasa'));
 

@@ -82,6 +82,11 @@ class StorePengajuanPengembalianRequest extends FormRequest
                 if ($alasan === 'pengembalian_biasa' && ! in_array($kondisi, ['baik', ''])) {
                     $validator->errors()->add("items.{$idx}.bmn_id", "Untuk pengembalian biasa, hanya barang berkondisi Baik yang dapat dipilih (kondisi saat ini: {$bmn->kondisi}).");
                 }
+
+                // Pembatasan kepemilikan: Pengguna non-Operator hanya dapat mengajukan BMN miliknya sendiri
+                if (auth()->check() && auth()->user()->role !== 'Operator' && ! $bmn->isOwnedBy(auth()->user())) {
+                    $validator->errors()->add("items.{$idx}.bmn_id", "Anda hanya dapat mengajukan pengembalian untuk BMN yang menjadi tanggung jawab Anda.");
+                }
             }
         });
     }

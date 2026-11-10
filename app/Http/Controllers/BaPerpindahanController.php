@@ -28,16 +28,21 @@ class BaPerpindahanController extends Controller
     public function create()
     {
         $user = auth()->user();
-        $bmns = Bmn::active()
+        $bmnQuery = Bmn::active()
             ->orderBy('kode_barang')
-            ->orderBy('nup')
-            ->get(['id', 'kode_barang', 'nup', 'nama_barang', 'lokasi', 'penanggungjawab', 'penanggung_jawab_id']);
+            ->orderBy('nup');
+
+        if ($user && $user->role !== 'Operator') {
+            $bmnQuery->ownedBy($user);
+        }
+
+        $bmns = $bmnQuery->get(['id', 'kode_barang', 'nup', 'nama_barang', 'lokasi', 'penanggungjawab', 'penanggung_jawab_id', 'penanggungjawab_nip']);
         $pegawais = Pegawai::orderBy('nama')->get(['id', 'nama', 'nip', 'jabatan', 'unit_kerja']);
         $lokasis = Lokasi::orderedByGedung()->get(['id', 'kode_ruangan', 'nama']);
 
-        $currentPegawai = $user ? $pegawais->first(function ($p) use ($user) {
+        $currentPegawai = $user ? ($user->pegawai ?? $pegawais->first(function ($p) use ($user) {
             return strcasecmp(trim($p->nama), trim($user->name)) === 0;
-        }) : null;
+        })) : null;
 
         if (! $currentPegawai && $user) {
             if ($user->role === 'Operator') {

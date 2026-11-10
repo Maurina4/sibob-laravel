@@ -250,4 +250,91 @@ class Bmn extends Model
 
         return $query;
     }
+
+    /**
+     * Scope query untuk membatasi barang hanya yang menjadi tanggung jawab user tertentu.
+     * Jika user adalah Operator dan $allowOperatorAll = true, kembalikan semua tanpa dibatasi.
+     */
+    public function scopeOwnedBy(Builder $query, User $user, bool $allowOperatorAll = true): Builder
+    {
+        if ($allowOperatorAll && $user->role === 'Operator') {
+            return $query;
+        }
+
+        $pegawai = $user->pegawai;
+        $userName = trim((string) $user->name);
+
+        return $query->where(function (Builder $q) use ($pegawai, $userName) {
+            $hasCondition = false;
+
+            if ($pegawai) {
+                $hasCondition = true;
+                $q->where('penanggung_jawab_id', $pegawai->id)
+                    ->orWhere('penanggungjawab', $pegawai->nama)
+                    ->orWhere('penanggungjawab', 'like', "%{$pegawai->nama}%");
+
+                if (! empty($pegawai->nip) && $pegawai->nip !== '-') {
+                    $q->orWhere('penanggungjawab_nip', $pegawai->nip);
+                }
+            }
+
+            if ($userName !== '') {
+                if ($hasCondition) {
+                    $q->orWhere('penanggungjawab', $userName)
+                        ->orWhere('penanggungjawab', 'like', "%{$userName}%");
+                } else {
+                    $hasCondition = true;
+                    $q->where('penanggungjawab', $userName)
+                        ->orWhere('penanggungjawab', 'like', "%{$userName}%");
+                }
+            }
+
+            if (! $hasCondition) {
+                $q->whereRaw('1 = 0');
+            }
+        });
+    }
+
+    /**
+     * Cek apakah BMN ini dimiliki/menjadi tanggung jawab user tertentu.
+     */
+    public function isOwnedBy(?User $user, bool $allowOperatorAll = true, ?int $fallbackPegawaiId = null): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($allowOperatorAll && $user->role === 'Operator') {
+            return true;
+        }
+
+        $pegawai = $user->pegawai;
+        $userName = strtolower(trim((string) $user->name));
+        $bmnPj = strtolower(trim((string) $this->penanggungjawab));
+
+        if ($pegawai && $this->penanggung_jawab_id && (int) $this->penanggung_jawab_id === (int) $pegawai->id) {
+            return true;
+        }
+
+        if ($pegawai && ! empty($pegawai->nip) && $pegawai->nip !== '-' && $this->penanggungjawab_nip === $pegawai->nip) {
+            return true;
+        }
+
+        if ($pegawai && ! empty($pegawai->nama)) {
+            $pegNama = strtolower(trim($pegawai->nama));
+            if ($bmnPj === $pegNama || str_contains($bmnPj, $pegNama)) {
+                return true;
+            }
+        }
+
+        if ($userName !== '' && ($bmnPj === $userName || str_contains($bmnPj, $userName))) {
+            return true;
+        }
+
+        if ($fallbackPegawaiId && (int) $this->penanggung_jawab_id === (int) $fallbackPegawaiId && ! $pegawai) {
+            return true;
+        }
+
+        return false;
+    }
 }

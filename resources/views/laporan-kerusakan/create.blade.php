@@ -73,43 +73,94 @@
         </div>
 
         @php
-            $userMatch = $pegawais->firstWhere('nama', auth()->user()->name);
-            $selectedPelaporId = old('pelapor_pegawai_id', $userMatch?->id);
-            $selectedPelaporNama = old('pelapor_nama', $userMatch?->nama ?? auth()->user()->name);
+            $isOperator = auth()->user()->role === 'Operator';
+            $defaultPegawai = $currentPegawai ?? $pegawais->firstWhere('nama', auth()->user()->name);
+            $selectedPelaporId = old('pelapor_pegawai_id', $defaultPegawai?->id);
+            $selectedPelaporNama = old('pelapor_nama', $defaultPegawai?->nama ?? auth()->user()->name);
             $selectedPelaporEmail = old('pelapor_email', auth()->user()->email);
         @endphp
 
-        {{-- PEGAWAI PENGAJU / PELAPOR --}}
+        {{-- PEGAWAI PENGAJU / PELAPOR (SESUAI AKUN LOGIN & DATABASE PEGAWAI) --}}
         <div>
-            <x-input-label for="pelapor_pegawai_id" value="Pegawai Pengaju / Pelapor *" />
-            <select
-                id="pelapor_pegawai_id"
-                name="pelapor_pegawai_id"
-                required
-                onchange="
-                    const opt = this.options[this.selectedIndex];
-                    document.getElementById('pelapor_nama').value = opt.getAttribute('data-nama') || '';
-                "
-                class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2.5 pl-3 pr-10 transition cursor-pointer"
-            >
-                <option value="">-- Pilih Pegawai Pengaju dari Database Pegawai --</option>
-                @foreach ($pegawais as $p)
-                    <option
-                        value="{{ $p->id }}"
-                        data-nama="{{ $p->nama }}"
-                        @selected((string)$selectedPelaporId === (string)$p->id)
-                    >
-                        {{ $p->nama }}{{ $p->nip ? " (NIP. {$p->nip})" : '' }}{{ $p->unit_kerja ? " — {$p->unit_kerja}" : ($p->jabatan ? " — {$p->jabatan}" : '') }}
-                    </option>
-                @endforeach
-            </select>
-            <input type="hidden" name="pelapor_nama" id="pelapor_nama" value="{{ $selectedPelaporNama }}" />
-            <input type="hidden" name="pelapor_email" id="pelapor_email" value="{{ $selectedPelaporEmail }}" />
-            <p class="text-[11px] text-[#62756A] mt-1">
-                Pegawai yang mengajukan laporan kerusakan (berelasi langsung ke database Pegawai agar Operator mengetahui siapa yang mengajukan aduan ini).
-            </p>
+            @if (! $isOperator)
+                {{-- Non-Operator: Terkunci sesuai akun login & master pegawai --}}
+                <x-input-label value="Pegawai Pengaju / Pelapor (Sesuai Akun Login) *" />
+                <div class="p-3.5 rounded-xl border border-[#D5E5DA] bg-[#F7FAF8] flex items-start justify-between gap-3">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs text-[#132219]">
+                                {{ $defaultPegawai?->nama ?? auth()->user()->name }}
+                            </span>
+                            @if ($defaultPegawai?->nip)
+                                <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-emerald-100/70 text-emerald-800 font-semibold">
+                                    NIP: {{ $defaultPegawai->nip }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="text-[11px] text-[#62756A] flex items-center gap-1.5 flex-wrap">
+                            <span>{{ $defaultPegawai?->jabatan ?: 'Pegawai' }}</span>
+                            @if ($defaultPegawai?->unit_kerja)
+                                <span>•</span>
+                                <span>{{ $defaultPegawai->unit_kerja }}</span>
+                            @endif
+                            <span>•</span>
+                            <span class="font-medium text-[#163828]">{{ auth()->user()->email }}</span>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#163828]/10 text-[#163828] shrink-0">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Database Pegawai
+                    </span>
+                </div>
+                <input type="hidden" name="pelapor_pegawai_id" id="pelapor_pegawai_id" value="{{ $selectedPelaporId }}" />
+                <input type="hidden" name="pelapor_nama" id="pelapor_nama" value="{{ $selectedPelaporNama }}" />
+                <input type="hidden" name="pelapor_email" id="pelapor_email" value="{{ $selectedPelaporEmail }}" />
+            @else
+                {{-- Operator: Dapat memilih pegawai pengaju jika melaporkan atas nama staf --}}
+                <x-input-label for="pelapor_pegawai_id" value="Pegawai Pengaju / Pelapor *" />
+                <select
+                    id="pelapor_pegawai_id"
+                    name="pelapor_pegawai_id"
+                    required
+                    onchange="
+                        const opt = this.options[this.selectedIndex];
+                        document.getElementById('pelapor_nama').value = opt.getAttribute('data-nama') || '';
+                    "
+                    class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2.5 pl-3 pr-10 transition cursor-pointer"
+                >
+                    <option value="">-- Pilih Pegawai Pengaju dari Database Pegawai --</option>
+                    @foreach ($pegawais as $p)
+                        <option
+                            value="{{ $p->id }}"
+                            data-nama="{{ $p->nama }}"
+                            @selected((string)$selectedPelaporId === (string)$p->id)
+                        >
+                            {{ $p->nama }}{{ $p->nip ? " (NIP. {$p->nip})" : '' }}{{ $p->unit_kerja ? " — {$p->unit_kerja}" : ($p->jabatan ? " — {$p->jabatan}" : '') }}
+                        </option>
+                    @endforeach
+                </select>
+                <input type="hidden" name="pelapor_nama" id="pelapor_nama" value="{{ $selectedPelaporNama }}" />
+                <input type="hidden" name="pelapor_email" id="pelapor_email" value="{{ $selectedPelaporEmail }}" />
+                <p class="text-[11px] text-[#62756A] mt-1">
+                    Pegawai yang mengajukan laporan kerusakan (berelasi langsung ke database Pegawai dengan NIP).
+                </p>
+            @endif
             <x-input-error :messages="$errors->get('pelapor_pegawai_id')" />
         </div>
+
+        @if ($bmns->isEmpty() && ! $isOperator)
+            <div class="p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-xs flex items-start gap-2.5">
+                <svg class="w-4 h-4 text-amber-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                    <strong class="font-semibold block mb-0.5">Tidak Ada BMN Terdaftar Atas Nama Anda</strong>
+                    <span>Saat ini belum ada BMN yang tercatat dengan penanggung jawab atas nama akun Anda. Anda hanya dapat melaporkan kerusakan untuk BMN milik/tanggung jawab Anda.</span>
+                </div>
+            </div>
+        @endif
 
         {{-- KODE & NUP BMN (RELASI MASTER BMN) --}}
         @php

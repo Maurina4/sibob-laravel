@@ -76,6 +76,11 @@ class PengajuanPengembalianService
             });
         }
 
+        // Pengguna non-Operator hanya dapat melihat & mengajukan BMN miliknya sendiri
+        if ($user && $user->role !== 'Operator') {
+            $query->ownedBy($user);
+        }
+
         if (! empty($search)) {
             $s = trim($search);
             $query->where(function ($q) use ($s) {
@@ -111,7 +116,7 @@ class PengajuanPengembalianService
     public function ajukan(array $validated, User $user): PengajuanPengembalian
     {
         return DB::transaction(function () use ($validated, $user) {
-            $pegawai = Pegawai::where('nama', $user->name)->first();
+            $pegawai = $user->pegawai ?? Pegawai::where('nama', $user->name)->first();
 
             $year = ! empty($validated['tanggal']) ? date('Y', strtotime($validated['tanggal'])) : now()->format('Y');
             $prefix = "BMN-{$year}";

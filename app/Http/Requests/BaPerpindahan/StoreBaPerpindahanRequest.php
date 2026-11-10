@@ -37,6 +37,15 @@ class StoreBaPerpindahanRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            // Validasi kepemilikan BMN untuk pengguna non-Operator
+            if (auth()->check() && auth()->user()->role !== 'Operator' && $this->filled('bmn_id')) {
+                $bmn = Bmn::find($this->input('bmn_id'));
+                $fallbackPegawaiId = $this->input('pengaju_pegawai_id') ?: $this->input('pegawai_id');
+                if ($bmn && ! $bmn->isOwnedBy(auth()->user(), false, $fallbackPegawaiId ? (int) $fallbackPegawaiId : null)) {
+                    $validator->errors()->add('bmn_id', 'Anda hanya dapat memindahkan BMN yang menjadi tanggung jawab Anda.');
+                }
+            }
+
             $pihakKedua = $this->input('pihak_kedua');
             if (empty($pihakKedua)) {
                 return;
