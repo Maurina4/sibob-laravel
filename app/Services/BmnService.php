@@ -574,15 +574,21 @@ class BmnService
                 $bmn->lab->update(['dihapus' => true, 'dihapus_pada' => $waktuHapus, 'dihapus_oleh' => $penghapus]);
             }
 
+            if ($bmn->angkutan) {
+                $bmn->angkutan->update(['dihapus' => true, 'dihapus_pada' => $waktuHapus, 'dihapus_oleh' => $penghapus]);
+            }
+
             $kategoriLabel = match ($bmn->jenis) {
                 'BMN-TIK' => 'BMN TIK',
                 'BMN-LAB' => 'BMN Lab',
+                'BMN-ANGKUTAN' => 'Alat Angkutan Bermotor',
                 default => 'BMN',
             };
 
             $dataId = match ($bmn->jenis) {
                 'BMN-TIK' => $bmn->tik?->id ?? $bmn->id,
                 'BMN-LAB' => $bmn->lab?->id ?? $bmn->id,
+                'BMN-ANGKUTAN' => $bmn->angkutan?->id ?? $bmn->id,
                 default => $bmn->id,
             };
 

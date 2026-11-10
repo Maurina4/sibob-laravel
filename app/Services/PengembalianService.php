@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\DataTerhapus;
@@ -160,6 +161,14 @@ class PengembalianService
                 ]);
 
             BmnLab::where('kode_barang', $bmn->kode_barang)
+                ->where('nup', $bmn->nup)
+                ->update([
+                    'kondisi' => $kondisi,
+                    'penanggungjawab' => 'Pengelola BMN',
+                    'is_dikembalikan' => true,
+                ]);
+
+            BmnAngkutan::where('kode_barang', $bmn->kode_barang)
                 ->where('nup', $bmn->nup)
                 ->update([
                     'kondisi' => $kondisi,

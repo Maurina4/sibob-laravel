@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BaPerpindahan;
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\DataTerhapus;
@@ -294,6 +295,10 @@ class BaPerpindahanService
                             ->update($subUpdate);
 
                         BmnLab::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update($subUpdate);
+
+                        BmnAngkutan::where('kode_barang', $bmn->kode_barang)
                             ->where('nup', $bmn->nup)
                             ->update($subUpdate);
                     }

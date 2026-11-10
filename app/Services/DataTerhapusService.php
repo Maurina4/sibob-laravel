@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BaPerpindahan;
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\DataTerhapus;
@@ -46,6 +47,7 @@ class DataTerhapusService
             $bmn = null;
             $tik = null;
             $lab = null;
+            $angkutan = null;
             $otherModel = null;
 
             if (in_array($jenis, ['BMN', 'BMN Umum', 'BMN-NON TIK'])) {
@@ -54,6 +56,7 @@ class DataTerhapusService
                     $bmnId = $bmn->id;
                     $tik = $bmn->tik;
                     $lab = $bmn->lab;
+                    $angkutan = $bmn->angkutan;
                 }
             } elseif (in_array($jenis, ['BMN TIK', 'BMN-TIK'])) {
                 $tik = BmnTik::find($dataId);
@@ -80,6 +83,19 @@ class DataTerhapusService
                     $bmn = $fallbackBmn;
                     $bmnId = $bmn->id;
                     $lab = $bmn->lab;
+                }
+            } elseif (in_array($jenis, ['BMN Angkutan', 'BMN-ANGKUTAN', 'Alat Angkutan Bermotor'])) {
+                $angkutan = BmnAngkutan::find($dataId);
+                if ($angkutan) {
+                    $bmnId = $angkutan->bmn_id ?? $bmnId;
+                    $bmn = $angkutan->bmn ?? ($bmnId ? Bmn::withTrashed()->find($bmnId) : null);
+                } elseif ($bmnId) {
+                    $bmn = Bmn::withTrashed()->find($bmnId);
+                    $angkutan = $bmn?->angkutan;
+                } elseif ($fallbackBmn = Bmn::withTrashed()->find($dataId)) {
+                    $bmn = $fallbackBmn;
+                    $bmnId = $bmn->id;
+                    $angkutan = $bmn->angkutan;
                 }
             } else {
                 $otherModel = match ($jenis) {
@@ -118,6 +134,13 @@ class DataTerhapusService
             }
             if ($lab) {
                 $lab->update([
+                    'dihapus' => false,
+                    'dihapus_pada' => null,
+                    'dihapus_oleh' => null,
+                ]);
+            }
+            if ($angkutan) {
+                $angkutan->update([
                     'dihapus' => false,
                     'dihapus_pada' => null,
                     'dihapus_oleh' => null,
@@ -226,6 +249,16 @@ class DataTerhapusService
             } else {
                 $lab?->delete();
             }
+        } elseif (in_array($jenis, ['BMN Angkutan', 'BMN-ANGKUTAN', 'Alat Angkutan Bermotor'])) {
+            $angkutan = BmnAngkutan::find($dataId);
+            $bmnId = $angkutan?->bmn_id ?? $bmnId;
+            $bmn = $angkutan?->bmn ?? ($bmnId ? Bmn::withTrashed()->find($bmnId) : null);
+
+            if ($bmn) {
+                $this->deleteBmnComplete($bmn);
+            } else {
+                $angkutan?->delete();
+            }
         } else {
             match ($jenis) {
                 'Pengembalian', 'Pengembalian BMN' => tap(Pengembalian::withTrashed()->find($dataId), function ($m) {
@@ -255,6 +288,7 @@ class DataTerhapusService
     {
         $bmn->tik?->delete();
         $bmn->lab?->delete();
+        $bmn->angkutan?->delete();
 
         foreach ($bmn->dokumens as $dokumen) {
             if ($dokumen->path && Storage::disk('public')->exists($dokumen->path)) {

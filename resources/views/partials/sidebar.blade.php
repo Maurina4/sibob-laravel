@@ -72,12 +72,12 @@
                         </svg>
                         <span>Inventaris BMN</span>
                     </div>
-                    <svg class="w-3.5 h-3.5 transition-transform {{ request()->routeIs('bmns.*', 'bmns-tik.*', 'bmns-lab.*') ? 'rotate-90' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="w-3.5 h-3.5 transition-transform {{ request()->routeIs('bmns.*', 'bmns-tik.*', 'bmns-lab.*', 'bmns-angkutan.*') ? 'rotate-90' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
 
-                <div id="submenu-bmn" class="pl-7 pr-1 pt-1 space-y-1 {{ request()->routeIs('bmns.*', 'bmns-tik.*', 'bmns-lab.*') ? 'block' : 'hidden' }}">
+                <div id="submenu-bmn" class="pl-7 pr-1 pt-1 space-y-1 {{ request()->routeIs('bmns.*', 'bmns-tik.*', 'bmns-lab.*', 'bmns-angkutan.*') ? 'block' : 'hidden' }}">
                     <a href="{{ session('nav_last_url.bmns', route('bmns.index')) }}" data-nav-key="bmns" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>Daftar BMN</span>
                     </a>
@@ -87,6 +87,9 @@
                     </a>
                     <a href="{{ session('nav_last_url.bmns-lab', route('bmns-lab.index')) }}" data-nav-key="bmns-lab" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-lab.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>BMN Laboratorium</span>
+                    </a>
+                    <a href="{{ session('nav_last_url.bmns-angkutan', route('bmns-angkutan.index')) }}" data-nav-key="bmns-angkutan" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('bmns-angkutan.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                        <span>Alat Angkutan Bermotor</span>
                     </a>
                 </div>
             </div>

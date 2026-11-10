@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\LaporanKerusakan;
@@ -265,6 +266,16 @@ class PengajuanPengembalianService
                 }
                 if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
                     BmnLab::where('kode_barang', $bmn->kode_barang)
+                        ->where('nup', $bmn->nup)
+                        ->update([
+                            'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
+                            'penanggungjawab' => 'Pengelola BMN',
+                            'kondisi' => $bmn->kondisi,
+                            'is_dikembalikan' => true,
+                        ]);
+                }
+                if ($bmn->jenis === 'BMN-ANGKUTAN' || $bmn->angkutan) {
+                    BmnAngkutan::where('kode_barang', $bmn->kode_barang)
                         ->where('nup', $bmn->nup)
                         ->update([
                             'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',

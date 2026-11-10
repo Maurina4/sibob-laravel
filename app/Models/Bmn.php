@@ -18,6 +18,7 @@ class Bmn extends Model
         'kode_barang',
         'nup',
         'no_seri',
+        'no_polisi',
         'nama_barang',
         'merek',
         'tahun_perolehan',
@@ -115,6 +116,11 @@ class Bmn extends Model
     public function lab(): HasOne
     {
         return $this->hasOne(BmnLab::class, 'bmn_id');
+    }
+
+    public function angkutan(): HasOne
+    {
+        return $this->hasOne(BmnAngkutan::class, 'bmn_id');
     }
 
     public function dataTerhapus(): HasMany

@@ -135,7 +135,7 @@
                     <h3 class="text-sm font-semibold text-[#132219]">Klasifikasi Inventaris</h3>
                     <p class="text-xs text-[#62756A]">Distribusi aset menurut rumpun unit kerja BPOM</p>
                 </div>
-                <span class="text-xs font-mono text-[#62756A]">3 Kategori</span>
+                <span class="text-xs font-mono text-[#62756A]">4 Kategori</span>
             </div>
 
             <div class="mt-5 space-y-4">
@@ -202,6 +202,29 @@
                     <div class="text-right">
                         <div class="text-base font-bold text-[#284B66]">{{ $jumlahBmnTik }}</div>
                         <div class="text-[10px] text-[#62756A]">Perangkat</div>
+                    </div>
+                </a>
+
+                {{-- ALAT ANGKUTAN BERMOTOR --}}
+                <a
+                    href="{{ route('bmns-angkutan.index') }}"
+                    class="p-4 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] hover:bg-[#FEF6E9] hover:border-[#B45309]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                >
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-white border border-[#E3ECE6] flex items-center justify-center text-[#B45309] group-hover:bg-[#FEF6E9] transition">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold text-[#132219] group-hover:text-[#B45309] transition">Alat Angkutan Bermotor</div>
+                            <div class="text-[11px] text-[#62756A]">Mobil dinas operasional, bus, dan sepeda motor</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-base font-bold text-[#B45309]">{{ $jumlahBmnAngkutan ?? 0 }}</div>
+                        <div class="text-[10px] text-[#62756A]">Kendaraan</div>
                     </div>
                 </a>
             </div>

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\DataTerhapus;
@@ -205,6 +206,15 @@ class LaporanKerusakanService
 
         if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
             BmnTik::where('kode_barang', $bmn->kode_barang)
+                ->where('nup', $bmn->nup)
+                ->update(['kondisi' => $kondisi]);
+        }
+
+        BmnAngkutan::where('bmn_id', $bmn->id)
+            ->update(['kondisi' => $kondisi]);
+
+        if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+            BmnAngkutan::where('kode_barang', $bmn->kode_barang)
                 ->where('nup', $bmn->nup)
                 ->update(['kondisi' => $kondisi]);
         }

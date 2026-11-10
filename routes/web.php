@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BaPerpindahanController;
+use App\Http\Controllers\BmnAngkutanController;
 use App\Http\Controllers\BmnController;
 use App\Http\Controllers\BmnImportController;
 use App\Http\Controllers\BmnLabController;
@@ -140,6 +141,24 @@ Route::middleware(['auth'])->group(function () {
             BmnLabController::class
         )->parameters([
             'bmns-lab' => 'bmnLab',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | BMN ANGKUTAN (ALAT ANGKUTAN BERMOTOR)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::patch(
+            '/bmns-angkutan/{bmnAngkutan}/lokasi',
+            [BmnAngkutanController::class, 'updateLokasi']
+        )->name('bmns-angkutan.update-lokasi');
+
+        Route::resource(
+            'bmns-angkutan',
+            BmnAngkutanController::class
+        )->parameters([
+            'bmns-angkutan' => 'bmnAngkutan',
         ]);
 
         /*

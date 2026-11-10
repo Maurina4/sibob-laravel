@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\DataTerhapus;
@@ -185,6 +186,10 @@ class DistribusiService
                     ->update($subUpdate);
 
                 BmnLab::where('bmn_id', $bmn->id)
+                    ->orWhere(fn ($q) => $q->where('kode_barang', $bmn->kode_barang)->where('nup', (int) $bmn->nup))
+                    ->update($subUpdate);
+
+                BmnAngkutan::where('bmn_id', $bmn->id)
                     ->orWhere(fn ($q) => $q->where('kode_barang', $bmn->kode_barang)->where('nup', (int) $bmn->nup))
                     ->update($subUpdate);
             }

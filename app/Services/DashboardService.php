@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BaPerpindahan;
 use App\Models\Bmn;
+use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
 use App\Models\Distribusi;
@@ -22,6 +23,7 @@ class DashboardService
             })->count(),
             'jumlahBmnTik' => BmnTik::active()->count(),
             'jumlahBmnLab' => BmnLab::active()->count(),
+            'jumlahBmnAngkutan' => BmnAngkutan::active()->count(),
             'jumlahKondisiBaik' => Bmn::active()->where('kondisi', 'Baik')->count(),
             'jumlahPerluKalibrasi' => BmnLab::active()->perluKalibrasi()->count(),
             'jumlahKerusakan' => LaporanKerusakan::active()->belumSelesai()->count(),
