@@ -67,8 +67,8 @@ class PengajuanPengembalianService
             })
             ->whereNotIn('id', $pendingBmnIds);
 
-        // Filter pengembalian BMN: dikhususkan hanya untuk BMN dengan kondisi 'Baik'
-        if ($alasan !== 'rusak_berat') {
+        // Filter alasan pengembalian biasa: hanya kondisi 'Baik' (barang layak pakai)
+        if ($alasan === 'pengembalian_biasa') {
             $query->where(function ($q) {
                 $q->whereNull('kondisi')
                     ->orWhereRaw('LOWER(kondisi) = ?', ['baik'])
@@ -302,33 +302,46 @@ class PengajuanPengembalianService
                 'disetujui_pada' => now(),
             ]);
 
-            // 5. Sinkronisasi otomatis ke Berita Acara Pengembalian (BA Pengembalian)
-            $pengembalian = Pengembalian::updateOrCreate(
-                ['pengajuan_id' => $locked->id],
-                [
-                    'nomor_pengajuan' => $nomorBa,
-                    'tanggal' => $locked->tanggal,
-                    'pengaju_id' => $locked->pegawai_id,
-                    'nama_pengaju' => $locked->nama_pegawai,
-                    'bidang' => $locked->bidang,
-                    'kondisi_pengembalian' => $locked->alasan === 'rusak_berat' ? 'Rusak Berat' : 'Baik',
-                    'status' => 'Disetujui',
-                    'dihapus' => false,
-                    'dihapus_pada' => null,
-                    'dihapus_oleh' => null,
-                ]
-            );
+            // 5. Sinkronisasi data sesuai pilihan alasan pemohon:
+            // JIKA RUSAK BERAT:
+            // Data HANYA masuk ke Daftar Rusak Berat (Laporan Kerusakan) - sudah dibuat pada step 3 di atas.
+            // Data TIDAK masuk ke Berita Acara Pengembalian (BA Pengembalian).
+            // JIKA BAIK (PENGEMBALIAN BIASA):
+            // Data HANYA masuk ke Berita Acara Pengembalian (BA Pengembalian).
+            if ($locked->alasan === 'rusak_berat') {
+                $pengembalianTerkait = Pengembalian::where('pengajuan_id', $locked->id)->first();
+                if ($pengembalianTerkait) {
+                    $pengembalianTerkait->items()->delete();
+                    $pengembalianTerkait->forceDelete();
+                }
+            } else {
+                $pengembalian = Pengembalian::updateOrCreate(
+                    ['pengajuan_id' => $locked->id],
+                    [
+                        'nomor_pengajuan' => $nomorBa,
+                        'tanggal' => $locked->tanggal,
+                        'pengaju_id' => $locked->pegawai_id,
+                        'nama_pengaju' => $locked->nama_pegawai,
+                        'bidang' => $locked->bidang,
+                        'kondisi_pengembalian' => 'Baik',
+                        'status' => 'Disetujui',
+                        'dihapus' => false,
+                        'dihapus_pada' => null,
+                        'dihapus_oleh' => null,
+                    ]
+                );
 
-            // Bersihkan item lama jika ada lalu isi ulang
-            $pengembalian->items()->delete();
-            foreach ($items as $item) {
-                $pengembalian->items()->create([
-                    'bmn_id' => $item->bmn_id,
-                    'nama_barang_snapshot' => $item->nama_barang,
-                    'kondisi_awal' => $item->kondisi_awal ?: 'Baik',
-                    'kondisi' => $item->kondisi ?: ($locked->alasan === 'rusak_berat' ? 'Rusak Berat' : 'Baik'),
-                    'keterangan' => $item->keterangan,
-                ]);
+                // Bersihkan item lama jika ada lalu isi ulang
+                $pengembalian->items()->delete();
+                foreach ($items as $item) {
+                    $pengembalian->items()->create([
+                        'bmn_id' => $item->bmn_id,
+                        'nama_barang_snapshot' => $item->nama_barang,
+                        'kondisi_awal' => $item->kondisi_awal ?: 'Baik',
+                        'kondisi' => 'Baik',
+                        'keterangan' => $item->keterangan,
+                    ]);
+                }
             }
 
             return true;

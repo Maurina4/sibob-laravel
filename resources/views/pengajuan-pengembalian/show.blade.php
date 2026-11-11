@@ -68,15 +68,27 @@
                 @endif
 
                 @if ($pengajuan->nomor_ba)
-                    <a
-                        href="{{ route('pengembalians.index', ['search' => $pengajuan->nomor_ba]) }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E3ECE6] bg-white hover:bg-[#F2F6F3] text-[#132219] text-xs font-semibold shadow-xs transition"
-                    >
-                        <svg class="w-4 h-4 text-[#163828]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                        <span>Buka di BA Pengembalian</span>
-                    </a>
+                    @if ($pengajuan->alasan === 'rusak_berat')
+                        <a
+                            href="{{ route('laporan-kerusakan.index', ['search' => $pengajuan->nomor_ba]) }}"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#F8D4D0] bg-[#FFF8F7] hover:bg-[#FDF0EE] text-[#9C322C] text-xs font-semibold shadow-xs transition"
+                        >
+                            <svg class="w-4 h-4 text-[#9C322C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Buka di Daftar Rusak Berat</span>
+                        </a>
+                    @else
+                        <a
+                            href="{{ route('pengembalians.index', ['search' => $pengajuan->nomor_ba]) }}"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E3ECE6] bg-white hover:bg-[#F2F6F3] text-[#132219] text-xs font-semibold shadow-xs transition"
+                        >
+                            <svg class="w-4 h-4 text-[#163828]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            <span>Buka di BA Pengembalian</span>
+                        </a>
+                    @endif
                 @endif
             @elseif ($pengajuan->status === 'dibatalkan' && ($pengajuan->diajukan_oleh === auth()->id() || (auth()->check() && auth()->user()->role === 'Operator')))
                 <form

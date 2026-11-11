@@ -445,17 +445,15 @@ class PengajuanPengembalianFeatureTest extends TestCase
 
         $response = $this->actingAs($this->operator)->post(route('admin.pengajuan-pengembalian.setujui', $pengajuan));
 
-        $response->assertRedirect(route('pengembalians.index'));
+        $response->assertRedirect(route('laporan-kerusakan.index'));
 
         $pengajuan->refresh();
         $this->assertEquals('disetujui', $pengajuan->status);
         $this->assertStringStartsWith('BA-RB/', $pengajuan->nomor_ba);
 
-        // Verifikasi otomatis tercatat di BA Pengembalian
-        $this->assertDatabaseHas('pengembalians', [
+        // Verifikasi TIDAK masuk ke BA Pengembalian
+        $this->assertDatabaseMissing('pengembalians', [
             'pengajuan_id' => $pengajuan->id,
-            'nomor_pengajuan' => $pengajuan->nomor_ba,
-            'kondisi_pengembalian' => 'Rusak Berat',
         ]);
 
         // Verifikasi mutasi BMN
@@ -647,7 +645,8 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $this->assertEquals('Gudang BMN', $bmn->lokasi);
         $this->assertEquals('Rusak Berat', $bmn->kondisi);
         $this->assertTrue($bmn->is_dikembalikan);
-        $this->assertDatabaseHas('pengembalians', ['pengajuan_id' => $pengajuan->id]);
+        $this->assertDatabaseMissing('pengembalians', ['pengajuan_id' => $pengajuan->id]);
+        $this->assertDatabaseHas('laporan_kerusakans', ['bmn_id' => $bmn->id]);
 
         // 2. Batalkan persetujuan oleh operator
         $cancelResponse = $this->actingAs($this->operator)->post(route('pengajuan-pengembalian.batalkan', $pengajuan));
@@ -723,17 +722,17 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $resAdminShow->assertDontSee('Cetak Berita Acara');
     }
 
-    public function test_create_view_is_dedicated_for_kondisi_baik_and_links_to_daftar_rusak_berat(): void
+    public function test_create_view_allows_both_pengembalian_biasa_and_rusak_berat(): void
     {
         $this->createSampleBmn(['kondisi' => 'Baik']);
 
         $response = $this->actingAs($this->regularUser)->get(route('pengajuan-pengembalian.create'));
         $response->assertOk();
-        $response->assertSee('Kriteria Pengembalian BMN');
-        $response->assertSee('Khusus Kondisi: Baik');
-        $response->assertSee('Barang Mengalami Rusak Berat?');
-        $response->assertSee(route('laporan-kerusakan.create'));
-        $response->assertDontSee('name="alasan" value="rusak_berat"', false);
+        $response->assertSee('Jenis & Alasan Pengembalian', false);
+        $response->assertSee('Pengembalian Barang Layak Pakai');
+        $response->assertSee('Pelaporan Rusak Berat');
+        $response->assertSee('value="pengembalian_biasa"', false);
+        $response->assertSee('value="rusak_berat"', false);
     }
 
     public function test_available_bmns_for_pengembalian_only_returns_kondisi_baik(): void
