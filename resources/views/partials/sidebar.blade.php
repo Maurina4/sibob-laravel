@@ -128,19 +128,21 @@
             </div>
         </div>
 
-        {{-- DAFTAR RUSAK BERAT --}}
-        <div class="pt-2">
-            <a
-                href="{{ session('nav_last_url.laporan-kerusakan', route('laporan-kerusakan.index')) }}"
-                data-nav-key="laporan-kerusakan"
-                class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('laporan-kerusakan.*') ? 'bg-white/12 text-white font-semibold' : 'text-emerald-100/70 hover:bg-white/6 hover:text-white' }}"
-            >
-                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>Daftar Rusak Berat</span>
-            </a>
-        </div>
+        {{-- DAFTAR RUSAK BERAT (HANYA OPERATOR) --}}
+        @if(auth()->user()->role === 'Operator')
+            <div class="pt-2">
+                <a
+                    href="{{ session('nav_last_url.laporan-kerusakan', route('laporan-kerusakan.index')) }}"
+                    data-nav-key="laporan-kerusakan"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition {{ request()->routeIs('laporan-kerusakan.*') ? 'bg-white/12 text-white font-semibold' : 'text-emerald-100/70 hover:bg-white/6 hover:text-white' }}"
+                >
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Daftar Rusak Berat</span>
+                </a>
+            </div>
+        @endif
 
         {{-- PENGATURAN (OPERATOR) --}}
         @if(auth()->user()->role === 'Operator')

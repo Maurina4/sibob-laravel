@@ -32,16 +32,26 @@
                     </svg>
                     <span>Tambah Aset</span>
                 </a>
+                <a
+                    href="{{ route('laporan-kerusakan.index') }}"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#E3ECE6] hover:bg-[#F7FAF8] text-[#132219] text-xs font-semibold tracking-wide transition"
+                >
+                    <svg class="w-4 h-4 text-[#62756A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Daftar Rusak Berat</span>
+                </a>
+            @else
+                <a
+                    href="{{ route('pengajuan-pengembalian.create') }}"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#163828] hover:bg-[#1E4834] text-white text-xs font-semibold tracking-wide transition shadow-2xs"
+                >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Ajukan Pengembalian</span>
+                </a>
             @endif
-            <a
-                href="{{ route('laporan-kerusakan.index') }}"
-                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#E3ECE6] hover:bg-[#F7FAF8] text-[#132219] text-xs font-semibold tracking-wide transition"
-            >
-                <svg class="w-4 h-4 text-[#62756A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>Daftar Rusak Berat</span>
-            </a>
         </div>
     </div>
 
@@ -98,30 +108,59 @@
             </div>
         </a>
 
-        {{-- CARD 3: DAFTAR RUSAK BERAT --}}
-        <a
-            href="{{ route('laporan-kerusakan.index') }}"
-            class="block bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#9C322C] hover:shadow-xs cursor-pointer group shadow-2xs"
-        >
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#9C322C] transition">Daftar Rusak Berat</span>
-                <span class="w-7 h-7 rounded-lg bg-[#FDF0EE] text-[#9C322C] flex items-center justify-center group-hover:scale-110 transition">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </span>
-            </div>
-            <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-bold tracking-tight text-[#9C322C]">
-                    {{ $jumlahKerusakan }}
-                </span>
-                <span class="text-xs text-[#62756A]">kasus</span>
-            </div>
-            <div class="mt-3 pt-3 border-t border-[#E3ECE6]/60 flex items-center justify-between text-xs text-[#62756A]">
-                <span>Belum Selesai</span>
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#FDF0EE] text-[#9C322C]">Pending</span>
-            </div>
-        </a>
+        {{-- CARD 3: DAFTAR RUSAK BERAT (OPERATOR) / PENGAJUAN PENGEMBALIAN (USER) --}}
+        @if(auth()->user()->role === 'Operator')
+            <a
+                href="{{ route('laporan-kerusakan.index') }}"
+                class="block bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#9C322C] hover:shadow-xs cursor-pointer group shadow-2xs"
+            >
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#9C322C] transition">Daftar Rusak Berat</span>
+                    <span class="w-7 h-7 rounded-lg bg-[#FDF0EE] text-[#9C322C] flex items-center justify-center group-hover:scale-110 transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </span>
+                </div>
+                <div class="mt-4 flex items-baseline gap-2">
+                    <span class="text-3xl font-bold tracking-tight text-[#9C322C]">
+                        {{ $jumlahKerusakan }}
+                    </span>
+                    <span class="text-xs text-[#62756A]">kasus</span>
+                </div>
+                <div class="mt-3 pt-3 border-t border-[#E3ECE6]/60 flex items-center justify-between text-xs text-[#62756A]">
+                    <span>Belum Selesai</span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#FDF0EE] text-[#9C322C]">Pending</span>
+                </div>
+            </a>
+        @else
+            @php
+                $userPengajuanCount = \App\Models\PengajuanPengembalian::where('diajukan_oleh', auth()->id())->count();
+            @endphp
+            <a
+                href="{{ route('pengajuan-pengembalian.index') }}"
+                class="block bg-white border border-[#E3ECE6] rounded-xl p-6 transition hover:border-[#163828] hover:shadow-xs cursor-pointer group shadow-2xs"
+            >
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-[#62756A] group-hover:text-[#163828] transition">Pengajuan Saya</span>
+                    <span class="w-7 h-7 rounded-lg bg-[#EAF2ED] text-[#163828] flex items-center justify-center group-hover:scale-110 transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                    </span>
+                </div>
+                <div class="mt-4 flex items-baseline gap-2">
+                    <span class="text-3xl font-bold tracking-tight text-[#163828]">
+                        {{ $userPengajuanCount }}
+                    </span>
+                    <span class="text-xs text-[#62756A]">pengajuan</span>
+                </div>
+                <div class="mt-3 pt-3 border-t border-[#E3ECE6]/60 flex items-center justify-between text-xs text-[#62756A]">
+                    <span>Riwayat Pengembalian</span>
+                    <span class="font-medium text-[#163828]">Lihat Semua →</span>
+                </div>
+            </a>
+        @endif
 
     </div>
 

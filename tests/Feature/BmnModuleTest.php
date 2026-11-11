@@ -4922,4 +4922,22 @@ class BmnModuleTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Buat BA Pengembalian');
     }
+
+    public function test_daftar_rusak_berat_hidden_from_regular_user_sidebar_and_dashboard(): void
+    {
+        $operator = User::factory()->create(['role' => 'Operator']);
+        $user = User::factory()->create(['role' => 'User']);
+
+        // Operator melihat Daftar Rusak Berat di sidebar dan dashboard
+        $opDashboard = $this->actingAs($operator)->get(route('dashboard'));
+        $opDashboard->assertOk();
+        $opDashboard->assertSee('Daftar Rusak Berat');
+
+        // User biasa TIDAK melihat Daftar Rusak Berat di sidebar dan dashboard
+        $userDashboard = $this->actingAs($user)->get(route('dashboard'));
+        $userDashboard->assertOk();
+        $userDashboard->assertDontSee('Daftar Rusak Berat');
+        $userDashboard->assertSee('Pengajuan Saya');
+        $userDashboard->assertSee('Ajukan Pengembalian');
+    }
 }
