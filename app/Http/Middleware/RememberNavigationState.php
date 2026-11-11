@@ -18,11 +18,14 @@ class RememberNavigationState
         'pengembalians.index' => 'pengembalians',
         'bmns-tik.index' => 'bmns-tik',
         'bmns-lab.index' => 'bmns-lab',
+        'bmns-angkutan.index' => 'bmns-angkutan',
         'ba-perpindahan.index' => 'ba-perpindahan',
         'distribusi.index' => 'distribusi',
         'laporan-kerusakan.index' => 'laporan-kerusakan',
         'lokasis.index' => 'lokasis',
         'data-terhapus.index' => 'data-terhapus',
+        'pengajuan-pengembalian.index' => 'pengajuan-pengembalian',
+        'admin.pengajuan-pengembalian.index' => 'pengajuan-pengembalian',
     ];
 
     /**

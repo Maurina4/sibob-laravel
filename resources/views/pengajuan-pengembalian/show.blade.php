@@ -10,7 +10,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <a
-                href="{{ route('pengajuan-pengembalian.index') }}"
+                href="{{ session('nav_last_url.pengajuan-pengembalian', route('pengajuan-pengembalian.index')) }}"
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#62756A] hover:text-[#163828] transition mb-2"
             >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -335,5 +335,16 @@
             </table>
         </div>
     </div>
+
+    {{-- BOTTOM BACK BUTTON --}}
+    <div class="flex items-center justify-between pt-2">
+        <a
+            href="{{ session('nav_last_url.pengajuan-pengembalian', route('pengajuan-pengembalian.index')) }}"
+            class="px-4 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-xl text-xs font-semibold transition"
+        >
+            &larr; Kembali ke Riwayat Pengajuan
+        </a>
+    </div>
+
 </div>
 @endsection

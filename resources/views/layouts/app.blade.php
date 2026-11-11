@@ -291,6 +291,50 @@
                 }
             }, true);
         })();
+
+        // Universal Smart Handler for all "Kembali" / "Batal" navigation buttons
+        (function() {
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('a, button');
+                if (!btn) return;
+
+                // Check text or class
+                const text = (btn.textContent || '').trim().toLowerCase();
+                const isKembali = text.startsWith('kembali') ||
+                                  text.includes('kembali ke') ||
+                                  text === 'kembali' ||
+                                  text === 'batal' ||
+                                  text === 'batalkan' ||
+                                  btn.classList.contains('btn-back');
+
+                if (!isKembali) return;
+
+                // Never intercept form submit, confirm dialogs, or custom JS toggles
+                if (btn.type === 'submit') return;
+                const onclickAttr = btn.getAttribute('onclick') || '';
+                const alpineClick = btn.getAttribute('@click') || btn.getAttribute('x-on:click') || '';
+                if (onclickAttr.includes('confirm') || onclickAttr.includes('submit()') || alpineClick.includes('Modal') || alpineClick.includes('open')) return;
+
+                // If document.referrer exists and is on the same host and not the exact same page or login page
+                if (document.referrer) {
+                    try {
+                        const refUrl = new URL(document.referrer);
+                        const curUrl = new URL(window.location.href);
+
+                        if (refUrl.host === curUrl.host &&
+                            refUrl.pathname !== curUrl.pathname &&
+                            !refUrl.pathname.includes('/login') &&
+                            !refUrl.pathname.includes('/logout')) {
+                            e.preventDefault();
+                            window.history.back();
+                            return;
+                        }
+                    } catch (err) {
+                        // fallback to default link
+                    }
+                }
+            }, false);
+        })();
     </script>
     @stack('scripts')
 

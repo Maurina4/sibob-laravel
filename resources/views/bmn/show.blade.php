@@ -7,16 +7,30 @@
 <div class="space-y-6 max-w-4xl mx-auto">
 
     {{-- KEMBALI & HEADER --}}
+    @php
+        $bmnFallbackUrl = match($bmn->jenis) {
+            'BMN-TIK' => session('nav_last_url.bmns-tik', route('bmns-tik.index')),
+            'BMN-LAB' => session('nav_last_url.bmns-lab', route('bmns-lab.index')),
+            'Alat Angkutan Bermotor' => session('nav_last_url.bmns-angkutan', route('bmns-angkutan.index')),
+            default => session('nav_last_url.bmns', route('bmns.index')),
+        };
+        $bmnFallbackLabel = match($bmn->jenis) {
+            'BMN-TIK' => 'Daftar BMN TIK',
+            'BMN-LAB' => 'Daftar BMN Lab',
+            'Alat Angkutan Bermotor' => 'Daftar Alat Angkutan Bermotor',
+            default => 'Daftar BMN',
+        };
+    @endphp
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <a
-                href="{{ session('nav_last_url.bmns', route('bmns.index')) }}"
+                href="{{ $bmnFallbackUrl }}"
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#62756A] hover:text-[#163828] transition mb-2"
             >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                <span>Kembali ke Daftar BMN</span>
+                <span>Kembali ke {{ $bmnFallbackLabel }}</span>
             </a>
             <h1 class="text-2xl font-bold tracking-tight text-[#132219]">{{ $bmn->nama_barang }}</h1>
             <div class="flex items-center gap-2 mt-1">
@@ -164,6 +178,16 @@
             </div>
         </div>
 
+    </div>
+
+    {{-- TOMBOL KEMBALI BAWAH --}}
+    <div class="flex items-center justify-between pt-2">
+        <a
+            href="{{ $bmnFallbackUrl }}"
+            class="px-4 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-xl text-xs font-semibold transition"
+        >
+            &larr; Kembali ke {{ $bmnFallbackLabel }}
+        </a>
     </div>
 
 </div>

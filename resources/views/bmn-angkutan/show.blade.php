@@ -177,6 +177,16 @@
 
     </div>
 
+    {{-- TOMBOL KEMBALI BAWAH --}}
+    <div class="flex items-center justify-between pt-2">
+        <a
+            href="{{ session('nav_last_url.bmns-angkutan', route('bmns-angkutan.index')) }}"
+            class="px-4 py-2 bg-white hover:bg-[#F2F6F3] border border-[#E3ECE6] text-[#62756A] hover:text-[#132219] rounded-xl text-xs font-semibold transition"
+        >
+            &larr; Kembali ke Daftar Alat Angkutan Bermotor
+        </a>
+    </div>
+
 </div>
 
 <x-qr-modal />

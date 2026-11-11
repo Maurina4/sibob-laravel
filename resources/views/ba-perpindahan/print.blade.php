@@ -544,7 +544,7 @@
     {{-- TOOLBAR KONTROL ATAS --}}
     <div class="toolbar-wrapper no-print">
         <div class="toolbar-group">
-            <a href="{{ route('ba-perpindahan.show', $baPerpindahan) }}" class="btn-tool" title="Kembali ke Detail Pengajuan">
+            <a href="{{ route('ba-perpindahan.show', $baPerpindahan) }}" onclick="if (window.opener) { window.close(); return false; } else if (window.history.length > 1) { window.history.back(); return false; }" class="btn-tool" title="Kembali ke Detail Pengajuan">
                 <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
