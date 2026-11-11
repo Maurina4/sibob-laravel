@@ -131,6 +131,36 @@ class BmnModuleTest extends TestCase
         $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
     }
 
+    public function test_bmn_tik_create_and_edit_page_penanggungjawab_is_searchable_dropdown(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+        Pegawai::create([
+            'nama' => 'Bambang TIK Officer',
+            'nip' => '199001012015011002',
+            'jabatan' => 'Pranata Komputer',
+            'unit_kerja' => 'TIK',
+        ]);
+        $tik = BmnTik::create([
+            'kode_barang' => 'TIK-SEARCH-001',
+            'nup' => '1',
+            'nama_barang' => 'Server Farm Uji PJ',
+            'jenis' => 'PC / Komputer',
+            'lokasi' => 'Ruang Server',
+            'penanggungjawab' => 'Bambang TIK Officer (199001012015011002)',
+            'kondisi' => 'Baik',
+        ]);
+
+        $responseCreate = $this->actingAs($user)->get(route('bmns-tik.create'));
+        $responseCreate->assertOk();
+        $responseCreate->assertSee('x-ref="pjSearchInput"', false);
+        $responseCreate->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+
+        $responseEdit = $this->actingAs($user)->get(route('bmns-tik.edit', $tik));
+        $responseEdit->assertOk();
+        $responseEdit->assertSee('x-ref="pjSearchInput"', false);
+        $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+    }
+
     public function test_bmn_index_page_is_accessible_by_operator(): void
     {
         $user = User::factory()->create([

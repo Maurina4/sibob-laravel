@@ -319,25 +319,171 @@
             </div>
         </div>
 
-        {{-- PENANGGUNG JAWAB --}}
-        <div>
+        {{-- PENANGGUNG JAWAB (SEARCHABLE DROPDOWN BERDASARKAN NAMA & NIP) --}}
+        @php
+            $initPj = old('penanggungjawab', '');
+            $pjOptions = collect();
+            foreach ($pegawais ?? [] as $p) {
+                $val = $p->nip ? "{$p->nama} ({$p->nip})" : $p->nama;
+                $pjOptions->push([
+                    'value' => $val,
+                    'nama' => $p->nama,
+                    'nip' => $p->nip ?: '-',
+                    'label' => $val,
+                ]);
+            }
+            $initNama = 'Pilih Penanggung Jawab...';
+            $initNip = '';
+            if ($initPj) {
+                $foundPj = $pjOptions->first(fn($o) => $o['value'] === $initPj || $o['nama'] === $initPj);
+                if ($foundPj) {
+                    $initNama = $foundPj['nama'];
+                    $initNip = $foundPj['nip'];
+                    $initPj = $foundPj['value'];
+                } else {
+                    $initNama = $initPj;
+                }
+            }
+        @endphp
+        <div
+            x-data="{
+                open: false,
+                search: '',
+                selected: @js($initPj),
+                selectedNama: @js($initNama),
+                selectedNip: @js($initNip),
+                options: @js($pjOptions->values()),
+                get filtered() {
+                    if (!this.search.trim()) return this.options;
+                    const q = this.search.toLowerCase().trim();
+                    return this.options.filter(o =>
+                        (o.nama && o.nama.toLowerCase().includes(q)) ||
+                        (o.nip && o.nip.toLowerCase().includes(q)) ||
+                        (o.label && o.label.toLowerCase().includes(q))
+                    );
+                },
+                select(opt) {
+                    this.selected = opt.value;
+                    this.selectedNama = opt.nama;
+                    this.selectedNip = opt.nip;
+                    this.open = false;
+                    this.search = '';
+                },
+                reset() {
+                    this.selected = '';
+                    this.selectedNama = 'Pilih Penanggung Jawab...';
+                    this.selectedNip = '';
+                    this.open = false;
+                    this.search = '';
+                }
+            }"
+            @click.outside="open = false"
+            @keydown.escape="open = false"
+            class="relative"
+        >
             <x-input-label for="penanggungjawab" value="Penanggung Jawab *" />
-            <select
-                id="penanggungjawab"
-                name="penanggungjawab"
-                required
-                class="w-full border border-[#E3ECE6] bg-white text-[#132219] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 rounded-lg text-xs py-2 pl-3 pr-10 transition cursor-pointer"
-            >
-                <option value="">Pilih Penanggung Jawab</option>
-                @foreach ($pegawais as $pegawai)
-                    @php
-                        $pjFormatted = $pegawai->nip ? "{$pegawai->nama} ({$pegawai->nip})" : $pegawai->nama;
-                    @endphp
-                    <option value="{{ $pjFormatted }}" @selected(old('penanggungjawab') === $pjFormatted || old('penanggungjawab') === $pegawai->nama)>
-                        {{ $pjFormatted }}
-                    </option>
-                @endforeach
-            </select>
+            <input type="hidden" id="penanggungjawab" name="penanggungjawab" :value="selected" required>
+
+            {{-- Trigger Button --}}
+            <div class="relative mt-1">
+                <button
+                    type="button"
+                    @click="open = !open; if(open) { $nextTick(() => $refs.pjSearchInput.focus()); }"
+                    class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-[#E3ECE6] bg-white hover:border-[#163828] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/20 text-xs text-[#132219] transition cursor-pointer shadow-2xs font-medium text-left"
+                    :class="open ? 'border-[#163828] ring-2 ring-[#163828]/20' : ''"
+                >
+                    <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                        <svg class="w-3.5 h-3.5 text-[#8D9D95] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <template x-if="selectedNip && selectedNip !== '-'">
+                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="selectedNip"></span>
+                        </template>
+                        <span class="truncate" :class="selected ? 'text-[#132219]' : 'text-[#8D9D95]'" x-text="selectedNama"></span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <template x-if="selected">
+                            <span
+                                @click.stop="reset()"
+                                class="p-0.5 text-[#8D9D95] hover:text-[#B22222] transition cursor-pointer"
+                                title="Hapus pilihan"
+                            >
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </span>
+                        </template>
+                        <svg class="w-3.5 h-3.5 text-[#8D9D95] transition-transform duration-150" :class="open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </button>
+
+                {{-- Floating Searchable Panel --}}
+                <div
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-xl border border-[#D5E5DA] p-2 z-50 text-xs"
+                    style="display: none;"
+                >
+                    {{-- Search Input --}}
+                    <div class="relative mb-1.5">
+                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            x-ref="pjSearchInput"
+                            x-model="search"
+                            placeholder="Ketik nama atau NIP penanggung jawab..."
+                            class="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] focus:bg-white text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                            @keydown.escape="open = false"
+                            @keydown.enter.prevent="if(filtered.length > 0) select(filtered[0])"
+                        >
+                        <button
+                            type="button"
+                            x-show="search"
+                            @click="search = ''; $refs.pjSearchInput.focus()"
+                            class="absolute inset-y-0 right-0 pr-2 flex items-center text-[#8D9D95] hover:text-[#132219] cursor-pointer"
+                        >
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Option List --}}
+                    <div class="max-h-56 overflow-y-auto space-y-0.5 divide-y divide-[#E3ECE6]/40" style="max-height: 220px; overflow-y: auto; overscroll-behavior: contain;">
+                        <template x-for="opt in filtered" :key="opt.value">
+                            <button
+                                type="button"
+                                @click="select(opt)"
+                                class="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left transition hover:bg-[#EAF2ED] cursor-pointer group"
+                                :class="(selected === opt.value || selectedNama === opt.nama) ? 'bg-[#EAF2ED] text-[#163828] font-semibold' : 'text-[#132219]'"
+                            >
+                                <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                    <template x-if="opt.nip && opt.nip !== '-'">
+                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-[#163828] border border-[#D5E5DA] shadow-2xs shrink-0" x-text="opt.nip"></span>
+                                    </template>
+                                    <span class="truncate text-xs" x-text="opt.label"></span>
+                                </div>
+                                <span x-show="selected === opt.value || selectedNama === opt.nama" class="text-[#163828] font-bold shrink-0 ml-1">✓</span>
+                            </button>
+                        </template>
+                        <div x-show="filtered.length === 0" class="py-4 text-center text-[#8D9D95]">
+                            <p class="text-xs">Tidak ada penanggung jawab cocok</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <x-input-error :messages="$errors->get('penanggungjawab')" class="mt-1" />
         </div>
 
         {{-- KONDISI FISIK --}}
