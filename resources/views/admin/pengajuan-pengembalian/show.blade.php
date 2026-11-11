@@ -376,9 +376,11 @@
                 <ul class="list-disc list-inside space-y-1">
                     <li>Nomor Berita Acara resmi (BA-PGM atau BA-RB) akan diterbitkan secara otomatis.</li>
                     <li>Status pengajuan berubah menjadi <strong class="text-emerald-800">Disetujui</strong>.</li>
-                    <li>Lokasi barang dipindahkan ke <strong class="text-[#132219]">Gudang BMN</strong> dan penanggung jawab diubah ke <strong class="text-[#132219]">Pengelola BMN</strong>.</li>
                     @if ($pengajuan->alasan === 'rusak_berat')
-                        <li class="text-rose-800">Kondisi barang diubah ke <strong>Rusak Berat</strong> dan dokumen <strong>Laporan Kerusakan</strong> otomatis diterbitkan per item barang.</li>
+                        <li class="text-rose-800">Kondisi barang diubah ke <strong>Rusak Berat</strong> (data lokasi ruangan & penanggung jawab tetap dipertahankan).</li>
+                        <li>Dokumen <strong>Laporan Kerusakan</strong> otomatis diterbitkan per item barang.</li>
+                    @else
+                        <li>Lokasi barang dipindahkan ke <strong class="text-[#132219]">Gudang BMN</strong> dan penanggung jawab diubah ke <strong class="text-[#132219]">Pengelola BMN</strong>.</li>
                     @endif
                 </ul>
             </div>

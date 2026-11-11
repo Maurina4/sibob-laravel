@@ -222,8 +222,8 @@ class PengajuanPengembalianService
                         'nomor' => $nomorLk,
                         'tanggal' => $item->tanggal_temuan ?: $locked->tanggal,
                         'bmn_id' => $bmn->id,
-                        'lokasi_id' => $gudang?->id,
-                        'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
+                        'lokasi_id' => $bmn->lokasi_id ?: ($gudang?->id),
+                        'lokasi' => $bmn->lokasi ?: ($item->lokasi_awal ?: 'Gudang BMN'),
                         'pelapor_id' => $locked->diajukan_oleh,
                         'pelapor_pegawai_id' => $locked->pegawai_id,
                         'pelapor_nama' => $locked->nama_pegawai,
@@ -238,18 +238,35 @@ class PengajuanPengembalianService
 
                     $item->update(['laporan_kerusakan_id' => $lk->id]);
 
-                    // Update Master BMN
+                    // Update Master BMN: Hanya kondisi yang diubah menjadi Rusak Berat, data ruangan & penanggung jawab TETAP
                     $bmn->update([
                         'kondisi' => 'Rusak Berat',
-                        'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
-                        'lokasi_id' => $gudang?->id,
-                        'penanggungjawab' => 'Pengelola BMN',
-                        'penanggungjawab_nip' => '-',
-                        'penanggung_jawab_id' => null,
-                        'is_dikembalikan' => true,
                     ]);
+
+                    // Sinkronisasi tabel ekstensi BMN-TIK / BMN-LAB / BMN-ANGKUTAN: hanya kondisi yang diubah
+                    if ($bmn->jenis === 'BMN-TIK' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->tik) {
+                        BmnTik::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'kondisi' => 'Rusak Berat',
+                            ]);
+                    }
+                    if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
+                        BmnLab::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'kondisi' => 'Rusak Berat',
+                            ]);
+                    }
+                    if ($bmn->jenis === 'BMN-ANGKUTAN' || $bmn->angkutan) {
+                        BmnAngkutan::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'kondisi' => 'Rusak Berat',
+                            ]);
+                    }
                 } else {
-                    // Pengembalian Biasa: kondisi tetap Baik
+                    // Pengembalian Biasa: kondisi tetap Baik, barang dipindahkan ke Gudang BMN & penanggung jawab Pengelola BMN
                     $bmn->update([
                         'kondisi' => 'Baik',
                         'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
@@ -259,38 +276,38 @@ class PengajuanPengembalianService
                         'penanggung_jawab_id' => null,
                         'is_dikembalikan' => true,
                     ]);
-                }
 
-                // Sinkronisasi tabel ekstensi BMN-TIK / BMN-LAB jika ada (mendukung Dual Tracking)
-                if ($bmn->jenis === 'BMN-TIK' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->tik) {
-                    BmnTik::where('kode_barang', $bmn->kode_barang)
-                        ->where('nup', $bmn->nup)
-                        ->update([
-                            'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
-                            'penanggungjawab' => 'Pengelola BMN',
-                            'kondisi' => $bmn->kondisi,
-                            'is_dikembalikan' => true,
-                        ]);
-                }
-                if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
-                    BmnLab::where('kode_barang', $bmn->kode_barang)
-                        ->where('nup', $bmn->nup)
-                        ->update([
-                            'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
-                            'penanggungjawab' => 'Pengelola BMN',
-                            'kondisi' => $bmn->kondisi,
-                            'is_dikembalikan' => true,
-                        ]);
-                }
-                if ($bmn->jenis === 'BMN-ANGKUTAN' || $bmn->angkutan) {
-                    BmnAngkutan::where('kode_barang', $bmn->kode_barang)
-                        ->where('nup', $bmn->nup)
-                        ->update([
-                            'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
-                            'penanggungjawab' => 'Pengelola BMN',
-                            'kondisi' => $bmn->kondisi,
-                            'is_dikembalikan' => true,
-                        ]);
+                    // Sinkronisasi tabel ekstensi BMN-TIK / BMN-LAB jika ada (mendukung Dual Tracking)
+                    if ($bmn->jenis === 'BMN-TIK' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->tik) {
+                        BmnTik::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
+                                'penanggungjawab' => 'Pengelola BMN',
+                                'kondisi' => $bmn->kondisi,
+                                'is_dikembalikan' => true,
+                            ]);
+                    }
+                    if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
+                        BmnLab::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
+                                'penanggungjawab' => 'Pengelola BMN',
+                                'kondisi' => $bmn->kondisi,
+                                'is_dikembalikan' => true,
+                            ]);
+                    }
+                    if ($bmn->jenis === 'BMN-ANGKUTAN' || $bmn->angkutan) {
+                        BmnAngkutan::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $gudang ? $gudang->nama : 'Gudang BMN',
+                                'penanggungjawab' => 'Pengelola BMN',
+                                'kondisi' => $bmn->kondisi,
+                                'is_dikembalikan' => true,
+                            ]);
+                    }
                 }
             }
 

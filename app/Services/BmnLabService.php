@@ -42,7 +42,7 @@ class BmnLabService
                 ->pluck('penanggungjawab'),
             'kondisiFilters' => [
                 'Baik',
-                'Rusak',
+                'Rusak Berat',
                 'Perlu Kalibrasi',
             ],
             'statusKalibrasiFilters' => [

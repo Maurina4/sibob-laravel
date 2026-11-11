@@ -100,7 +100,12 @@ class BmnLab extends Model
         }
 
         if (! empty($filters['kondisi'])) {
-            $query->where('kondisi', $filters['kondisi']);
+            $k = trim($filters['kondisi']);
+            if (in_array(strtolower($k), ['rusak', 'rusak berat'])) {
+                $query->whereIn('kondisi', ['Rusak', 'Rusak Berat']);
+            } else {
+                $query->where('kondisi', $k);
+            }
         }
 
         if (! empty($filters['status_kalibrasi'])) {

@@ -456,12 +456,12 @@ class PengajuanPengembalianFeatureTest extends TestCase
             'pengajuan_id' => $pengajuan->id,
         ]);
 
-        // Verifikasi mutasi BMN
+        // Verifikasi mutasi BMN: kondisi berubah jadi Rusak Berat, data ruangan & penanggung jawab tetap utuh
         $bmn->refresh();
-        $this->assertEquals('Gudang BMN', $bmn->lokasi);
-        $this->assertEquals('Pengelola BMN', $bmn->penanggungjawab);
+        $this->assertEquals('Ruang TU', $bmn->lokasi);
+        $this->assertEquals('Budi Santoso', $bmn->penanggungjawab);
         $this->assertEquals('Rusak Berat', $bmn->kondisi);
-        $this->assertTrue((bool) $bmn->is_dikembalikan);
+        $this->assertFalse((bool) $bmn->is_dikembalikan);
 
         // Verifikasi terbitnya Laporan Kerusakan otomatis
         $this->assertDatabaseHas('laporan_kerusakans', [
@@ -609,6 +609,7 @@ class PengajuanPengembalianFeatureTest extends TestCase
     public function test_operator_can_cancel_approved_pengajuan_and_reverts_bmn_assets(): void
     {
         $bmn = $this->createSampleBmn([
+            'lokasi' => 'Ruang Laboratorium Kimia',
             'ruangan' => 'Ruang Laboratorium Kimia',
             'penanggungjawab' => 'Siti Aminah',
             'kondisi' => 'Baik',
@@ -642,9 +643,10 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $pengajuan->refresh();
         $bmn->refresh();
         $this->assertEquals('disetujui', $pengajuan->status);
-        $this->assertEquals('Gudang BMN', $bmn->lokasi);
+        $this->assertEquals('Ruang Laboratorium Kimia', $bmn->lokasi);
         $this->assertEquals('Rusak Berat', $bmn->kondisi);
-        $this->assertTrue($bmn->is_dikembalikan);
+        $this->assertEquals('Siti Aminah', $bmn->penanggungjawab);
+        $this->assertFalse((bool) $bmn->is_dikembalikan);
         $this->assertDatabaseMissing('pengembalians', ['pengajuan_id' => $pengajuan->id]);
         $this->assertDatabaseHas('laporan_kerusakans', ['bmn_id' => $bmn->id]);
 
