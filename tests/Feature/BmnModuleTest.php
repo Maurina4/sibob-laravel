@@ -131,6 +131,37 @@ class BmnModuleTest extends TestCase
         $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
     }
 
+    public function test_bmn_lab_create_and_edit_page_penanggungjawab_is_searchable_dropdown(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+        Pegawai::create([
+            'nama' => 'Sri Rejeki, S.Si.',
+            'nip' => '198901012014022001',
+            'jabatan' => 'Analis Laboratorium',
+            'unit_kerja' => 'Pengujian Kimia',
+        ]);
+        $lab = BmnLab::create([
+            'kode_barang' => 'LAB-SEARCH-001',
+            'nup' => '1',
+            'nama_barang' => 'Spektrofotometer UV-Vis Uji PJ',
+            'kategori' => 'Spektrometri',
+            'lokasi' => 'Laboratorium Kimia',
+            'penanggungjawab' => 'Sri Rejeki, S.Si. (198901012014022001)',
+            'kondisi' => 'Baik',
+            'status_kalibrasi' => 'Terkalibrasi',
+        ]);
+
+        $responseCreate = $this->actingAs($user)->get(route('bmns-lab.create'));
+        $responseCreate->assertOk();
+        $responseCreate->assertSee('x-ref="pjSearchInput"', false);
+        $responseCreate->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+
+        $responseEdit = $this->actingAs($user)->get(route('bmns-lab.edit', $lab));
+        $responseEdit->assertOk();
+        $responseEdit->assertSee('x-ref="pjSearchInput"', false);
+        $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+    }
+
     public function test_bmn_tik_create_and_edit_page_penanggungjawab_is_searchable_dropdown(): void
     {
         $user = User::factory()->create(['role' => 'Operator']);
