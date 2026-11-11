@@ -192,6 +192,29 @@ class BmnModuleTest extends TestCase
         $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
     }
 
+    public function test_bmn_filter_bar_penanggungjawab_is_searchable_dropdown(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+
+        // 1. BMN Umum Index
+        $responseBmn = $this->actingAs($user)->get(route('bmns.index'));
+        $responseBmn->assertOk();
+        $responseBmn->assertSee('x-ref="pjFilterSearchInput"', false);
+        $responseBmn->assertSee('name="penanggungjawab"', false);
+
+        // 2. BMN TIK Index
+        $responseTik = $this->actingAs($user)->get(route('bmns-tik.index'));
+        $responseTik->assertOk();
+        $responseTik->assertSee('x-ref="pjFilterSearchInput"', false);
+        $responseTik->assertSee('name="penanggungjawab"', false);
+
+        // 3. BMN Angkutan Index
+        $responseAngkutan = $this->actingAs($user)->get(route('bmns-angkutan.index'));
+        $responseAngkutan->assertOk();
+        $responseAngkutan->assertSee('x-ref="pjFilterSearchInput"', false);
+        $responseAngkutan->assertSee('name="penanggungjawab"', false);
+    }
+
     public function test_bmn_index_page_is_accessible_by_operator(): void
     {
         $user = User::factory()->create([
