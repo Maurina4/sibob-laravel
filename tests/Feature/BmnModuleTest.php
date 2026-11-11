@@ -4940,4 +4940,30 @@ class BmnModuleTest extends TestCase
         $userDashboard->assertSee('Pengajuan Saya');
         $userDashboard->assertSee('Ajukan Pengembalian');
     }
+
+    public function test_perpindahan_in_user_role_is_not_inside_berita_acara_and_named_perpindahan(): void
+    {
+        $operator = User::factory()->create(['role' => 'Operator']);
+        $user = User::factory()->create(['role' => 'User']);
+
+        // 1. Operator melihat dropdown 'Berita Acara' dan submenu 'BA Perpindahan'
+        $opResponse = $this->actingAs($operator)->get(route('dashboard'));
+        $opResponse->assertOk();
+        $opResponse->assertSee('<span>Berita Acara</span>', false);
+        $opResponse->assertSee('<span>BA Perpindahan</span>', false);
+
+        // 2. User biasa TIDAK melihat menu 'Berita Acara', melainkan menu langsung 'Perpindahan'
+        $userResponse = $this->actingAs($user)->get(route('dashboard'));
+        $userResponse->assertOk();
+        $userResponse->assertDontSee('<span>Berita Acara</span>', false);
+        $userResponse->assertDontSee('<span>BA Perpindahan</span>', false);
+        $userResponse->assertSee('<span>Perpindahan</span>', false);
+
+        // 3. User biasa membuka halaman index perpindahan: judul adalah 'Perpindahan BMN'
+        $userIndex = $this->actingAs($user)->get(route('ba-perpindahan.index'));
+        $userIndex->assertOk();
+        $userIndex->assertSee('Perpindahan BMN');
+        $userIndex->assertSee('Ajukan Perpindahan');
+        $userIndex->assertDontSee('<span>Berita Acara</span>', false);
+    }
 }

@@ -95,38 +95,52 @@
             </div>
         @endif
 
-        {{-- MODUL BERITA ACARA --}}
-        <div class="pt-2">
-            <button
-                type="button"
-                class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-emerald-100/70 hover:bg-white/6 hover:text-white transition"
-                onclick="toggleSubmenu('submenu-ba', this)"
-            >
-                <div class="flex items-center gap-3">
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        {{-- MODUL BERITA ACARA (OPERATOR) / PERPINDAHAN (USER) --}}
+        @if(auth()->user()->role === 'Operator')
+            <div class="pt-2">
+                <button
+                    type="button"
+                    class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-emerald-100/70 hover:bg-white/6 hover:text-white transition"
+                    onclick="toggleSubmenu('submenu-ba', this)"
+                >
+                    <div class="flex items-center gap-3">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Berita Acara</span>
+                    </div>
+                    <svg class="w-3.5 h-3.5 transition-transform {{ request()->routeIs('ba-perpindahan.*', 'distribusi.*', 'pengembalians.*') ? 'rotate-90' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
-                    <span>Berita Acara</span>
-                </div>
-                <svg class="w-3.5 h-3.5 transition-transform {{ request()->routeIs('ba-perpindahan.*', 'distribusi.*', 'pengembalians.*') ? 'rotate-90' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
+                </button>
 
-            <div id="submenu-ba" class="pl-7 pr-1 pt-1 space-y-1 {{ request()->routeIs('ba-perpindahan.*', 'distribusi.*', 'pengembalians.*') ? 'block' : 'hidden' }}">
-                <a href="{{ session('nav_last_url.ba-perpindahan', route('ba-perpindahan.index')) }}" data-nav-key="ba-perpindahan" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('ba-perpindahan.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
-                    <span>BA Perpindahan</span>
-                </a>
-                @if(auth()->user()->role === 'Operator')
+                <div id="submenu-ba" class="pl-7 pr-1 pt-1 space-y-1 {{ request()->routeIs('ba-perpindahan.*', 'distribusi.*', 'pengembalians.*') ? 'block' : 'hidden' }}">
+                    <a href="{{ session('nav_last_url.ba-perpindahan', route('ba-perpindahan.index')) }}" data-nav-key="ba-perpindahan" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('ba-perpindahan.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
+                        <span>BA Perpindahan</span>
+                    </a>
                     <a href="{{ session('nav_last_url.distribusi', route('distribusi.index')) }}" data-nav-key="distribusi" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('distribusi.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>BA Distribusi</span>
                     </a>
                     <a href="{{ session('nav_last_url.pengembalians', route('pengembalians.index')) }}" data-nav-key="pengembalians" class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition {{ request()->routeIs('pengembalians.*') ? 'bg-white/12 text-white font-medium' : 'text-emerald-100/60 hover:text-white hover:bg-white/5' }}">
                         <span>BA Pengembalian</span>
                     </a>
-                @endif
+                </div>
             </div>
-        </div>
+        @else
+            {{-- MENU PERPINDAHAN UNTUK USER BIASA (STANDALONE, BUKAN BERITA ACARA) --}}
+            <div class="pt-2">
+                <a
+                    href="{{ session('nav_last_url.ba-perpindahan', route('ba-perpindahan.index')) }}"
+                    data-nav-key="ba-perpindahan"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition {{ request()->routeIs('ba-perpindahan.*') ? 'bg-white/12 text-white font-semibold shadow-xs' : 'text-emerald-100/70 hover:bg-white/6 hover:text-white' }}"
+                >
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    <span>Perpindahan</span>
+                </a>
+            </div>
+        @endif
 
         {{-- DAFTAR RUSAK BERAT (HANYA OPERATOR) --}}
         @if(auth()->user()->role === 'Operator')

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Ajukan BA Perpindahan — SIBOB')
-@section('page-title', 'Ajukan BA Perpindahan')
+@section('title', (auth()->check() && auth()->user()->role === 'Operator' ? 'Ajukan BA Perpindahan' : 'Ajukan Perpindahan') . ' — SIBOB')
+@section('page-title', auth()->check() && auth()->user()->role === 'Operator' ? 'Ajukan BA Perpindahan' : 'Ajukan Perpindahan')
 
 @section('content')
 <div class="space-y-6 max-w-3xl mx-auto">
@@ -15,9 +15,9 @@
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Kembali ke Daftar BA Perpindahan</span>
+            <span>Kembali ke {{ auth()->check() && auth()->user()->role === 'Operator' ? 'Daftar BA Perpindahan' : 'Daftar Perpindahan' }}</span>
         </a>
-        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Pengajuan Berita Acara Perpindahan</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">{{ auth()->check() && auth()->user()->role === 'Operator' ? 'Pengajuan Berita Acara Perpindahan' : 'Pengajuan Perpindahan BMN' }}</h1>
         <p class="text-xs text-[#62756A] mt-0.5">Ajukan mutasi atau pemindahan barang BMN antar ruangan atau pemegang aset.</p>
     </div>
 

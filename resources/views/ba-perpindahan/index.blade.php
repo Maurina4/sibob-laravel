@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Berita Acara Perpindahan — SIBOB')
-@section('page-title', 'BA Perpindahan')
+@section('title', (auth()->check() && auth()->user()->role === 'Operator' ? 'Berita Acara Perpindahan' : 'Perpindahan BMN') . ' — SIBOB')
+@section('page-title', auth()->check() && auth()->user()->role === 'Operator' ? 'BA Perpindahan' : 'Perpindahan')
 
 @section('content')
 <div class="space-y-6">
@@ -10,8 +10,8 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Mutasi Internal</div>
-            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Berita Acara Perpindahan BMN</h1>
-            <p class="text-xs text-[#62756A] mt-0.5">Pengajuan dan persetujuan perpindahan barang inventaris antar pegawai atau ruangan.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">{{ auth()->check() && auth()->user()->role === 'Operator' ? 'Berita Acara Perpindahan BMN' : 'Perpindahan BMN' }}</h1>
+            <p class="text-xs text-[#62756A] mt-0.5">{{ auth()->check() && auth()->user()->role === 'Operator' ? 'Pengajuan dan persetujuan perpindahan barang inventaris antar pegawai atau ruangan.' : 'Pengajuan dan pemantauan permohonan perpindahan barang inventaris milik Anda antar ruangan atau penanggung jawab.' }}</p>
         </div>
 
         <a
@@ -21,7 +21,7 @@
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Ajukan BA Perpindahan</span>
+            <span>{{ auth()->check() && auth()->user()->role === 'Operator' ? 'Ajukan BA Perpindahan' : 'Ajukan Perpindahan' }}</span>
         </a>
     </div>
 
@@ -331,7 +331,7 @@
                                         href="{{ route('ba-perpindahan.create') }}"
                                         class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#163828] text-white rounded-lg text-xs font-semibold hover:bg-[#1E4834] transition shadow-2xs"
                                     >
-                                        + Ajukan BA Perpindahan
+                                        {{ auth()->check() && auth()->user()->role === 'Operator' ? '+ Ajukan BA Perpindahan' : '+ Ajukan Perpindahan' }}
                                     </a>
                                 </div>
                             </td>
