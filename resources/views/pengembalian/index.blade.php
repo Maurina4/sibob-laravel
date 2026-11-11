@@ -7,21 +7,10 @@
 <div class="space-y-6">
 
     {{-- HEADER HALAMAN --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Dokumen Berita Acara</div>
-            <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Berita Acara Pengembalian BMN</h1>
-            <p class="text-xs text-[#62756A] mt-0.5">Pencatatan dan penerbitan Berita Acara Serah Terima (BAST) pengembalian barang milik negara.</p>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-[#EAF2ED] text-[#163828] border border-[#D5E5DA]">
-                <svg class="w-3.5 h-3.5 text-[#163828]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Diterbitkan Otomatis dari Pengajuan Disetujui</span>
-            </span>
-        </div>
+    <div>
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Dokumen Berita Acara</div>
+        <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Berita Acara Pengembalian BMN</h1>
+        <p class="text-xs text-[#62756A] mt-0.5">Pencatatan dan penerbitan Berita Acara Serah Terima (BAST) pengembalian barang milik negara.</p>
     </div>
 
     {{-- FILTER BAR --}}
