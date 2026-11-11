@@ -269,15 +269,34 @@
             </div>
         </div>
 
-        {{-- PANEL KANAN: ANTRIAN PERSETUJUAN / TRANSAKSI --}}
+        {{-- PANEL KANAN: ANTREAN VERIFIKASI / STATUS PENGAJUAN --}}
         <div class="bg-white border border-[#E3ECE6] rounded-xl p-6 shadow-2xs flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between pb-4 border-b border-[#E3ECE6]">
-                    <h3 class="text-sm font-semibold text-[#132219]">Antrean Verifikasi</h3>
+                    <h3 class="text-sm font-semibold text-[#132219]">{{ auth()->user()->role === 'Operator' ? 'Antrean Verifikasi' : 'Status Pengajuan' }}</h3>
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                 </div>
 
                 <div class="mt-4 space-y-3">
+                    {{-- PENGAJUAN PENGEMBALIAN --}}
+                    @php
+                        $pengembalianCount = auth()->user()->role === 'Operator'
+                            ? \App\Models\PengajuanPengembalian::where('status', 'diajukan')->count()
+                            : \App\Models\PengajuanPengembalian::where('diajukan_oleh', auth()->id())->count();
+                    @endphp
+                    <a
+                        href="{{ route('pengajuan-pengembalian.index') }}"
+                        class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white hover:bg-[#F7FAF8] hover:border-[#163828]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                    >
+                        <div>
+                            <div class="text-xs font-medium text-[#132219] group-hover:text-[#163828] transition">Pengajuan Pengembalian</div>
+                            <div class="text-[11px] text-[#62756A]">{{ auth()->user()->role === 'Operator' ? 'Menunggu verifikasi' : 'Permohonan saya' }}</div>
+                        </div>
+                        <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED] group-hover:bg-[#163828] group-hover:text-white transition">
+                            {{ $pengembalianCount }}
+                        </span>
+                    </a>
+
                     {{-- BA PERPINDAHAN / PERPINDAHAN --}}
                     <a
                         href="{{ route('ba-perpindahan.index') }}"
@@ -292,32 +311,22 @@
                         </span>
                     </a>
 
-                    {{-- DISTRIBUSI --}}
-                    <a
-                        href="{{ route('distribusi.index') }}"
-                        class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white hover:bg-[#F7FAF8] hover:border-[#163828]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
-                    >
-                        <div>
-                            <div class="text-xs font-medium text-[#132219] group-hover:text-[#163828] transition">Distribusi Barang</div>
-                            <div class="text-[11px] text-[#62756A]">Permintaan diajukan</div>
-                        </div>
-                        <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED] group-hover:bg-[#163828] group-hover:text-white transition">
-                            {{ $jumlahDistribusi }}
-                        </span>
-                    </a>
+                    {{-- DISTRIBUSI (HANYA OPERATOR) --}}
+                    @if(auth()->user()->role === 'Operator')
+                        <a
+                            href="{{ route('distribusi.index') }}"
+                            class="p-3.5 rounded-lg border border-[#E3ECE6] bg-white hover:bg-[#F7FAF8] hover:border-[#163828]/40 flex items-center justify-between transition cursor-pointer group shadow-2xs"
+                        >
+                            <div>
+                                <div class="text-xs font-medium text-[#132219] group-hover:text-[#163828] transition">Distribusi Barang</div>
+                                <div class="text-[11px] text-[#62756A]">Permintaan diajukan</div>
+                            </div>
+                            <span class="text-sm font-bold text-[#163828] px-2 py-0.5 rounded bg-[#EAF2ED] group-hover:bg-[#163828] group-hover:text-white transition">
+                                {{ $jumlahDistribusi }}
+                            </span>
+                        </a>
+                    @endif
                 </div>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-[#E3ECE6]">
-                <a
-                    href="{{ route('ba-perpindahan.index') }}"
-                    class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[#F7FAF8] hover:bg-[#EAF2ED] text-[#163828] border border-[#E3ECE6] text-xs font-semibold transition"
-                >
-                    <span>{{ auth()->user()->role === 'Operator' ? 'Buka Daftar Verifikasi' : 'Buka Riwayat Perpindahan' }}</span>
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
             </div>
         </div>
 
