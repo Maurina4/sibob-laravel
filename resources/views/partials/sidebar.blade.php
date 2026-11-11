@@ -193,7 +193,7 @@
     {{-- FOOTER SIDEBAR --}}
     <div class="p-3 border-t border-white/10 bg-[#0E281C]">
         <div class="px-3 py-2 rounded-lg bg-white/5 border border-white/5 text-[11px] text-emerald-200/70 flex items-center justify-between">
-            <span>Balai POM BJM</span>
+            <span>Balai POM BJB</span>
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
         </div>
     </div>
