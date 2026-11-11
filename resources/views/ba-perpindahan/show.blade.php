@@ -571,7 +571,7 @@
 
                         <p class="text-xs text-[#62756A]">
                             @if($status === 'Disetujui')
-                                Jika dibatalkan, status akan diubah menjadi <strong>Dibatalkan</strong> dan master BMN dipulihkan ke lokasi semula. Anda dapat memutuskan ulang kembali melalui Form Aksi.
+                                Jika dibatalkan, status akan diubah menjadi <strong>Dibatalkan</strong>, serta posisi lokasi dan penanggung jawab BMN otomatis dipulihkan ke semula. Anda dapat memutuskan ulang kembali melalui Form Aksi.
                             @else
                                 Jika dibatalkan, penolakan akan ditarik kembali dan Anda dapat memutuskan ulang (Setuju atau Ditolak lagi) melalui Form Aksi.
                             @endif

@@ -246,7 +246,7 @@ class BaPerpindahanController extends Controller
         );
 
         return back(fallback: route('ba-perpindahan.show', $baPerpindahan))
-            ->with('success', 'Keputusan BA perpindahan berhasil dibatalkan. Status diubah menjadi Dibatalkan dan Anda dapat memutuskan kembali.');
+            ->with('success', 'Keputusan BA perpindahan berhasil dibatalkan. Status diubah menjadi Dibatalkan serta posisi aset dan penanggung jawab BMN telah dipulihkan ke semula.');
     }
 
     public function cancelApproval(Request $request, BaPerpindahan $baPerpindahan)

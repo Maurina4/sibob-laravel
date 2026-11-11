@@ -257,16 +257,21 @@ class BaPerpindahanService
             $bmn = $baPerpindahan->bmn;
             if ($bmn) {
                 $bmnUpdate = [];
+
+                // 1. Lokasi Baru (ke)
                 if (! empty($baPerpindahan->ke)) {
-                    $bmnUpdate['lokasi'] = $baPerpindahan->ke;
-                    $lokasiModel = Lokasi::where('nama', $baPerpindahan->ke)->first();
+                    $lokasiModel = Lokasi::findByNameOrCode($baPerpindahan->ke);
                     if ($lokasiModel) {
+                        $bmnUpdate['lokasi'] = $lokasiModel->nama;
                         $bmnUpdate['lokasi_id'] = $lokasiModel->id;
+                    } else {
+                        $bmnUpdate['lokasi'] = $baPerpindahan->ke;
                     }
                 }
+
+                // 2. Penanggung Jawab Baru (Pihak Kedua)
                 $finalPihakKedua = $pihakKedua ?? $baPerpindahan->pihak_kedua;
                 if (! empty($finalPihakKedua)) {
-                    $bmnUpdate['penanggungjawab'] = $finalPihakKedua;
                     $pegawaiModel = null;
                     if (preg_match('/\((\d+)\)/', $finalPihakKedua, $matches)) {
                         $pegawaiModel = Pegawai::where('nip', $matches[1])->first();
@@ -275,37 +280,49 @@ class BaPerpindahanService
                         $cleanName = trim(preg_replace('/\s*\(.*?\)\s*/', '', $finalPihakKedua));
                         $pegawaiModel = Pegawai::where('nama', $cleanName)->orWhere('nama', $finalPihakKedua)->first();
                     }
+
+                    $bmnUpdate['penanggungjawab'] = $finalPihakKedua;
                     if ($pegawaiModel) {
                         $bmnUpdate['penanggung_jawab_id'] = $pegawaiModel->id;
-                        if (! empty($pegawaiModel->nip)) {
-                            $bmnUpdate['penanggungjawab_nip'] = $pegawaiModel->nip;
-                        }
+                        $bmnUpdate['penanggungjawab_nip'] = $pegawaiModel->nip ?: '-';
                     }
                 }
+
                 if (! empty($bmnUpdate)) {
                     $bmnUpdate['is_dikembalikan'] = false;
                     $bmn->update($bmnUpdate);
 
-                    if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
-                        $subUpdate = ['is_dikembalikan' => false];
-                        if (isset($bmnUpdate['lokasi'])) {
-                            $subUpdate['lokasi'] = $bmnUpdate['lokasi'];
-                        }
-                        if (isset($bmnUpdate['penanggungjawab'])) {
-                            $subUpdate['penanggungjawab'] = $bmnUpdate['penanggungjawab'];
-                        }
-                        BmnTik::where('kode_barang', $bmn->kode_barang)
-                            ->where('nup', $bmn->nup)
-                            ->update($subUpdate);
-
-                        BmnLab::where('kode_barang', $bmn->kode_barang)
-                            ->where('nup', $bmn->nup)
-                            ->update($subUpdate);
-
-                        BmnAngkutan::where('kode_barang', $bmn->kode_barang)
-                            ->where('nup', $bmn->nup)
-                            ->update($subUpdate);
+                    $subUpdate = ['is_dikembalikan' => false];
+                    if (isset($bmnUpdate['lokasi'])) {
+                        $subUpdate['lokasi'] = $bmnUpdate['lokasi'];
                     }
+                    if (isset($bmnUpdate['penanggungjawab'])) {
+                        $subUpdate['penanggungjawab'] = $bmnUpdate['penanggungjawab'];
+                    }
+
+                    BmnTik::where('bmn_id', $bmn->id)
+                        ->orWhere(function ($q) use ($bmn) {
+                            if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+                                $q->where('kode_barang', $bmn->kode_barang)->where('nup', $bmn->nup);
+                            }
+                        })
+                        ->update($subUpdate);
+
+                    BmnLab::where('bmn_id', $bmn->id)
+                        ->orWhere(function ($q) use ($bmn) {
+                            if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+                                $q->where('kode_barang', $bmn->kode_barang)->where('nup', $bmn->nup);
+                            }
+                        })
+                        ->update($subUpdate);
+
+                    BmnAngkutan::where('bmn_id', $bmn->id)
+                        ->orWhere(function ($q) use ($bmn) {
+                            if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+                                $q->where('kode_barang', $bmn->kode_barang)->where('nup', $bmn->nup);
+                            }
+                        })
+                        ->update($subUpdate);
                 }
             }
         }
@@ -331,28 +348,83 @@ class BaPerpindahanService
             $bmn = $baPerpindahan->bmn;
             if ($bmn) {
                 $bmnRevert = [];
-                if (! empty($baPerpindahan->dari)) {
-                    $bmnRevert['lokasi'] = $baPerpindahan->dari;
-                    $lokasiModel = Lokasi::where('nama', $baPerpindahan->dari)->first();
-                    if ($lokasiModel) {
-                        $bmnRevert['lokasi_id'] = $lokasiModel->id;
-                    }
-                }
-                $revertPjName = $baPerpindahan->pihak_pertama ?: $baPerpindahan->pengaju_nama;
-                $revertPjId = $baPerpindahan->pihak_pertama_id ?: $baPerpindahan->pegawai_id;
 
-                if (! empty($revertPjName)) {
-                    $bmnRevert['penanggungjawab'] = $revertPjName;
-                }
-                if ($revertPjId) {
-                    $bmnRevert['penanggung_jawab_id'] = $revertPjId;
-                    $revertPegawai = Pegawai::find($revertPjId);
-                    if ($revertPegawai && ! empty($revertPegawai->nip)) {
-                        $bmnRevert['penanggungjawab_nip'] = $revertPegawai->nip;
+                // 1. Lokasi Semula (dari)
+                if (! empty($baPerpindahan->dari)) {
+                    $lokasiModel = Lokasi::findByNameOrCode($baPerpindahan->dari);
+                    if ($lokasiModel) {
+                        $bmnRevert['lokasi'] = $lokasiModel->nama;
+                        $bmnRevert['lokasi_id'] = $lokasiModel->id;
+                    } else {
+                        $bmnRevert['lokasi'] = $baPerpindahan->dari;
                     }
                 }
+
+                // 2. Penanggung Jawab Semula (Pihak Pertama / Asal)
+                $rawPjName = $baPerpindahan->pihak_pertama ?: $baPerpindahan->pengaju_nama;
+                $pjPegawaiId = $baPerpindahan->pihak_pertama_id;
+
+                $revertPegawai = null;
+                if ($pjPegawaiId) {
+                    $revertPegawai = Pegawai::find($pjPegawaiId);
+                }
+                if (! $revertPegawai && ! empty($rawPjName)) {
+                    if (preg_match('/\((\d+)\)/', $rawPjName, $matches)) {
+                        $revertPegawai = Pegawai::where('nip', $matches[1])->first();
+                    }
+                    if (! $revertPegawai) {
+                        $cleanName = trim(preg_replace('/\s*\(.*?\)\s*/', '', $rawPjName));
+                        $revertPegawai = Pegawai::where('nama', $cleanName)->orWhere('nama', $rawPjName)->first();
+                    }
+                }
+
+                if ($revertPegawai) {
+                    $bmnRevert['penanggungjawab'] = $revertPegawai->nama;
+                    $bmnRevert['penanggung_jawab_id'] = $revertPegawai->id;
+                    $bmnRevert['penanggungjawab_nip'] = $revertPegawai->nip ?: '-';
+                } elseif (! empty($rawPjName)) {
+                    $cleanName = trim(preg_replace('/\s*\(.*?\)\s*/', '', $rawPjName));
+                    $bmnRevert['penanggungjawab'] = $cleanName;
+                    $bmnRevert['penanggung_jawab_id'] = null;
+                    $bmnRevert['penanggungjawab_nip'] = '-';
+                }
+
                 if (! empty($bmnRevert)) {
                     $bmn->update($bmnRevert);
+
+                    $subRevert = [];
+                    if (isset($bmnRevert['lokasi'])) {
+                        $subRevert['lokasi'] = $bmnRevert['lokasi'];
+                    }
+                    if (isset($bmnRevert['penanggungjawab'])) {
+                        $subRevert['penanggungjawab'] = $bmnRevert['penanggungjawab'];
+                    }
+
+                    if (! empty($subRevert)) {
+                        BmnTik::where('bmn_id', $bmn->id)
+                            ->orWhere(function ($q) use ($bmn) {
+                                if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+                                    $q->where('kode_barang', $bmn->kode_barang)->where('nup', $bmn->nup);
+                                }
+                            })
+                            ->update($subRevert);
+
+                        BmnLab::where('bmn_id', $bmn->id)
+                            ->orWhere(function ($q) use ($bmn) {
+                                if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+                                    $q->where('kode_barang', $bmn->kode_barang)->where('nup', $bmn->nup);
+                                }
+                            })
+                            ->update($subRevert);
+
+                        BmnAngkutan::where('bmn_id', $bmn->id)
+                            ->orWhere(function ($q) use ($bmn) {
+                                if (! empty($bmn->kode_barang) && ! empty($bmn->nup)) {
+                                    $q->where('kode_barang', $bmn->kode_barang)->where('nup', $bmn->nup);
+                                }
+                            })
+                            ->update($subRevert);
+                    }
                 }
             }
         }
