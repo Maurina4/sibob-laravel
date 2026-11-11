@@ -699,4 +699,27 @@ class PengajuanPengembalianFeatureTest extends TestCase
 
         $this->assertEquals('disetujui', $pengajuan->fresh()->status);
     }
+
+    public function test_pengajuan_pengembalian_views_do_not_have_cetak_button(): void
+    {
+        $pengajuan = $this->createPengajuan([
+            'diajukan_oleh' => $this->regularUser->id,
+            'status' => 'disetujui',
+            'nomor_ba' => 'BA-PGM/20261110/001',
+        ]);
+
+        // 1. User view index & show
+        $resIndex = $this->actingAs($this->regularUser)->get(route('pengajuan-pengembalian.index'));
+        $resIndex->assertOk();
+        $resIndex->assertDontSee('Cetak Berita Acara');
+
+        $resShow = $this->actingAs($this->regularUser)->get(route('pengajuan-pengembalian.show', $pengajuan));
+        $resShow->assertOk();
+        $resShow->assertDontSee('Cetak Berita Acara');
+
+        // 2. Admin view show
+        $resAdminShow = $this->actingAs($this->operator)->get(route('admin.pengajuan-pengembalian.show', $pengajuan));
+        $resAdminShow->assertOk();
+        $resAdminShow->assertDontSee('Cetak Berita Acara');
+    }
 }
