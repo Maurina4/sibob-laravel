@@ -722,4 +722,47 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $resAdminShow->assertOk();
         $resAdminShow->assertDontSee('Cetak Berita Acara');
     }
+
+    public function test_create_view_is_dedicated_for_kondisi_baik_and_links_to_daftar_rusak_berat(): void
+    {
+        $this->createSampleBmn(['kondisi' => 'Baik']);
+
+        $response = $this->actingAs($this->regularUser)->get(route('pengajuan-pengembalian.create'));
+        $response->assertOk();
+        $response->assertSee('Kriteria Pengembalian BMN');
+        $response->assertSee('Khusus Kondisi: Baik');
+        $response->assertSee('Barang Mengalami Rusak Berat?');
+        $response->assertSee(route('laporan-kerusakan.create'));
+        $response->assertDontSee('name="alasan" value="rusak_berat"', false);
+    }
+
+    public function test_available_bmns_for_pengembalian_only_returns_kondisi_baik(): void
+    {
+        $bmnBaik = $this->createSampleBmn([
+            'nama_barang' => 'Laptop Baik',
+            'nup' => '101',
+            'kondisi' => 'Baik',
+        ]);
+
+        $bmnRusak = $this->createSampleBmn([
+            'nama_barang' => 'Laptop Rusak Berat',
+            'nup' => '102',
+            'kondisi' => 'Rusak Berat',
+        ]);
+
+        $response = $this->actingAs($this->regularUser)->getJson(route('pengajuan-pengembalian.api-search-bmn'));
+        $response->assertOk();
+
+        $ids = collect($response->json())->pluck('id')->toArray();
+        $this->assertContains($bmnBaik->id, $ids);
+        $this->assertNotContains($bmnRusak->id, $ids);
+    }
+
+    public function test_laporan_kerusakan_index_displays_laporkan_rusak_berat_button(): void
+    {
+        $response = $this->actingAs($this->regularUser)->get(route('laporan-kerusakan.index'));
+        $response->assertOk();
+        $response->assertSee('Laporkan Rusak Berat');
+        $response->assertSee(route('laporan-kerusakan.create'));
+    }
 }

@@ -67,8 +67,8 @@ class PengajuanPengembalianService
             })
             ->whereNotIn('id', $pendingBmnIds);
 
-        // Filter alasan pengembalian biasa: hanya kondisi 'Baik'
-        if ($alasan === 'pengembalian_biasa') {
+        // Filter pengembalian BMN: dikhususkan hanya untuk BMN dengan kondisi 'Baik'
+        if ($alasan !== 'rusak_berat') {
             $query->where(function ($q) {
                 $q->whereNull('kondisi')
                     ->orWhereRaw('LOWER(kondisi) = ?', ['baik'])

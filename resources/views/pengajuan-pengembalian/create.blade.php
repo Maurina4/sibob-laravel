@@ -19,7 +19,7 @@
         </a>
         <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Pengajuan Pengembalian BMN</h1>
         <p class="text-xs text-[#62756A] mt-0.5">
-            Ajukan pengembalian BMN yang telah selesai digunakan atau laporkan barang rusak berat untuk verifikasi pengelola BMN.
+            Ajukan pengembalian BMN kondisi baik yang telah selesai digunakan untuk verifikasi dan serah terima pengelola BMN.
         </p>
     </div>
 
@@ -96,74 +96,61 @@
             </div>
         </div>
 
-        {{-- CARD 2: JENIS PENGAJUAN (ALASAN) --}}
+        {{-- CARD 2: KRITERIA PENGEMBALIAN BMN --}}
         <div class="bg-white rounded-2xl border border-[#E3ECE6] p-6 lg:p-7 shadow-2xs space-y-4">
+            <input type="hidden" name="alasan" value="pengembalian_biasa" />
+
             <div class="flex items-center justify-between pb-3 border-b border-[#E3ECE6]">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-[#163828]"></span>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Jenis & Alasan Pengembalian <span class="text-[#9C322C]">*</span></h2>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-[#132219]">Kriteria Pengembalian BMN</h2>
                 </div>
-                <span class="text-[11px] text-[#62756A]">Pilih salah satu sesuai kondisi riil barang</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    Khusus Kondisi: Baik
+                </span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {{-- PILIHAN A: PENGEMBALIAN BIASA --}}
-                <label
-                    @click="setAlasan('pengembalian_biasa')"
-                    class="relative flex flex-col p-4 rounded-xl border-2 transition cursor-pointer"
-                    :class="alasan === 'pengembalian_biasa' ? 'border-[#163828] bg-[#F7FAF8]' : 'border-[#E3ECE6] bg-white hover:border-[#163828]/40'"
-                >
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <input
-                                type="radio"
-                                name="alasan"
-                                value="pengembalian_biasa"
-                                x-model="alasan"
-                                class="text-[#163828] focus:ring-[#163828] h-4 w-4"
-                            />
+                {{-- INFO KONDISI BAIK --}}
+                <div class="p-4 rounded-xl border border-emerald-200 bg-[#F7FAF8] flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#163828]"></span>
                             <span class="text-xs font-bold text-[#132219]">Pengembalian Barang Layak Pakai</span>
                         </div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                            Kondisi: Baik
-                        </span>
+                        <p class="text-[11px] text-[#62756A] leading-relaxed">
+                            Formulir ini dikhususkan untuk penyerahan atau pengembalian BMN dalam <strong>kondisi baik dan berfungsi normal</strong> yang telah selesai digunakan atau masa penugasannya berakhir.
+                        </p>
                     </div>
-                    <p class="text-[11px] text-[#62756A] mt-2.5 ml-6.5 leading-relaxed">
-                        BMN dalam kondisi baik dan berfungsi normal yang sudah tidak digunakan lagi atau selesai masa penugasan.
-                    </p>
-                    <div class="mt-3 ml-6.5 text-[10px] text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60">
-                        ✓ Berita Acara: <strong>BA-PGM/...</strong> • Masuk kembali ke Gudang BMN.
+                    <div class="mt-3 text-[11px] text-[#163828] bg-emerald-50/80 px-3 py-1.5 rounded-lg border border-emerald-200/60 font-medium">
+                        ✓ Diterbitkan <strong>Berita Acara Pengembalian (BA-PGM)</strong> dan aset masuk kembali ke Gudang BMN.
                     </div>
-                </label>
+                </div>
 
-                {{-- PILIHAN B: RUSAK BERAT --}}
-                <label
-                    @click="setAlasan('rusak_berat')"
-                    class="relative flex flex-col p-4 rounded-xl border-2 transition cursor-pointer"
-                    :class="alasan === 'rusak_berat' ? 'border-[#9C322C] bg-[#FDF0EE]/50' : 'border-[#E3ECE6] bg-white hover:border-[#9C322C]/40'"
-                >
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <input
-                                type="radio"
-                                name="alasan"
-                                value="rusak_berat"
-                                x-model="alasan"
-                                class="text-[#9C322C] focus:ring-[#9C322C] h-4 w-4"
-                            />
-                            <span class="text-xs font-bold text-[#9C322C]">Pelaporan Rusak Berat (Usul Hapus)</span>
+                {{-- CALLOUT ARAHKAN KE DAFTAR RUSAK BERAT --}}
+                <div class="p-4 rounded-xl border border-[#F8D4D0] bg-[#FFF8F7] flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#9C322C]"></span>
+                            <span class="text-xs font-bold text-[#9C322C]">Barang Mengalami Rusak Berat?</span>
                         </div>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800">
-                            Kondisi: Rusak Berat
-                        </span>
+                        <p class="text-[11px] text-[#62756A] leading-relaxed">
+                            Aset yang mati total, rusak berat, atau tidak ekonomis diperbaiki harus dilaporkan melalui modul <strong>Daftar Rusak Berat</strong> agar langsung diproses untuk usulan penghapusan BMN.
+                        </p>
                     </div>
-                    <p class="text-[11px] text-[#62756A] mt-2.5 ml-6.5 leading-relaxed">
-                        BMN mengalami kerusakan fatal, mati total, atau tidak ekonomis diperbaiki. Memerlukan tanggal kejadian dan deskripsi kerusakan per item.
-                    </p>
-                    <div class="mt-3 ml-6.5 text-[10px] text-rose-700 bg-rose-50 px-2.5 py-1.5 rounded-lg border border-rose-200/60">
-                        ✓ Berita Acara: <strong>BA-RB/...</strong> • Otomatis menerbitkan Laporan Kerusakan untuk usulan penghapusan.
+                    <div class="mt-3 pt-2 border-t border-[#F8D4D0]/60 flex items-center justify-between">
+                        <span class="text-[11px] text-[#9C322C] font-semibold">Bukan di formulir pengembalian</span>
+                        <a
+                            href="{{ route('laporan-kerusakan.create') }}"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#9C322C] hover:bg-[#822924] text-white rounded-lg text-xs font-semibold shadow-2xs transition"
+                        >
+                            <span>Ke Daftar Rusak Berat</span>
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
                     </div>
-                </label>
+                </div>
             </div>
         </div>
 
@@ -376,24 +363,11 @@
                                     <input
                                         type="hidden"
                                         :name="`items[${index}][kondisi]`"
-                                        :value="alasan === 'pengembalian_biasa' ? 'Baik' : 'Rusak Berat'"
+                                        value="Baik"
                                     />
-                                    <template x-if="alasan === 'pengembalian_biasa'">
-                                        <input
-                                            type="text"
-                                            readonly
-                                            value="Baik"
-                                            class="w-full bg-[#F0FDF4] border border-[#DCFCE7] text-emerald-800 font-semibold rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
-                                        />
-                                    </template>
-                                    <template x-if="alasan === 'rusak_berat'">
-                                        <input
-                                            type="text"
-                                            readonly
-                                            value="Rusak Berat"
-                                            class="w-full bg-[#FEF2F2] border border-[#FEE2E2] text-rose-800 font-semibold rounded-lg text-xs py-2 px-3 cursor-not-allowed select-none"
-                                        />
-                                    </template>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F0FDF4] border border-[#DCFCE7] text-emerald-800">
+                                        Baik
+                                    </span>
                                 </td>
 
                                 {{-- KETERANGAN --}}
@@ -420,44 +394,6 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
-                                </td>
-                            </tr>
-
-                            {{-- SUB-BARIS UNTUK RUSAK BERAT --}}
-                            <tr x-show="alasan === 'rusak_berat'" class="bg-[#FFF8F7] border-b border-[#F8D4D0]">
-                                <td colspan="8" class="py-3 px-4">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-2 h-2 rounded-full bg-[#9C322C]"></span>
-                                        <span class="text-xs font-bold text-[#9C322C] uppercase tracking-wide">Rincian Kerusakan Berat (Barang #<span x-text="index + 1"></span>)</span>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                                        <div class="md:col-span-4">
-                                            <label class="block text-[11px] font-semibold text-[#9C322C] mb-1">
-                                                Tanggal Temuan Kerusakan <span class="text-[#9C322C]">*</span>
-                                            </label>
-                                            <input
-                                                type="date"
-                                                :name="`items[${index}][tanggal_temuan]`"
-                                                x-model="item.tanggal_temuan"
-                                                max="{{ date('Y-m-d') }}"
-                                                :required="alasan === 'rusak_berat'"
-                                                class="w-full text-xs rounded-lg border border-[#F8D4D0] bg-white focus:border-[#9C322C] focus:ring-1 focus:ring-[#9C322C] py-2 px-3 text-[#132219]"
-                                            />
-                                        </div>
-                                        <div class="md:col-span-8">
-                                            <label class="block text-[11px] font-semibold text-[#9C322C] mb-1">
-                                                Rincian & Gejala Kerusakan Berat <span class="text-[#9C322C]">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                :name="`items[${index}][deskripsi_kerusakan]`"
-                                                x-model="item.deskripsi_kerusakan"
-                                                placeholder="Contoh: Korsleting listrik, mati total, motherboard terbakar dan tidak ekonomis diperbaiki."
-                                                :required="alasan === 'rusak_berat'"
-                                                class="w-full text-xs rounded-lg border border-[#F8D4D0] bg-white focus:border-[#9C322C] focus:ring-1 focus:ring-[#9C322C] py-2 px-3 text-[#132219]"
-                                            />
-                                        </div>
-                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -536,8 +472,6 @@
                 'open' => false,
                 'panelStyle' => '',
                 'searchQuery' => '',
-                'tanggal_temuan' => $it['tanggal_temuan'] ?? date('Y-m-d'),
-                'deskripsi_kerusakan' => $it['deskripsi_kerusakan'] ?? '',
                 'keterangan' => $it['keterangan'] ?? '',
             ];
         }
@@ -555,8 +489,6 @@
             'open' => false,
             'panelStyle' => '',
             'searchQuery' => '',
-            'tanggal_temuan' => date('Y-m-d'),
-            'deskripsi_kerusakan' => '',
             'keterangan' => '',
         ];
     }
@@ -566,19 +498,9 @@ function pengajuanForm() {
     const rawBmns = @json($initialBmns);
 
     return {
-        alasan: '{{ old('alasan', 'pengembalian_biasa') }}',
+        alasan: 'pengembalian_biasa',
         allBmns: rawBmns || [],
         items: @json($initialItemsList),
-
-        setAlasan(val) {
-            this.alasan = val;
-            fetch(`{{ route('pengajuan-pengembalian.api-search-bmn') }}?alasan=${val}`)
-                .then(res => res.json())
-                .then(data => {
-                    this.allBmns = data;
-                })
-                .catch(err => console.error(err));
-        },
 
         addItem() {
             this.items.push({
@@ -593,8 +515,6 @@ function pengajuanForm() {
                 open: false,
                 panelStyle: '',
                 searchQuery: '',
-                tanggal_temuan: '{{ date('Y-m-d') }}',
-                deskripsi_kerusakan: '',
                 keterangan: ''
             });
         },
@@ -689,7 +609,6 @@ function pengajuanForm() {
             target.open = false;
             target.searchQuery = '';
             target.keterangan = '';
-            target.deskripsi_kerusakan = '';
         },
 
         handleSubmit(e) {
@@ -700,18 +619,7 @@ function pengajuanForm() {
                 return false;
             }
 
-            if (this.alasan === 'rusak_berat') {
-                for (let i = 0; i < this.items.length; i++) {
-                    const it = this.items[i];
-                    if (!it.tanggal_temuan || !it.deskripsi_kerusakan || it.deskripsi_kerusakan.trim().length < 5) {
-                        e.preventDefault();
-                        alert(`Baris #${i + 1}: Untuk usulan rusak berat, tanggal temuan dan rincian kerusakan (minimal 5 karakter) wajib diisi.`);
-                        return false;
-                    }
-                }
-            }
-
-            return confirm('Apakah Anda yakin data pengajuan pengembalian ini sudah benar dan siap diajukan?');
+            return confirm('Apakah Anda yakin data pengajuan pengembalian BMN kondisi baik ini sudah benar dan siap diajukan?');
         }
     };
 }

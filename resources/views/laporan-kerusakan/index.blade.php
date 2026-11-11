@@ -11,7 +11,18 @@
         <div>
             <div class="text-[11px] font-semibold uppercase tracking-wider text-[#62756A]">Layanan & Aduan Kerusakan</div>
             <h1 class="text-2xl font-bold tracking-tight text-[#132219]">Daftar Rusak Berat</h1>
-            <p class="text-xs text-[#62756A] mt-0.5">Daftar riwayat kerusakan aset BMN yang diterbitkan otomatis melalui formulir Pengajuan Pengembalian BMN.</p>
+            <p class="text-xs text-[#62756A] mt-0.5">Daftar pencatatan dan pelaporan aset BMN rusak berat untuk usulan perbaikan atau penghapusan BMN.</p>
+        </div>
+        <div>
+            <a
+                href="{{ route('laporan-kerusakan.create') }}"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#9C322C] hover:bg-[#822924] active:bg-[#681E1A] text-white rounded-xl text-xs font-semibold shadow-2xs transition"
+            >
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Laporkan Rusak Berat</span>
+            </a>
         </div>
     </div>
 

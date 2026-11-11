@@ -13,6 +13,13 @@ class StorePengajuanPengembalianRequest extends FormRequest
         return auth()->check();
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('alasan') || empty($this->input('alasan'))) {
+            $this->merge(['alasan' => 'pengembalian_biasa']);
+        }
+    }
+
     public function rules(): array
     {
         $rules = [
