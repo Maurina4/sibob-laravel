@@ -119,7 +119,7 @@ class LaporanKerusakanService
                         ->where('bmn_id', $oldBmn->id)
                         ->where('id', '!=', $laporanKerusakan->id)
                         ->active()
-                        ->whereIn('status', ['Diterima', 'Diproses'])
+                        ->whereIn('status', ['Dilaporkan', 'Diterima', 'Diproses'])
                         ->latest()
                         ->first();
 
@@ -171,18 +171,18 @@ class LaporanKerusakanService
 
         $targetKondisi = null;
 
-        if (in_array($laporanKerusakan->status, ['Diterima', 'Diproses'])) {
+        if (in_array($laporanKerusakan->status, ['Dilaporkan', 'Diterima', 'Diproses'])) {
             $targetKondisi = match ($laporanKerusakan->tingkat) {
                 'Rusak Berat', 'Berat' => 'Rusak Berat',
                 'Sedang', 'Rusak Sedang' => 'Rusak Sedang',
                 default => 'Rusak Berat',
             };
-        } elseif (in_array($laporanKerusakan->status, ['Selesai', 'Ditolak', 'Dilaporkan'])) {
+        } elseif (in_array($laporanKerusakan->status, ['Selesai', 'Ditolak'])) {
             $otherReport = LaporanKerusakan::query()
                 ->where('bmn_id', $bmn->id)
                 ->where('id', '!=', $laporanKerusakan->id)
                 ->active()
-                ->whereIn('status', ['Diterima', 'Diproses'])
+                ->whereIn('status', ['Dilaporkan', 'Diterima', 'Diproses'])
                 ->latest()
                 ->first();
 
@@ -260,7 +260,7 @@ class LaporanKerusakanService
                     ->where('bmn_id', $bmn->id)
                     ->where('id', '!=', $laporanKerusakan->id)
                     ->active()
-                    ->whereIn('status', ['Diterima', 'Diproses'])
+                    ->whereIn('status', ['Dilaporkan', 'Diterima', 'Diproses'])
                     ->latest()
                     ->first();
 

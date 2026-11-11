@@ -104,7 +104,7 @@ class LaporanKerusakanController extends Controller
         $successMessage = 'Laporan kerusakan berhasil diperbarui.';
         if (isset($validated['status'])) {
             $freshLaporan = $laporanKerusakan->fresh();
-            if (in_array($validated['status'], ['Diterima', 'Diproses'])) {
+            if (in_array($validated['status'], ['Dilaporkan', 'Diterima', 'Diproses'])) {
                 $kondisiTerkait = match ($freshLaporan->tingkat) {
                     'Rusak Berat', 'Berat' => 'Rusak Berat',
                     'Sedang', 'Rusak Sedang' => 'Rusak Sedang',

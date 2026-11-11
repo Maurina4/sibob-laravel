@@ -4192,7 +4192,7 @@ class BmnModuleTest extends TestCase
             'kondisi' => 'Baik',
         ]);
 
-        // 1. User membuat laporan kerusakan: kondisi BMN awal tetap 'Baik' sebelum diterima
+        // 1. User membuat laporan kerusakan: kondisi BMN langsung berubah menjadi 'Rusak Berat' saat dilaporkan
         $createRes = $this->actingAs($user)->post(route('laporan-kerusakan.store'), [
             'nomor' => 'LK-SYNC-001',
             'tanggal' => now()->toDateString(),
@@ -4204,8 +4204,8 @@ class BmnModuleTest extends TestCase
         ]);
         $createRes->assertRedirect(route('laporan-kerusakan.index'));
 
-        $this->assertEquals('Baik', $bmn->fresh()->kondisi);
-        $this->assertEquals('Baik', $bmnTik->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmn->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmnTik->fresh()->kondisi);
 
         $laporan = LaporanKerusakan::where('nomor', 'LK-SYNC-001')->firstOrFail();
 
@@ -5082,5 +5082,94 @@ class BmnModuleTest extends TestCase
         $userIndex->assertSee('Perpindahan BMN');
         $userIndex->assertSee('Ajukan Perpindahan');
         $userIndex->assertDontSee('<span>Berita Acara</span>', false);
+    }
+
+    public function test_barang_dilaporkan_rusak_tetap_ada_di_daftar_dan_kondisi_berubah_jadi_rusak_berat(): void
+    {
+        $operator = User::factory()->create(['role' => 'Operator']);
+        $pegawai = Pegawai::create([
+            'nama' => 'Rina Kartika',
+            'nip' => '199411032020122004',
+            'jabatan' => 'Pranata Komputer',
+            'unit_kerja' => 'Tata Usaha',
+        ]);
+        $user = User::factory()->create([
+            'role' => 'User',
+            'name' => 'Rina Kartika',
+        ]);
+
+        $lokasi = Lokasi::create([
+            'nama' => 'Ruang Server TIK',
+            'kode_ruangan' => 'R-TIK-01',
+            'gedung' => 'Gedung A',
+        ]);
+
+        $bmn = Bmn::create([
+            'kode_barang' => 'BMN-TEST-RUSAK-01',
+            'nup' => '1',
+            'nama_barang' => 'Server Cloud SIBOB',
+            'merek' => 'Dell PowerEdge',
+            'lokasi' => 'Ruang Server TIK',
+            'lokasi_id' => $lokasi->id,
+            'penanggungjawab' => 'Rina Kartika',
+            'penanggung_jawab_id' => $pegawai->id,
+            'penanggungjawab_nip' => $pegawai->nip,
+            'jenis' => 'BMN-TIK',
+            'kondisi' => 'Baik',
+            'tahun_perolehan' => 2024,
+            'dihapus' => false,
+        ]);
+
+        $bmnTik = BmnTik::create([
+            'bmn_id' => $bmn->id,
+            'kode_barang' => 'BMN-TEST-RUSAK-01',
+            'nup' => '1',
+            'nama_barang' => 'Server Cloud SIBOB',
+            'lokasi' => 'Ruang Server TIK',
+            'penanggungjawab' => 'Rina Kartika',
+            'jenis' => 'Server',
+            'kondisi' => 'Baik',
+        ]);
+
+        // Kondisi awal: Baik
+        $this->assertEquals('Baik', $bmn->fresh()->kondisi);
+        $this->assertEquals('Baik', $bmnTik->fresh()->kondisi);
+
+        // User / Operator melaporkan kerusakan
+        $response = $this->actingAs($user)->post(route('laporan-kerusakan.store'), [
+            'nomor' => 'LK/20261111/TEST01',
+            'tanggal' => now()->toDateString(),
+            'bmn_id' => $bmn->id,
+            'nama_barang' => 'Server Cloud SIBOB',
+            'lokasi' => 'Ruang Server TIK',
+            'tingkat' => 'Rusak Berat',
+            'deskripsi' => 'Power supply meledak dan server mati total.',
+        ]);
+
+        $response->assertRedirect(route('laporan-kerusakan.index'));
+
+        // 1. Kondisi BMN dan ekstensi langsung berubah menjadi 'Rusak Berat' saat dilaporkan
+        $this->assertEquals('Rusak Berat', $bmn->fresh()->kondisi);
+        $this->assertEquals('Rusak Berat', $bmnTik->fresh()->kondisi);
+
+        // 2. Data BMN TETAP ADA DI DAFTAR (lokasi & penanggung jawab tidak berubah / tidak dihapus)
+        $this->assertEquals('Ruang Server TIK', $bmn->fresh()->lokasi);
+        $this->assertEquals('Rina Kartika', $bmn->fresh()->penanggungjawab);
+        $this->assertFalse((bool) $bmn->fresh()->dihapus);
+        $this->assertNull($bmn->fresh()->deleted_at);
+
+        // 3. Pada halaman Daftar BMN, item tetap tampil dengan label/kondisi 'Rusak Berat'
+        $indexResponse = $this->actingAs($operator)->get(route('bmns.index'));
+        $indexResponse->assertOk();
+        $indexResponse->assertSee('Server Cloud SIBOB');
+        $indexResponse->assertSee('Rusak Berat');
+
+        // 4. Jika laporan kerusakan dihapus, kondisi BMN otomatis pulih kembali ke 'Baik'
+        $laporan = LaporanKerusakan::where('nomor', 'LK/20261111/TEST01')->firstOrFail();
+        $deleteResponse = $this->actingAs($operator)->delete(route('laporan-kerusakan.destroy', $laporan));
+        $deleteResponse->assertRedirect();
+
+        $this->assertEquals('Baik', $bmn->fresh()->kondisi);
+        $this->assertEquals('Baik', $bmnTik->fresh()->kondisi);
     }
 }
