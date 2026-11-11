@@ -98,6 +98,39 @@ class BmnModuleTest extends TestCase
         $responseEdit->assertSee('198703202012031003');
     }
 
+    public function test_bmn_create_and_edit_page_penanggungjawab_is_searchable_dropdown(): void
+    {
+        $user = User::factory()->create(['role' => 'Operator']);
+        Pegawai::create([
+            'nama' => 'Dr. H. Sulaiman, M.Sc.',
+            'nip' => '198501012010121001',
+            'jabatan' => 'Staff Pengujian',
+            'unit_kerja' => 'Laboratorium',
+        ]);
+        $bmn = Bmn::create([
+            'kode_barang' => 'SEARCH-PJ-001',
+            'nup' => '1',
+            'nama_barang' => 'Alat Uji PJ Searchable',
+            'jenis' => 'BMN-Umum',
+            'lokasi' => 'Gudang BMN',
+            'penanggungjawab' => 'Dr. H. Sulaiman, M.Sc. (198501012010121001)',
+            'penanggungjawab_nip' => '198501012010121001',
+            'kondisi' => 'Baik',
+            'dihapus' => false,
+        ]);
+
+        $responseCreate = $this->actingAs($user)->get(route('bmns.create'));
+        $responseCreate->assertOk();
+        // Memastikan menggunakan searchable dropdown dengan trigger dan input search
+        $responseCreate->assertSee('x-ref="pjSearchInput"', false);
+        $responseCreate->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+
+        $responseEdit = $this->actingAs($user)->get(route('bmns.edit', $bmn));
+        $responseEdit->assertOk();
+        $responseEdit->assertSee('x-ref="pjSearchInput"', false);
+        $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+    }
+
     public function test_bmn_index_page_is_accessible_by_operator(): void
     {
         $user = User::factory()->create([
