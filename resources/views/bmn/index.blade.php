@@ -241,23 +241,80 @@
     {{-- INDIKATOR FILTER & SHORTCUT EXPORT EXCEL --}}
     @if(request()->hasAny(['tahun', 'search', 'jenis', 'lokasi', 'penanggungjawab', 'kondisi']))
         <div class="flex flex-wrap items-center justify-between gap-3 bg-[#EAF2ED]/80 border border-[#D5E5DA] px-4 py-2.5 rounded-xl text-xs text-[#163828]">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <svg class="w-4 h-4 text-[#107C41] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
-                <span>
-                    Monev Terfilter:
-                    @if(request('tahun') === 'current')
-                        <span class="font-bold bg-white px-2 py-0.5 rounded border border-[#D5E5DA]">Tahun Berjalan ({{ date('Y') }})</span>
-                    @elseif(request('tahun') === 'previous')
-                        <span class="font-bold bg-white px-2 py-0.5 rounded border border-[#D5E5DA]">Tahun Sebelumnya ({{ date('Y') - 1 }})</span>
-                    @elseif(request('tahun') === 'prior_all')
-                        <span class="font-bold bg-white px-2 py-0.5 rounded border border-[#D5E5DA]">Semua Thn Lalu (&le; {{ date('Y') - 1 }})</span>
-                    @elseif(request('tahun'))
-                        <span class="font-bold bg-white px-2 py-0.5 rounded border border-[#D5E5DA]">Tahun {{ request('tahun') }}</span>
-                    @endif
-                    <span class="text-[#4D6357] ml-1">Total: <strong>{{ $bmns->total() }}</strong> barang</span>
-                </span>
+                <span class="font-semibold text-[#163828]">Filter Aktif:</span>
+
+                {{-- KONDISI PILL --}}
+                @if(request('kondisi'))
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Kondisi: <strong>{{ request('kondisi') }}</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('kondisi', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter kondisi">&times;</a>
+                    </span>
+                @endif
+
+                {{-- SEARCH PILL --}}
+                @if(request('search'))
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Cari: "<strong>{{ request('search') }}</strong>"</span>
+                        <a href="{{ route('bmns.index', request()->except('search', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus pencarian">&times;</a>
+                    </span>
+                @endif
+
+                {{-- JENIS PILL --}}
+                @if(request('jenis'))
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Jenis: <strong>{{ request('jenis') }}</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('jenis', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter jenis">&times;</a>
+                    </span>
+                @endif
+
+                {{-- LOKASI PILL --}}
+                @if(request('lokasi'))
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Lokasi: <strong>{{ request('lokasi') }}</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('lokasi', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter lokasi">&times;</a>
+                    </span>
+                @endif
+
+                {{-- PENANGGUNG JAWAB PILL --}}
+                @if(request('penanggungjawab'))
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>PJ: <strong>{{ request('penanggungjawab') }}</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('penanggungjawab', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter penanggung jawab">&times;</a>
+                    </span>
+                @endif
+
+                {{-- TAHUN PILL --}}
+                @if(request('tahun') === 'current')
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Tahun: <strong>Berjalan ({{ date('Y') }})</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('tahun', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter tahun">&times;</a>
+                    </span>
+                @elseif(request('tahun') === 'previous')
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Tahun: <strong>Sebelumnya ({{ date('Y') - 1 }})</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('tahun', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter tahun">&times;</a>
+                    </span>
+                @elseif(request('tahun') === 'prior_all')
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Tahun: <strong>Semua Lalu (&le; {{ date('Y') - 1 }})</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('tahun', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter tahun">&times;</a>
+                    </span>
+                @elseif(request('tahun'))
+                    <span class="inline-flex items-center gap-1.5 font-bold bg-white text-[#163828] px-2.5 py-1 rounded-lg border border-[#D5E5DA] shadow-2xs">
+                        <span>Tahun: <strong>{{ request('tahun') }}</strong></span>
+                        <a href="{{ route('bmns.index', request()->except('tahun', 'page')) }}" class="text-[#8D9D95] hover:text-rose-600 transition font-black ml-0.5 text-sm leading-none" title="Hapus filter tahun">&times;</a>
+                    </span>
+                @endif
+
+                <span class="text-[#4D6357] ml-1">Total: <strong>{{ $bmns->total() }}</strong> barang</span>
+
+                <a href="{{ route('bmns.index') }}" class="inline-flex items-center gap-1 text-xs font-semibold text-[#9C322C] hover:text-rose-800 underline ml-2 cursor-pointer" title="Reset dan tampilkan semua barang">
+                    Reset Filter
+                </a>
             </div>
             <a
                 href="{{ route('bmns.export', request()->query()) }}"
