@@ -3464,6 +3464,57 @@ class BmnModuleTest extends TestCase
         $this->assertLessThan($posC2, $posC1, 'C1 must be ordered before C2');
     }
 
+    public function test_lokasi_validation_prevents_same_kode_ruangan_and_nama_or_duplicates(): void
+    {
+        $operator = User::factory()->create(['role' => 'Operator']);
+
+        // 1. Ditolak jika kode_ruangan dan nama bernilai sama
+        $resSame = $this->actingAs($operator)->post(route('lokasis.store'), [
+            'kode_ruangan' => 'R.TEST',
+            'nama' => 'R.TEST',
+        ]);
+        $resSame->assertSessionHasErrors(['kode_ruangan', 'nama']);
+
+        // 2. Buat lokasi unik awal
+        $resValid = $this->actingAs($operator)->post(route('lokasis.store'), [
+            'kode_ruangan' => 'R.TEST.01',
+            'nama' => 'Ruang Laboratorium Khusus',
+        ]);
+        $resValid->assertRedirect();
+        $this->assertDatabaseHas('lokasis', ['kode_ruangan' => 'R.TEST.01', 'nama' => 'Ruang Laboratorium Khusus']);
+
+        // 3. Ditolak jika kode_ruangan duplikat
+        $resDupKode = $this->actingAs($operator)->post(route('lokasis.store'), [
+            'kode_ruangan' => 'R.TEST.01',
+            'nama' => 'Ruang Lain Berbeda',
+        ]);
+        $resDupKode->assertSessionHasErrors(['kode_ruangan']);
+
+        // 4. Ditolak jika nama duplikat
+        $resDupNama = $this->actingAs($operator)->post(route('lokasis.store'), [
+            'kode_ruangan' => 'R.TEST.02',
+            'nama' => 'Ruang Laboratorium Khusus',
+        ]);
+        $resDupNama->assertSessionHasErrors(['nama']);
+
+        // 5. Update: ditolak jika mengubah nama/kode ke data yang sudah dipakai lokasi lain
+        $lokasiA = Lokasi::where('kode_ruangan', 'R.TEST.01')->firstOrFail();
+        $lokasiB = Lokasi::create(['kode_ruangan' => 'R.TEST.03', 'nama' => 'Ruang Arsip Tambahan']);
+
+        $resUpdateDup = $this->actingAs($operator)->put(route('lokasis.update', $lokasiB), [
+            'kode_ruangan' => 'R.TEST.01', // Milik lokasiA
+            'nama' => 'Ruang Arsip Tambahan',
+        ]);
+        $resUpdateDup->assertSessionHasErrors(['kode_ruangan']);
+
+        // 6. Update: berhasil jika mempertahankan kode dan namanya sendiri
+        $resUpdateSelf = $this->actingAs($operator)->put(route('lokasis.update', $lokasiA), [
+            'kode_ruangan' => 'R.TEST.01',
+            'nama' => 'Ruang Laboratorium Khusus',
+        ]);
+        $resUpdateSelf->assertRedirect();
+    }
+
     public function test_ba_perpindahan_print_template_srikandi_a4_and_f4(): void
     {
         $operator = User::factory()->create(['role' => 'Operator']);
