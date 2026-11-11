@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Bmn;
 use App\Models\BmnAngkutan;
 use App\Models\DataTerhapus;
+use App\Models\Pegawai;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -55,6 +56,38 @@ class BmnAngkutanFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Tambah Data Alat Angkutan Bermotor');
         $response->assertSee('Nomor Polisi (Plat Nomor)');
+    }
+
+    public function test_bmn_angkutan_create_and_edit_page_penanggungjawab_is_searchable_dropdown(): void
+    {
+        $user = $this->createOperator();
+        Pegawai::create([
+            'nama' => 'Hasan Basri, S.T.',
+            'nip' => '198701012011011003',
+            'jabatan' => 'Pengemudi / Teknisi Angkutan',
+            'unit_kerja' => 'Umum',
+        ]);
+        $angkutan = BmnAngkutan::create([
+            'kode_barang' => 'ANGKUTAN-PJ-001',
+            'nup' => 1,
+            'nama_barang' => 'Mitsubishi Triton Double Cabin',
+            'merek' => 'Mitsubishi',
+            'no_polisi' => 'DA 9999 XX',
+            'tahun_perolehan' => 2022,
+            'lokasi' => 'Garasi BMN',
+            'penanggungjawab' => 'Hasan Basri, S.T. (198701012011011003)',
+            'kondisi' => 'Baik',
+        ]);
+
+        $responseCreate = $this->actingAs($user)->get(route('bmns-angkutan.create'));
+        $responseCreate->assertOk();
+        $responseCreate->assertSee('x-ref="pjSearchInput"', false);
+        $responseCreate->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
+
+        $responseEdit = $this->actingAs($user)->get(route('bmns-angkutan.edit', $angkutan));
+        $responseEdit->assertOk();
+        $responseEdit->assertSee('x-ref="pjSearchInput"', false);
+        $responseEdit->assertSee('type="hidden" id="penanggungjawab" name="penanggungjawab"', false);
     }
 
     public function test_operator_can_create_bmn_angkutan_with_no_polisi_and_syncs_to_bmns(): void
