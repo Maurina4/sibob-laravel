@@ -4,7 +4,7 @@
 @section('page-title', 'Daftar BMN TIK')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="bmnTableBatchManager()" @bmn-field-changed="handleFieldChanged($event)">
 
     {{-- HEADER HALAMAN --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -14,18 +14,49 @@
             <p class="text-xs text-[#62756A] mt-0.5">Pengelolaan perangkat teknologi informasi dan komunikasi BBPOM di Banjarbaru.</p>
         </div>
 
-        <a
-            href="{{ route('bmns-tik.create') }}"
-            class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#163828] hover:bg-[#1E4834] active:bg-[#0E281C] text-white rounded-xl text-xs font-semibold tracking-wide shadow-2xs transition shrink-0"
-        >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Tambah BMN TIK</span>
-        </a>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            {{-- TOMBOL SIMPAN SEMUA PERUBAHAN (BATCH) --}}
+            <template x-if="dirtyCount > 0">
+                <div class="inline-flex items-center gap-1.5 animate-fadeIn">
+                    <button
+                        type="button"
+                        @click="submitBatch()"
+                        class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-[#0E5954] hover:bg-[#163828] active:bg-[#093734] text-white rounded-xl text-xs font-semibold tracking-wide transition shadow-sm cursor-pointer"
+                        title="Simpan semua perubahan lokasi dan penanggung jawab di halaman ini"
+                    >
+                        <svg class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        <span>Simpan Semua Perubahan</span>
+                        <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-400 text-emerald-950 font-mono" x-text="dirtyCount"></span>
+                    </button>
+                    <button
+                        type="button"
+                        @click="cancelAll()"
+                        class="inline-flex items-center gap-1.5 px-3 py-2.5 bg-white hover:bg-rose-50 text-rose-700 hover:text-rose-800 border border-rose-200 rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
+                        title="Batalkan semua perubahan di halaman ini"
+                    >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Batal</span>
+                    </button>
+                </div>
+            </template>
+
+            <a
+                href="{{ route('bmns-tik.create') }}"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#163828] hover:bg-[#1E4834] active:bg-[#0E281C] text-white rounded-xl text-xs font-semibold tracking-wide shadow-2xs transition shrink-0"
+            >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah BMN TIK</span>
+            </a>
+        </div>
     </div>
 
-    {{-- MASTER LOKASI MEMORY CACHE UNTUK SEARCHABLE DROPDOWNS --}}
+    {{-- MASTER LOKASI & PEGAWAI MEMORY CACHE UNTUK SEARCHABLE DROPDOWNS --}}
     @php
         $masterLokasiOptions = ($lokasis ?? collect())->map(function($l) {
             return [
@@ -53,12 +84,39 @@
                 }
             }
         }
+
+        $masterPegawaiOptions = ($penanggungjawabs ?? collect())->map(function($p) {
+            return [
+                'id' => $p->id,
+                'nama' => $p->nama,
+                'nip' => $p->nip ?? '',
+                'jabatan' => $p->jabatan ?? '',
+                'label' => $p->nip ? "{$p->nama} ({$p->nip})" : $p->nama,
+            ];
+        })->values();
+
+        $existingPjNames = $masterPegawaiOptions->pluck('nama')->map(fn($n) => strtolower(trim($n)))->toArray();
+        foreach ($bmnsTik as $rowBmn) {
+            $rawPj = trim((string)($rowBmn->penanggungjawab ?? ''));
+            if ($rawPj !== '' && $rawPj !== '—' && !in_array(strtolower($rawPj), $existingPjNames)) {
+                $masterPegawaiOptions->push([
+                    'id' => null,
+                    'nama' => $rawPj,
+                    'nip' => '',
+                    'jabatan' => '',
+                    'label' => $rawPj,
+                ]);
+                $existingPjNames[] = strtolower($rawPj);
+            }
+        }
     @endphp
     <script>
         window.__MASTER_LOKASIS__ = @json($masterLokasiOptions);
+        window.__MASTER_PEGAWAIS__ = @json($masterPegawaiOptions);
 
         window.bmnLocationCell = function(config) {
             return {
+                bmnId: config.bmnId,
                 open: false,
                 openUpward: false,
                 search: '',
@@ -71,6 +129,13 @@
                 initialKode: config.selectedKode || '',
                 initialNama: config.selectedNama || 'Pilih Lokasi...',
                 itemName: config.itemName || '',
+                init() {
+                    window.addEventListener('bmn-batch-reset', () => {
+                        if (this.isChanged) {
+                            this.resetToInitial();
+                        }
+                    });
+                },
                 get isChanged() {
                     return this.selected !== this.initialSelected;
                 },
@@ -108,8 +173,13 @@
                     if (this.$refs.hiddenInput) {
                         this.$refs.hiddenInput.value = opt.label;
                     }
+                    this.notifyBatch();
                 },
                 cancel() {
+                    this.resetToInitial();
+                    this.notifyBatch();
+                },
+                resetToInitial() {
                     this.selected = this.initialSelected;
                     this.selectedLabel = this.initialLabel;
                     this.selectedKode = this.initialKode;
@@ -119,6 +189,14 @@
                     if (this.$refs.hiddenInput) {
                         this.$refs.hiddenInput.value = this.initialSelected;
                     }
+                },
+                notifyBatch() {
+                    this.$dispatch('bmn-field-changed', {
+                        id: this.bmnId,
+                        field: 'lokasi',
+                        isChanged: this.isChanged,
+                        data: this.isChanged ? { lokasi: this.selected } : null
+                    });
                 },
                 confirmSave() {
                     if (!this.isChanged) return;
@@ -132,6 +210,185 @@
                     if (this.$refs.form) {
                         this.$refs.form.submit();
                     }
+                }
+            };
+        };
+
+        window.bmnPjCell = function(config) {
+            return {
+                bmnId: config.bmnId,
+                open: false,
+                openUpward: false,
+                search: '',
+                selected: config.selected || '',
+                selectedId: config.selectedId || null,
+                selectedNip: config.selectedNip || '',
+                selectedNama: config.selectedNama || 'Pilih PJ...',
+                selectedJabatan: config.selectedJabatan || '',
+                initialSelected: config.selected || '',
+                initialId: config.selectedId || null,
+                initialNip: config.selectedNip || '',
+                initialNama: config.selectedNama || 'Pilih PJ...',
+                initialJabatan: config.selectedJabatan || '',
+                itemName: config.itemName || '',
+                init() {
+                    window.addEventListener('bmn-batch-reset', () => {
+                        if (this.isChanged) {
+                            this.resetToInitial();
+                        }
+                    });
+                },
+                get isChanged() {
+                    return (this.selected || '') !== (this.initialSelected || '');
+                },
+                toggle(triggerEl) {
+                    this.open = !this.open;
+                    if (this.open) {
+                        if (triggerEl) {
+                            const rect = triggerEl.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            this.openUpward = (spaceBelow < 250 && rect.top > spaceBelow);
+                        }
+                        this.$nextTick(() => {
+                            if (this.$refs.rowPjSearchInput) {
+                                this.$refs.rowPjSearchInput.focus();
+                            }
+                        });
+                    }
+                },
+                get filtered() {
+                    if (!this.search.trim()) return window.__MASTER_PEGAWAIS__ || [];
+                    const q = this.search.toLowerCase().trim();
+                    return (window.__MASTER_PEGAWAIS__ || []).filter(p =>
+                        (p.nama && p.nama.toLowerCase().includes(q)) ||
+                        (p.nip && p.nip.toLowerCase().includes(q)) ||
+                        (p.jabatan && p.jabatan.toLowerCase().includes(q))
+                    );
+                },
+                select(opt) {
+                    if (!opt) return;
+                    this.selected = opt.nama;
+                    this.selectedId = opt.id;
+                    this.selectedNip = opt.nip || '';
+                    this.selectedNama = opt.nama;
+                    this.selectedJabatan = opt.jabatan || '';
+                    this.open = false;
+                    this.notifyBatch();
+                },
+                cancel() {
+                    this.resetToInitial();
+                    this.notifyBatch();
+                },
+                resetToInitial() {
+                    this.selected = this.initialSelected;
+                    this.selectedId = this.initialId;
+                    this.selectedNip = this.initialNip;
+                    this.selectedNama = this.initialNama;
+                    this.selectedJabatan = this.initialJabatan;
+                    this.open = false;
+                    this.search = '';
+                },
+                notifyBatch() {
+                    this.$dispatch('bmn-field-changed', {
+                        id: this.bmnId,
+                        field: 'pj',
+                        isChanged: this.isChanged,
+                        data: this.isChanged ? {
+                            penanggungjawab: this.selected,
+                            penanggung_jawab_id: this.selectedId,
+                            penanggungjawab_nip: this.selectedNip
+                        } : null
+                    });
+                },
+                confirmSave() {
+                    if (!this.isChanged) return;
+                    const msg = 'Apakah Anda yakin ingin mengubah penanggung jawab barang "' + this.itemName + '" ke "' + this.selectedNama + '"?';
+                    if (!confirm(msg)) {
+                        return;
+                    }
+                    if (this.$refs.form) {
+                        this.$refs.form.submit();
+                    }
+                }
+            };
+        };
+
+        window.bmnTableBatchManager = function() {
+            return {
+                rowChanges: {},
+                isSubmitting: false,
+                get dirtyMap() {
+                    const map = {};
+                    for (const [id, fields] of Object.entries(this.rowChanges)) {
+                        const combined = { id: parseInt(id) };
+                        let hasChange = false;
+                        if (fields.lokasi) {
+                            combined.lokasi = fields.lokasi.lokasi;
+                            hasChange = true;
+                        }
+                        if (fields.pj) {
+                            combined.penanggungjawab = fields.pj.penanggungjawab;
+                            combined.penanggung_jawab_id = fields.pj.penanggung_jawab_id;
+                            combined.penanggungjawab_nip = fields.pj.penanggungjawab_nip;
+                            hasChange = true;
+                        }
+                        if (hasChange) {
+                            map[id] = combined;
+                        }
+                    }
+                    return map;
+                },
+                get dirtyCount() {
+                    return Object.keys(this.dirtyMap).length;
+                },
+                handleFieldChanged(e) {
+                    const { id, field, isChanged, data } = e.detail;
+                    if (!this.rowChanges[id]) {
+                        this.rowChanges[id] = {};
+                    }
+                    if (isChanged && data) {
+                        this.rowChanges[id][field] = data;
+                    } else {
+                        delete this.rowChanges[id][field];
+                        if (Object.keys(this.rowChanges[id]).length === 0) {
+                            delete this.rowChanges[id];
+                        }
+                    }
+                },
+                cancelAll() {
+                    if (!confirm('Apakah Anda yakin ingin membatalkan semua perubahan pada halaman ini?')) return;
+                    this.rowChanges = {};
+                    window.dispatchEvent(new CustomEvent('bmn-batch-reset'));
+                },
+                submitBatch() {
+                    const count = this.dirtyCount;
+                    if (count === 0) return;
+                    if (!confirm(`Simpan ${count} perubahan BMN TIK pada halaman ini?`)) return;
+
+                    const items = Object.values(this.dirtyMap);
+                    this.$refs.batchItemsInput.value = JSON.stringify(items);
+                    this.isSubmitting = true;
+                    this.$refs.batchForm.submit();
+                },
+                init() {
+                    window.addEventListener('beforeunload', (e) => {
+                        if (this.dirtyCount > 0 && !this.isSubmitting) {
+                            e.preventDefault();
+                            e.returnValue = '';
+                        }
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (this.dirtyCount > 0 && !this.isSubmitting) {
+                            const link = e.target.closest('a');
+                            if (link && link.href && !link.href.startsWith('#') && !link.href.startsWith('javascript:') && !link.target && !link.hasAttribute('download')) {
+                                if (!confirm(`Ada ${this.dirtyCount} perubahan yang belum disimpan di halaman ini. Apakah Anda yakin ingin meninggalkan halaman? Perubahan yang belum disimpan akan hilang.`)) {
+                                    e.preventDefault();
+                                    e.stopImmediatePropagation();
+                                }
+                            }
+                        }
+                    }, true);
                 }
             };
         };
@@ -684,6 +941,7 @@
                                     action="{{ route('bmns-tik.update-lokasi', $item) }}"
                                     class="inline-block w-full min-w-[210px] max-w-[320px]"
                                     x-data="bmnLocationCell({
+                                        bmnId: {{ $item->id }},
                                         selected: @js($item->lokasi ?: ''),
                                         selectedLabel: @js($rowLabel),
                                         selectedKode: @js($rowKode),
@@ -789,23 +1047,13 @@
                                             </div>
                                         </div>
 
-                                        {{-- Tombol Konfirmasi Centang & Batal (Hanya muncul jika lokasi diubah) --}}
+                                        {{-- Tombol Batal (Hanya muncul jika lokasi diubah) --}}
                                         <template x-if="isChanged">
-                                            <div class="flex items-center gap-1 shrink-0">
-                                                <button
-                                                    type="button"
-                                                    @click="confirmSave()"
-                                                    class="w-7 h-7 rounded-lg bg-[#0E5954] hover:bg-[#163828] text-white flex items-center justify-center shadow-xs transition cursor-pointer"
-                                                    title="Konfirmasi & Simpan Perubahan Lokasi"
-                                                >
-                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </button>
+                                            <div class="flex items-center shrink-0">
                                                 <button
                                                     type="button"
                                                     @click="cancel()"
-                                                    class="w-7 h-7 rounded-lg bg-[#F7FAF8] hover:bg-[#EAF2ED] text-[#62756A] hover:text-[#132219] border border-[#D5E5DA] flex items-center justify-center shadow-2xs transition cursor-pointer"
+                                                    class="w-7 h-7 rounded-lg bg-[#F7FAF8] hover:bg-[#FDF0EE] text-[#62756A] hover:text-[#9C322C] border border-[#D5E5DA] hover:border-[#F8D4D0] flex items-center justify-center shadow-2xs transition cursor-pointer"
                                                     title="Batal Ubah Lokasi"
                                                 >
                                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -841,9 +1089,150 @@
                                 </button>
                             </td>
 
-                            {{-- PENANGGUNG JAWAB --}}
-                            <td class="py-3.5 px-4 font-medium text-[#132219]">
-                                <div>{{ $item->penanggungjawab ?: '—' }}</div>
+                            {{-- PENANGGUNG JAWAB (SEARCHABLE DROPDOWN LANGSUNG DI TABEL) --}}
+                            @php
+                                $rowPjNama = $item->penanggungjawab ?: '';
+                                $rowPjNip = $item->bmn?->penanggungjawab_nip ?: '';
+                            @endphp
+                            <td class="py-2.5 px-3">
+                                <form
+                                    x-ref="form"
+                                    method="POST"
+                                    action="{{ route('bmns-tik.update-penanggungjawab', $item) }}"
+                                    class="inline-block w-full min-w-[210px] max-w-[320px]"
+                                    x-data="bmnPjCell({
+                                        bmnId: {{ $item->id }},
+                                        selected: @js($rowPjNama),
+                                        selectedId: null,
+                                        selectedNip: @js($rowPjNip),
+                                        selectedNama: @js($rowPjNama ?: 'Pilih PJ...'),
+                                        selectedJabatan: '',
+                                        itemName: @js($item->nama_barang)
+                                    })"
+                                    onclick="event.stopPropagation()"
+                                >
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="penanggungjawab" :value="selected">
+
+                                    <div class="flex items-center gap-1.5 w-full">
+                                        <div class="relative flex-1 min-w-0" @click.outside="open = false" @keydown.escape="open = false">
+                                            {{-- Trigger Button --}}
+                                            <button
+                                                type="button"
+                                                @click="toggle($el)"
+                                                class="w-full flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] hover:bg-white hover:border-[#163828] focus:border-[#163828] focus:ring-2 focus:ring-[#163828]/15 text-xs text-[#132219] transition cursor-pointer shadow-2xs font-medium text-left"
+                                                :class="[
+                                                    open ? 'border-[#163828] ring-2 ring-[#163828]/15 bg-white' : '',
+                                                    isChanged ? 'border-amber-400 bg-amber-50/40 text-amber-950 ring-1 ring-amber-400/50' : ''
+                                                ]"
+                                                title="Ubah Penanggung Jawab (Klik untuk cari & pilih)"
+                                            >
+                                                <div class="flex items-center gap-1.5 min-w-0 pr-1 truncate">
+                                                    <svg class="w-3.5 h-3.5 text-[#8D9D95] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                    <div class="flex flex-col min-w-0 truncate">
+                                                        <span class="truncate text-xs text-[#132219]" x-text="selectedNama">{{ $rowPjNama ?: 'Pilih PJ...' }}</span>
+                                                        <template x-if="selectedNip && selectedNip !== '-'">
+                                                            <span class="text-[10px] text-[#62756A] font-mono leading-tight truncate" x-text="'NIP. ' + selectedNip"></span>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <svg class="w-3.5 h-3.5 text-[#8D9D95] shrink-0 transition-transform duration-150" :class="open ? 'rotate-180 text-[#163828]' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+
+                                            {{-- Floating Searchable Panel --}}
+                                            <div
+                                                x-show="open"
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="opacity-0 scale-95"
+                                                x-transition:enter-end="opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="opacity-100 scale-100"
+                                                x-transition:leave-end="opacity-0 scale-95"
+                                                class="absolute left-0 w-72 sm:w-80 bg-white rounded-xl shadow-xl border border-[#D5E5DA] p-2 z-50 text-xs"
+                                                :class="openUpward ? 'bottom-full mb-1' : 'top-full mt-1'"
+                                                style="display: none;"
+                                            >
+                                                {{-- Search Input --}}
+                                                <div class="relative mb-1.5">
+                                                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#8D9D95]">
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                        </svg>
+                                                    </span>
+                                                    <input
+                                                        type="text"
+                                                        x-ref="rowPjSearchInput"
+                                                        x-model="search"
+                                                        placeholder="Cari nama atau NIP pegawai..."
+                                                        class="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E3ECE6] bg-[#F7FAF8] focus:bg-white text-xs text-[#132219] focus:outline-none focus:border-[#163828] focus:ring-1 focus:ring-[#163828] transition"
+                                                        @keydown.escape="open = false"
+                                                        @keydown.enter.prevent="if(filtered.length > 0) select(filtered[0])"
+                                                    >
+                                                    <button
+                                                        type="button"
+                                                        x-show="search"
+                                                        @click="search = ''; $refs.rowPjSearchInput.focus()"
+                                                        class="absolute inset-y-0 right-0 pr-2 flex items-center text-[#8D9D95] hover:text-[#132219] cursor-pointer"
+                                                    >
+                                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+
+                                                {{-- Option List --}}
+                                                <div class="max-h-36 overflow-y-auto space-y-0.5 divide-y divide-[#E3ECE6]/40" style="max-height: 180px; overflow-y: auto; overscroll-behavior: contain;">
+                                                    <template x-for="opt in filtered" :key="opt.label">
+                                                        <button
+                                                            type="button"
+                                                            @click="select(opt)"
+                                                            class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition hover:bg-[#EAF2ED] cursor-pointer group"
+                                                            :class="(selectedNama === opt.nama) ? 'bg-[#EAF2ED] text-[#163828] font-semibold' : 'text-[#132219]'"
+                                                        >
+                                                            <div class="flex flex-col min-w-0 pr-1 truncate">
+                                                                <span class="truncate text-xs" x-text="opt.nama"></span>
+                                                                <div class="flex items-center gap-1.5 text-[10px] text-[#62756A]">
+                                                                    <template x-if="opt.nip && opt.nip !== '-'">
+                                                                        <span class="font-mono" x-text="opt.nip"></span>
+                                                                    </template>
+                                                                    <template x-if="opt.jabatan">
+                                                                        <span class="truncate text-[#8D9D95]" x-text="'• ' + opt.jabatan"></span>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                            <span x-show="selectedNama === opt.nama" class="text-[#163828] font-bold shrink-0 ml-1">✓</span>
+                                                        </button>
+                                                    </template>
+                                                    <div x-show="filtered.length === 0" class="py-4 text-center text-[#8D9D95]">
+                                                        <p class="text-xs">Pegawai tidak ditemukan</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Tombol Batal (Hanya muncul jika PJ diubah) --}}
+                                        <template x-if="isChanged">
+                                            <div class="flex items-center shrink-0">
+                                                <button
+                                                    type="button"
+                                                    @click="cancel()"
+                                                    class="w-7 h-7 rounded-lg bg-[#F7FAF8] hover:bg-[#FDF0EE] text-[#62756A] hover:text-[#9C322C] border border-[#D5E5DA] hover:border-[#F8D4D0] flex items-center justify-center shadow-2xs transition cursor-pointer"
+                                                    title="Batal Ubah Penanggung Jawab"
+                                                >
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </form>
+
                                 @if($item->is_dikembalikan)
                                     <div class="mt-1">
                                         <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B25E00] bg-[#FFF4E5] px-1.5 py-0.5 rounded border border-[#FFE2BF]">
@@ -945,6 +1334,58 @@
         {{-- FOOTER / PAGINATION --}}
         <div class="px-5 pb-5">
             <x-table-footer :paginator="$bmnsTik" />
+        </div>
+    </div>
+
+    {{-- FORM SUBMIT BATCH UPDATE LOKASI & PJ --}}
+    <form x-ref="batchForm" method="POST" action="{{ route('bmns-tik.batch-update') }}" class="hidden">
+        @csrf
+        <input type="hidden" name="items" x-ref="batchItemsInput">
+        <input type="hidden" name="page" value="{{ request('page') }}">
+        <input type="hidden" name="q" value="{{ request('q') }}">
+        <input type="hidden" name="jenis" value="{{ request('jenis') }}">
+        <input type="hidden" name="lokasi" value="{{ request('lokasi') }}">
+        <input type="hidden" name="penanggungjawab" value="{{ request('penanggungjawab') }}">
+        <input type="hidden" name="kondisi" value="{{ request('kondisi') }}">
+    </form>
+
+    {{-- FLOATING ACTION BAR BATCH UPDATE --}}
+    <div
+        x-show="dirtyCount > 0"
+        x-cloak
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 translate-y-4"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-4"
+        class="fixed bottom-6 right-6 z-40 bg-[#163828] text-white px-4 py-3 rounded-2xl shadow-2xl border border-emerald-500/30 flex items-center gap-3.5 backdrop-blur-md"
+    >
+        <div class="flex items-center gap-2 text-xs">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span><strong x-text="dirtyCount" class="font-bold text-emerald-300"></strong> baris diubah</span>
+        </div>
+        <div class="h-4 w-[1px] bg-white/20"></div>
+        <div class="flex items-center gap-1.5">
+            <button
+                type="button"
+                @click="submitBatch()"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-emerald-950 font-semibold rounded-xl text-xs transition cursor-pointer shadow-xs"
+                title="Simpan semua perubahan"
+            >
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Simpan Semua</span>
+            </button>
+            <button
+                type="button"
+                @click="cancelAll()"
+                class="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl text-xs transition cursor-pointer"
+                title="Batalkan semua perubahan"
+            >
+                Batal
+            </button>
         </div>
     </div>
 

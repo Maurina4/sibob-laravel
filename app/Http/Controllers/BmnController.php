@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Bmn\BatchUpdateBmnLokasiPjRequest;
 use App\Http\Requests\Bmn\StoreBmnRequest;
 use App\Http\Requests\Bmn\UpdateBmnLokasiRequest;
+use App\Http\Requests\Bmn\UpdateBmnPenanggungJawabRequest;
 use App\Http\Requests\Bmn\UpdateBmnRequest;
 use App\Models\Bmn;
 use App\Models\Lokasi;
@@ -122,6 +124,50 @@ class BmnController extends Controller
         return redirect()
             ->route('bmns.index', $query)
             ->with('success', 'Lokasi BMN berhasil diperbarui.');
+    }
+
+    public function updatePenanggungJawab(UpdateBmnPenanggungJawabRequest $request, Bmn $bmn)
+    {
+        if ($bmn->dihapus) {
+            return redirect()
+                ->route('bmns.index')
+                ->with('error', 'Data BMN tersebut sudah berada di Data Terhapus.');
+        }
+
+        $this->bmnService->updatePenanggungJawab($bmn, $request->validated());
+
+        $query = array_filter([
+            'page' => $request->input('page'),
+            'search' => $request->input('search'),
+            'jenis' => $request->input('jenis') ?: $request->input('old_filter_jenis'),
+            'lokasi' => $request->input('lokasi') ?: $request->input('old_filter_lokasi'),
+            'penanggungjawab' => $request->input('old_filter_penanggungjawab'),
+            'kondisi' => $request->input('kondisi'),
+            'tahun' => $request->input('tahun'),
+        ], fn ($val) => ! empty($val));
+
+        return redirect()
+            ->route('bmns.index', $query)
+            ->with('success', 'Penanggung jawab BMN berhasil diperbarui.');
+    }
+
+    public function batchUpdate(BatchUpdateBmnLokasiPjRequest $request)
+    {
+        $count = $this->bmnService->batchUpdateLokasiPj($request->validated('items'));
+
+        $query = array_filter([
+            'page' => $request->input('page'),
+            'search' => $request->input('search'),
+            'jenis' => $request->input('jenis'),
+            'lokasi' => $request->input('lokasi'),
+            'penanggungjawab' => $request->input('penanggungjawab'),
+            'kondisi' => $request->input('kondisi'),
+            'tahun' => $request->input('tahun'),
+        ], fn ($val) => ! empty($val));
+
+        return redirect()
+            ->route('bmns.index', $query)
+            ->with('success', "Berhasil memperbarui {$count} data BMN.");
     }
 
     public function destroy(Bmn $bmn)

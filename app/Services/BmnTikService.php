@@ -42,6 +42,7 @@ class BmnTikService
                 ->orderBy('lokasi')
                 ->pluck('lokasi'),
             'lokasis' => Lokasi::orderedByGedung()->get(),
+            'penanggungjawabs' => Pegawai::orderBy('nama')->get(),
             'penanggungjawabFilters' => BmnTik::query()
                 ->active()
                 ->whereNotNull('penanggungjawab')
@@ -59,6 +60,7 @@ class BmnTikService
                 ->orderBy('kondisi')
                 ->pluck('kondisi'),
             'lokasis' => Lokasi::orderedByGedung()->get(),
+            'penanggungjawabs' => Pegawai::orderBy('nama')->get(),
             'pegawais' => Pegawai::orderBy('nama')->get(),
         ];
     }

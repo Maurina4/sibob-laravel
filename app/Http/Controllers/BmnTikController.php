@@ -95,6 +95,77 @@ class BmnTikController extends Controller
         return back()->with('success', 'Lokasi BMN TIK berhasil diperbarui.');
     }
 
+    public function updatePenanggungJawab(Request $request, BmnTik $bmnTik)
+    {
+        abort_if($bmnTik->dihapus, 404);
+
+        $pjBaru = trim((string) $request->input('penanggungjawab'));
+        if ($pjBaru !== '') {
+            $bmnTik->update(['penanggungjawab' => $pjBaru]);
+            if ($bmnTik->bmn_id) {
+                $bmn = Bmn::find($bmnTik->bmn_id);
+                if ($bmn) {
+                    $bmn->update([
+                        'penanggungjawab' => $pjBaru,
+                        'penanggung_jawab_id' => $request->input('penanggung_jawab_id'),
+                        'penanggungjawab_nip' => $request->input('penanggungjawab_nip') ?: '-',
+                    ]);
+                }
+            }
+        }
+
+        return back()->with('success', 'Penanggung jawab BMN TIK berhasil diperbarui.');
+    }
+
+    public function batchUpdate(Request $request)
+    {
+        $items = $request->input('items');
+        if (is_string($items)) {
+            $items = json_decode($items, true);
+        }
+        if (! is_array($items) || empty($items)) {
+            return back()->with('error', 'Tidak ada data perubahan yang dikirim.');
+        }
+
+        $count = 0;
+        \Illuminate\Support\Facades\DB::transaction(function () use ($items, &$count) {
+            foreach ($items as $item) {
+                $tikId = $item['id'] ?? null;
+                if (! $tikId) continue;
+                $bmnTik = BmnTik::find($tikId);
+                if (! $bmnTik || $bmnTik->dihapus) continue;
+
+                $updateData = [];
+                if (! empty($item['lokasi'])) {
+                    $updateData['lokasi'] = $item['lokasi'];
+                }
+                if (! empty($item['penanggungjawab'])) {
+                    $updateData['penanggungjawab'] = $item['penanggungjawab'];
+                }
+
+                if (! empty($updateData)) {
+                    $bmnTik->update($updateData);
+                    if ($bmnTik->bmn_id) {
+                        $bmn = Bmn::find($bmnTik->bmn_id);
+                        if ($bmn) {
+                            $bmnUpdate = $updateData;
+                            if (isset($item['penanggung_jawab_id'])) {
+                                $bmnUpdate['penanggung_jawab_id'] = $item['penanggung_jawab_id'];
+                            }
+                            if (isset($item['penanggungjawab_nip'])) {
+                                $bmnUpdate['penanggungjawab_nip'] = $item['penanggungjawab_nip'];
+                            }
+                            $bmn->update($bmnUpdate);
+                        }
+                    }
+                    $count++;
+                }
+            }
+        });
+
+        return back()->with('success', "Berhasil memperbarui {$count} data BMN TIK.");
+    }
+
     public function destroy(BmnTik $bmnTik)
     {
         abort_if($bmnTik->dihapus, 404);

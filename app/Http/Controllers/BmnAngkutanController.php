@@ -95,6 +95,77 @@ class BmnAngkutanController extends Controller
         return back()->with('success', 'Lokasi Alat Angkutan Bermotor berhasil diperbarui.');
     }
 
+    public function updatePenanggungJawab(Request $request, BmnAngkutan $bmnAngkutan)
+    {
+        abort_if($bmnAngkutan->dihapus, 404);
+
+        $pjBaru = trim((string) $request->input('penanggungjawab'));
+        if ($pjBaru !== '') {
+            $bmnAngkutan->update(['penanggungjawab' => $pjBaru]);
+            if ($bmnAngkutan->bmn_id) {
+                $bmn = Bmn::find($bmnAngkutan->bmn_id);
+                if ($bmn) {
+                    $bmn->update([
+                        'penanggungjawab' => $pjBaru,
+                        'penanggung_jawab_id' => $request->input('penanggung_jawab_id'),
+                        'penanggungjawab_nip' => $request->input('penanggungjawab_nip') ?: '-',
+                    ]);
+                }
+            }
+        }
+
+        return back()->with('success', 'Penanggung jawab Alat Angkutan Bermotor berhasil diperbarui.');
+    }
+
+    public function batchUpdate(Request $request)
+    {
+        $items = $request->input('items');
+        if (is_string($items)) {
+            $items = json_decode($items, true);
+        }
+        if (! is_array($items) || empty($items)) {
+            return back()->with('error', 'Tidak ada data perubahan yang dikirim.');
+        }
+
+        $count = 0;
+        \Illuminate\Support\Facades\DB::transaction(function () use ($items, &$count) {
+            foreach ($items as $item) {
+                $angId = $item['id'] ?? null;
+                if (! $angId) continue;
+                $bmnAng = BmnAngkutan::find($angId);
+                if (! $bmnAng || $bmnAng->dihapus) continue;
+
+                $updateData = [];
+                if (! empty($item['lokasi'])) {
+                    $updateData['lokasi'] = $item['lokasi'];
+                }
+                if (! empty($item['penanggungjawab'])) {
+                    $updateData['penanggungjawab'] = $item['penanggungjawab'];
+                }
+
+                if (! empty($updateData)) {
+                    $bmnAng->update($updateData);
+                    if ($bmnAng->bmn_id) {
+                        $bmn = Bmn::find($bmnAng->bmn_id);
+                        if ($bmn) {
+                            $bmnUpdate = $updateData;
+                            if (isset($item['penanggung_jawab_id'])) {
+                                $bmnUpdate['penanggung_jawab_id'] = $item['penanggung_jawab_id'];
+                            }
+                            if (isset($item['penanggungjawab_nip'])) {
+                                $bmnUpdate['penanggungjawab_nip'] = $item['penanggungjawab_nip'];
+                            }
+                            $bmn->update($bmnUpdate);
+                        }
+                    }
+                    $count++;
+                }
+            }
+        });
+
+        return back()->with('success', "Berhasil memperbarui {$count} data Alat Angkutan Bermotor.");
+    }
+
     public function destroy(BmnAngkutan $bmnAngkutan)
     {
         abort_if($bmnAngkutan->dihapus, 404);

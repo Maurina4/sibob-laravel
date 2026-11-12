@@ -52,6 +52,7 @@ class BmnLabService
             ],
             'lokasis' => Lokasi::orderedByGedung()->get(),
             'pegawais' => Pegawai::orderBy('nama')->get(),
+            'penanggungjawabs' => Pegawai::orderBy('nama')->get(),
         ];
     }
 

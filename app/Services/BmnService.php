@@ -578,6 +578,160 @@ class BmnService
         return true;
     }
 
+    public function updatePenanggungJawab(Bmn $bmn, array $pjData): bool
+    {
+        $penanggungJawabId = $pjData['penanggung_jawab_id'] ?? null;
+        $pjName = trim((string) ($pjData['penanggungjawab'] ?? ''));
+        $pjNip = trim((string) ($pjData['penanggungjawab_nip'] ?? ''));
+
+        if (! $penanggungJawabId && $pjName !== '') {
+            $pegawai = Pegawai::where('nama', $pjName)->first();
+            $penanggungJawabId = $pegawai?->id;
+            if ($pegawai && empty($pjNip)) {
+                $pjNip = $pegawai->nip ?? '-';
+            }
+        } elseif ($penanggungJawabId && empty($pjNip)) {
+            $pegawai = Pegawai::find($penanggungJawabId);
+            if ($pegawai) {
+                $pjNip = $pegawai->nip ?? '-';
+                if (empty($pjName)) {
+                    $pjName = $pegawai->nama;
+                }
+            }
+        }
+
+        $bmn->update([
+            'penanggungjawab' => $pjName ?: ($bmn->penanggungjawab ?? 'Pengelola BMN'),
+            'penanggung_jawab_id' => $penanggungJawabId,
+            'penanggungjawab_nip' => $pjNip ?: ($bmn->penanggungjawab_nip ?? '-'),
+        ]);
+
+        if ($bmn->tik) {
+            $bmn->tik->update(['penanggungjawab' => $bmn->penanggungjawab]);
+        }
+
+        if ($bmn->lab) {
+            $bmn->lab->update(['penanggungjawab' => $bmn->penanggungjawab]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Batch update lokasi dan/atau penanggung jawab untuk sekumpulan BMN.
+     *
+     * @param array $items
+     * @return int Jumlah BMN yang berhasil diupdate
+     */
+    public function batchUpdateLokasiPj(array $items): int
+    {
+        return DB::transaction(function () use ($items) {
+            $updatedCount = 0;
+            $pegawaiCache = [];
+
+            foreach ($items as $item) {
+                $bmnId = $item['id'] ?? null;
+                if (! $bmnId) {
+                    continue;
+                }
+
+                $bmn = Bmn::find($bmnId);
+                if (! $bmn || $bmn->dihapus) {
+                    continue;
+                }
+
+                $updateData = [];
+
+                // 1. Lokasi
+                if (array_key_exists('lokasi', $item) && $item['lokasi'] !== null && $item['lokasi'] !== '') {
+                    $lokasiModel = Lokasi::findOrCreateByName($item['lokasi']);
+                    $updateData['lokasi'] = $lokasiModel->nama;
+                    $updateData['lokasi_id'] = $lokasiModel->id;
+                }
+
+                // 2. Penanggung Jawab
+                if (array_key_exists('penanggungjawab', $item) || array_key_exists('penanggung_jawab_id', $item)) {
+                    $penanggungJawabId = $item['penanggung_jawab_id'] ?? null;
+                    $pjName = trim((string) ($item['penanggungjawab'] ?? ''));
+                    $pjNip = trim((string) ($item['penanggungjawab_nip'] ?? ''));
+
+                    if (! $penanggungJawabId && $pjName !== '') {
+                        if (! isset($pegawaiCache[$pjName])) {
+                            $pegawai = Pegawai::where('nama', $pjName)->first();
+                            $pegawaiCache[$pjName] = $pegawai;
+                        } else {
+                            $pegawai = $pegawaiCache[$pjName];
+                        }
+                        $penanggungJawabId = $pegawai?->id;
+                        if ($pegawai && empty($pjNip)) {
+                            $pjNip = $pegawai->nip ?? '-';
+                        }
+                    } elseif ($penanggungJawabId && empty($pjNip)) {
+                        $cacheKey = "id_{$penanggungJawabId}";
+                        if (! isset($pegawaiCache[$cacheKey])) {
+                            $pegawai = Pegawai::find($penanggungJawabId);
+                            $pegawaiCache[$cacheKey] = $pegawai;
+                        } else {
+                            $pegawai = $pegawaiCache[$cacheKey];
+                        }
+                        if ($pegawai) {
+                            $pjNip = $pegawai->nip ?? '-';
+                            if (empty($pjName)) {
+                                $pjName = $pegawai->nama;
+                            }
+                        }
+                    }
+
+                    if ($pjName !== '') {
+                        $updateData['penanggungjawab'] = $pjName;
+                    }
+                    if ($penanggungJawabId !== null) {
+                        $updateData['penanggung_jawab_id'] = $penanggungJawabId;
+                    }
+                    if ($pjNip !== '') {
+                        $updateData['penanggungjawab_nip'] = $pjNip;
+                    }
+                }
+
+                if (! empty($updateData)) {
+                    $bmn->update($updateData);
+
+                    // Sync ke TIK
+                    if ($bmn->tik) {
+                        $tikData = [];
+                        if (isset($updateData['lokasi'])) {
+                            $tikData['lokasi'] = $updateData['lokasi'];
+                        }
+                        if (isset($updateData['penanggungjawab'])) {
+                            $tikData['penanggungjawab'] = $updateData['penanggungjawab'];
+                        }
+                        if (! empty($tikData)) {
+                            $bmn->tik->update($tikData);
+                        }
+                    }
+
+                    // Sync ke Lab
+                    if ($bmn->lab) {
+                        $labData = [];
+                        if (isset($updateData['lokasi'])) {
+                            $labData['lokasi'] = $updateData['lokasi'];
+                        }
+                        if (isset($updateData['penanggungjawab'])) {
+                            $labData['penanggungjawab'] = $updateData['penanggungjawab'];
+                        }
+                        if (! empty($labData)) {
+                            $bmn->lab->update($labData);
+                        }
+                    }
+
+                    $updatedCount++;
+                }
+            }
+
+            return $updatedCount;
+        });
+    }
+
     public function delete(Bmn $bmn, ?string $userEmail): bool
     {
         $waktuHapus = now();

@@ -88,6 +88,11 @@ Route::middleware(['auth'])->group(function () {
             [BmnController::class, 'export']
         )->name('bmns.export');
 
+        Route::post(
+            '/bmns/batch-update',
+            [BmnController::class, 'batchUpdate']
+        )->name('bmns.batch-update');
+
         Route::resource(
             'bmns',
             BmnController::class
@@ -95,7 +100,7 @@ Route::middleware(['auth'])->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE LOKASI BMN
+        | UPDATE LOKASI & PENANGGUNG JAWAB BMN
         |--------------------------------------------------------------------------
         */
 
@@ -107,16 +112,34 @@ Route::middleware(['auth'])->group(function () {
             ]
         )->name('bmns.update-lokasi');
 
+        Route::patch(
+            '/bmns/{bmn}/penanggungjawab',
+            [
+                BmnController::class,
+                'updatePenanggungJawab',
+            ]
+        )->name('bmns.update-penanggungjawab');
+
         /*
         |--------------------------------------------------------------------------
         | BMN TIK
         |--------------------------------------------------------------------------
         */
 
+        Route::post(
+            '/bmns-tik/batch-update',
+            [BmnTikController::class, 'batchUpdate']
+        )->name('bmns-tik.batch-update');
+
         Route::patch(
             '/bmns-tik/{bmnTik}/lokasi',
             [BmnTikController::class, 'updateLokasi']
         )->name('bmns-tik.update-lokasi');
+
+        Route::patch(
+            '/bmns-tik/{bmnTik}/penanggungjawab',
+            [BmnTikController::class, 'updatePenanggungJawab']
+        )->name('bmns-tik.update-penanggungjawab');
 
         Route::resource(
             'bmns-tik',
@@ -131,10 +154,20 @@ Route::middleware(['auth'])->group(function () {
         |--------------------------------------------------------------------------
         */
 
+        Route::post(
+            '/bmns-lab/batch-update',
+            [BmnLabController::class, 'batchUpdate']
+        )->name('bmns-lab.batch-update');
+
         Route::patch(
             '/bmns-lab/{bmnLab}/lokasi',
             [BmnLabController::class, 'updateLokasi']
         )->name('bmns-lab.update-lokasi');
+
+        Route::patch(
+            '/bmns-lab/{bmnLab}/penanggungjawab',
+            [BmnLabController::class, 'updatePenanggungJawab']
+        )->name('bmns-lab.update-penanggungjawab');
 
         Route::resource(
             'bmns-lab',
@@ -149,10 +182,20 @@ Route::middleware(['auth'])->group(function () {
         |--------------------------------------------------------------------------
         */
 
+        Route::post(
+            '/bmns-angkutan/batch-update',
+            [BmnAngkutanController::class, 'batchUpdate']
+        )->name('bmns-angkutan.batch-update');
+
         Route::patch(
             '/bmns-angkutan/{bmnAngkutan}/lokasi',
             [BmnAngkutanController::class, 'updateLokasi']
         )->name('bmns-angkutan.update-lokasi');
+
+        Route::patch(
+            '/bmns-angkutan/{bmnAngkutan}/penanggungjawab',
+            [BmnAngkutanController::class, 'updatePenanggungJawab']
+        )->name('bmns-angkutan.update-penanggungjawab');
 
         Route::resource(
             'bmns-angkutan',

@@ -45,6 +45,7 @@ class BmnAngkutanService
                 'Rusak Berat',
             ],
             'pegawais' => Pegawai::orderBy('nama')->get(),
+            'penanggungjawabs' => Pegawai::orderBy('nama')->get(),
         ];
     }
 
