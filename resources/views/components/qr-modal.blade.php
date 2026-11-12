@@ -19,7 +19,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-[#132219]" id="qr-modal-title">QR Code Aset BMN</h3>
-                        <p class="text-[11px] text-[#62756A]">Balai Besar POM di Banjarbaru</p>
+                        <p class="text-[11px] text-[#62756A]">BBPOM di Banjarbaru</p>
                     </div>
                 </div>
                 <button
@@ -41,7 +41,7 @@
                         Badan Pengawas Obat dan Makanan
                     </div>
                     <div class="text-[9px] text-[#62756A] mb-3">
-                        Balai Besar POM di Banjarbaru — Label Inventaris BMN
+                        BBPOM di Banjarbaru — Label Inventaris BMN
                     </div>
 
                     {{-- QR CODE RENDER TARGET --}}
@@ -52,14 +52,14 @@
                     {{-- INFORMASI ASET --}}
                     <div class="space-y-1 mt-2">
                         <div>
-                            <span id="qr-item-code" class="inline-block font-mono text-xs font-bold text-[#163828] bg-[#EAF2ED] px-2.5 py-0.5 rounded border border-[#D5E5DA]">
+                            <span id="qr-item-code" class="inline-block font-mono text-xs font-bold text-[#163828] bg-[#EAF2ED] px-2.5 py-0.5 rounded border border-[#D5E5DA] break-all">
                                 -
                             </span>
                         </div>
-                        <div id="qr-item-name" class="text-xs font-bold text-[#132219]">
+                        <div id="qr-item-name" class="text-xs font-bold text-[#132219] break-words">
                             -
                         </div>
-                        <div class="text-[11px] text-[#62756A] flex items-center gap-3 pt-1">
+                        <div class="text-[11px] text-[#62756A] flex flex-wrap items-center gap-x-3 gap-y-1 pt-1.5 border-t border-dashed border-[#D5E5DA] mt-2">
                             <span>Lokasi: <strong id="qr-item-lokasi" class="text-[#132219] font-semibold">-</strong></span>
                             <span>Penanggung Jawab: <strong id="qr-item-pj" class="text-[#132219] font-semibold">-</strong></span>
                         </div>
@@ -189,30 +189,61 @@ function downloadQrCode() {
 function printQrLabel() {
     const printArea = document.getElementById('qr-label-card');
     if (!printArea) return;
-    const printWindow = window.open('', '_blank', 'width=500,height=500');
+
+    let qrImageTag = '';
+    const canvas = document.querySelector('#modal-qrcode-container canvas');
+    const img = document.querySelector('#modal-qrcode-container img');
+
+    if (canvas) {
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            qrImageTag = `<img src="${dataUrl}" alt="QR Code" style="width: 140px; height: 140px; display: block; margin: 0 auto; object-fit: contain;" />`;
+        } catch (e) {
+            console.error('Gagal mengambil data QR canvas:', e);
+        }
+    }
+
+    if (!qrImageTag && img && img.src) {
+        qrImageTag = `<img src="${img.src}" alt="QR Code" style="width: 140px; height: 140px; display: block; margin: 0 auto; object-fit: contain;" />`;
+    }
+
+    if (!qrImageTag) {
+        qrImageTag = document.getElementById('modal-qrcode-container').innerHTML;
+    }
+
+    const printWindow = window.open('', '_blank', 'width=520,height=560');
+    if (!printWindow) {
+        alert('Pop-up jendela cetak diblokir oleh browser. Harap izinkan pop-up untuk mencetak label.');
+        return;
+    }
+
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Cetak Label QR BMN - BBPOM Banjarbaru</title>
+            <meta charset="utf-8">
+            <title>Cetak Label QR BMN - BBPOM di Banjarbaru</title>
             <style>
-                @page { size: auto; margin: 8mm; }
+                @page { size: auto; margin: 5mm; }
+                * { box-sizing: border-box; }
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     min-height: 100vh;
                     margin: 0;
+                    padding: 10px;
                     background: #fff;
                 }
                 .label-box {
                     border: 2px solid #163828;
                     border-radius: 8px;
-                    padding: 16px 20px;
+                    padding: 14px 16px;
                     width: 320px;
+                    max-width: 100%;
                     text-align: left;
-                    box-sizing: border-box;
+                    background: #fff;
                 }
                 .header-instansi {
                     font-size: 10px;
@@ -220,49 +251,71 @@ function printQrLabel() {
                     color: #163828;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
+                    line-height: 1.2;
                 }
                 .header-sub {
-                    font-size: 8px;
+                    font-size: 8.5px;
                     color: #555;
-                    margin-bottom: 10px;
+                    margin-top: 2px;
+                    margin-bottom: 8px;
+                    line-height: 1.2;
                 }
                 .qr-wrapper {
-                    margin: 8px auto 10px;
+                    margin: 6px auto 10px;
                     display: flex;
                     justify-content: center;
+                    align-items: center;
                 }
-                .qr-wrapper canvas, .qr-wrapper img {
+                .qr-wrapper img, .qr-wrapper canvas {
                     width: 140px !important;
                     height: 140px !important;
                     display: block;
                     margin: 0 auto;
                 }
                 .code-badge {
-                    font-family: monospace;
-                    font-size: 12px;
+                    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                    font-size: 11px;
                     font-weight: bold;
                     background: #eaf2ed;
                     color: #163828;
-                    padding: 3px 8px;
+                    padding: 2px 7px;
                     border-radius: 4px;
                     display: inline-block;
                     border: 1px solid #c2dbcd;
                     margin-bottom: 4px;
+                    word-break: break-all;
                 }
                 .item-name {
                     font-size: 11px;
                     font-weight: bold;
                     color: #111;
-                    margin-bottom: 4px;
+                    line-height: 1.3;
+                    margin-bottom: 6px;
+                    word-break: break-word;
                 }
                 .meta-row {
                     font-size: 9px;
                     color: #444;
                     display: flex;
-                    justify-content: space-around;
-                    margin-top: 4px;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    gap: 4px 10px;
+                    margin-top: 6px;
                     border-top: 1px dashed #ccc;
-                    padding-top: 4px;
+                    padding-top: 6px;
+                    line-height: 1.3;
+                }
+                .meta-row span {
+                    word-break: break-word;
+                }
+                @media print {
+                    body {
+                        min-height: auto;
+                        padding: 0;
+                    }
+                    .label-box {
+                        page-break-inside: avoid;
+                    }
                 }
             </style>
         </head>
@@ -271,7 +324,7 @@ function printQrLabel() {
                 <div class="header-instansi">Badan Pengawas Obat dan Makanan</div>
                 <div class="header-sub">BBPOM di Banjarbaru — Label Inventaris BMN</div>
                 <div class="qr-wrapper">
-                    ${document.getElementById('modal-qrcode-container').innerHTML}
+                    ${qrImageTag}
                 </div>
                 <div>
                     <div class="code-badge">${document.getElementById('qr-item-code').textContent}</div>
@@ -283,14 +336,27 @@ function printQrLabel() {
                 </div>
             </div>
             <script>
-                window.onload = function() {
+                function doPrint() {
+                    window.focus();
                     window.print();
                     setTimeout(function() { window.close(); }, 500);
-                };
+                }
+                if (document.readyState === 'complete') {
+                    setTimeout(doPrint, 250);
+                } else {
+                    window.addEventListener('load', function() {
+                        setTimeout(doPrint, 250);
+                    });
+                }
             <\/script>
         </body>
         </html>
     `);
     printWindow.document.close();
+    setTimeout(() => {
+        try {
+            printWindow.focus();
+        } catch (e) {}
+    }, 200);
 }
 </script>
