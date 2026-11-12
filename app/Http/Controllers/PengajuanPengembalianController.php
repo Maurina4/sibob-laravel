@@ -110,4 +110,27 @@ class PengajuanPengembalianController extends Controller
             'pengajuan' => $pengajuanPengembalian,
         ]);
     }
+
+    public function destroy(PengajuanPengembalian $pengajuanPengembalian)
+    {
+        $user = auth()->user();
+        if ($user->role !== 'Operator' && $pengajuanPengembalian->diajukan_oleh !== $user->id) {
+            abort(403, 'Anda tidak memiliki hak untuk menghapus pengajuan ini.');
+        }
+
+        if ($user->role !== 'Operator' && $pengajuanPengembalian->status === 'disetujui') {
+            abort(403, 'Pengajuan yang sudah disetujui hanya dapat dihapus oleh Operator.');
+        }
+
+        try {
+            $nomorPengajuan = $pengajuanPengembalian->nomor_pengajuan;
+            $this->service->delete($pengajuanPengembalian, $user);
+
+            return redirect()
+                ->route('pengajuan-pengembalian.index')
+                ->with('success', "Pengajuan pengembalian {$nomorPengajuan} berhasil dihapus dan dipindahkan ke Data Terhapus.");
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 }

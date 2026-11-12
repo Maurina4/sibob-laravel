@@ -10,6 +10,7 @@ use App\Models\BmnTik;
 use App\Models\DataTerhapus;
 use App\Models\Distribusi;
 use App\Models\LaporanKerusakan;
+use App\Models\PengajuanPengembalian;
 use App\Models\Pengembalian;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -100,13 +101,14 @@ class DataTerhapusService
             } else {
                 $otherModel = match ($jenis) {
                     'Pengembalian', 'Pengembalian BMN' => Pengembalian::withTrashed()->find($dataId),
+                    'Pengajuan Pengembalian' => PengajuanPengembalian::withTrashed()->find($dataId),
                     'BA Perpindahan' => BaPerpindahan::withTrashed()->find($dataId),
                     'Distribusi' => Distribusi::withTrashed()->find($dataId),
                     'Laporan Kerusakan' => LaporanKerusakan::withTrashed()->find($dataId),
                     default => null,
                 };
 
-                if ($otherModel === null && ! in_array($jenis, ['Pengembalian', 'Pengembalian BMN', 'BA Perpindahan', 'Distribusi', 'Laporan Kerusakan'])) {
+                if ($otherModel === null && ! in_array($jenis, ['Pengembalian', 'Pengembalian BMN', 'Pengajuan Pengembalian', 'BA Perpindahan', 'Distribusi', 'Laporan Kerusakan'])) {
                     return [
                         'success' => false,
                         'message' => 'Jenis data tidak dikenali: '.$jenis,
@@ -147,6 +149,9 @@ class DataTerhapusService
                 ]);
             }
             if ($otherModel) {
+                if (method_exists($otherModel, 'restore')) {
+                    $otherModel->restore();
+                }
                 $otherModel->update($restorePayload);
                 if ($otherModel instanceof LaporanKerusakan) {
                     app(LaporanKerusakanService::class)->syncBmnKondisi($otherModel);
@@ -262,6 +267,10 @@ class DataTerhapusService
         } else {
             match ($jenis) {
                 'Pengembalian', 'Pengembalian BMN' => tap(Pengembalian::withTrashed()->find($dataId), function ($m) {
+                    $m?->items()->delete();
+                    $m?->forceDelete();
+                }),
+                'Pengajuan Pengembalian' => tap(PengajuanPengembalian::withTrashed()->find($dataId), function ($m) {
                     $m?->items()->delete();
                     $m?->forceDelete();
                 }),

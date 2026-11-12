@@ -6,6 +6,7 @@ use App\Models\Bmn;
 use App\Models\BmnAngkutan;
 use App\Models\BmnLab;
 use App\Models\BmnTik;
+use App\Models\DataTerhapus;
 use App\Models\LaporanKerusakan;
 use App\Models\Lokasi;
 use App\Models\Pegawai;
@@ -529,6 +530,123 @@ class PengajuanPengembalianService
             }
 
             throw new Exception("Pengajuan berstatus '{$locked->status}' tidak dapat dibatalkan.");
+        });
+    }
+
+    /**
+     * Hapus pengajuan pengembalian (soft delete & catat ke DataTerhapus).
+     * Jika pengajuan berstatus disetujui, revert aset BMN dan hapus BA terkait.
+     */
+    public function delete(PengajuanPengembalian $pengajuan, User|string|null $user = null): bool
+    {
+        $penghapus = is_string($user) ? $user : ($user?->email ?? (auth()->user()?->email ?? 'Operator'));
+
+        return DB::transaction(function () use ($pengajuan, $penghapus) {
+            /** @var PengajuanPengembalian $locked */
+            $locked = PengajuanPengembalian::where('id', $pengajuan->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Jika status disetujui, revert aset BMN dan hapus BA terkait
+            if ($locked->status === 'disetujui') {
+                $items = $locked->items()->with('bmn')->get();
+
+                foreach ($items as $item) {
+                    /** @var Bmn $bmn */
+                    $bmn = Bmn::where('id', $item->bmn_id)->lockForUpdate()->first();
+                    if (! $bmn) {
+                        continue;
+                    }
+
+                    $lokasiAsal = $item->lokasi_awal ?: 'Gudang BMN';
+                    $lokasiModel = Lokasi::where('nama', $lokasiAsal)->first();
+                    $kondisiAsal = $item->kondisi_awal ?: 'Baik';
+                    $namaPegawai = $locked->nama_pegawai;
+                    $nipPegawai = $locked->nip_pegawai ?: ($locked->pegawai?->nip ?: '-');
+                    $pegawaiId = $locked->pegawai_id;
+
+                    $bmn->update([
+                        'kondisi' => $kondisiAsal,
+                        'lokasi' => $lokasiAsal,
+                        'lokasi_id' => $lokasiModel?->id,
+                        'penanggungjawab' => $namaPegawai,
+                        'penanggungjawab_nip' => $nipPegawai,
+                        'penanggung_jawab_id' => $pegawaiId,
+                        'is_dikembalikan' => false,
+                    ]);
+
+                    // Sinkronisasi BMN-TIK
+                    if ($bmn->jenis === 'BMN-TIK' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->tik) {
+                        BmnTik::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $lokasiAsal,
+                                'penanggungjawab' => $namaPegawai,
+                                'kondisi' => $kondisiAsal,
+                                'is_dikembalikan' => false,
+                            ]);
+                    }
+
+                    // Sinkronisasi BMN-LAB
+                    if ($bmn->jenis === 'BMN-LAB' || $bmn->jenis === 'BMN-TIK & LAB' || $bmn->lab) {
+                        BmnLab::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $lokasiAsal,
+                                'penanggungjawab' => $namaPegawai,
+                                'kondisi' => $kondisiAsal,
+                                'is_dikembalikan' => false,
+                            ]);
+                    }
+
+                    // Sinkronisasi BMN-ANGKUTAN
+                    if ($bmn->jenis === 'BMN-ANGKUTAN' || $bmn->angkutan) {
+                        BmnAngkutan::where('kode_barang', $bmn->kode_barang)
+                            ->where('nup', $bmn->nup)
+                            ->update([
+                                'lokasi' => $lokasiAsal,
+                                'penanggungjawab' => $namaPegawai,
+                                'kondisi' => $kondisiAsal,
+                                'is_dikembalikan' => false,
+                            ]);
+                    }
+
+                    // Hapus / tolak LaporanKerusakan jika ada
+                    if ($item->laporan_kerusakan_id) {
+                        $lk = LaporanKerusakan::find($item->laporan_kerusakan_id);
+                        if ($lk) {
+                            $lk->update([
+                                'status' => 'Ditolak',
+                                'dihapus' => true,
+                                'dihapus_pada' => now(),
+                                'dihapus_oleh' => $penghapus,
+                                'tanggapan' => 'Pengajuan pengembalian dihapus.',
+                            ]);
+                        }
+                    }
+                }
+
+                // Hapus sinkronisasi di BA Pengembalian
+                $pengembalianTerkait = Pengembalian::where('pengajuan_id', $locked->id)->first();
+                if ($pengembalianTerkait) {
+                    $pengembalianTerkait->items()->delete();
+                    $pengembalianTerkait->forceDelete();
+                }
+            }
+
+            // Catat ke Data Terhapus
+            DataTerhapus::create([
+                'jenis' => 'Pengajuan Pengembalian',
+                'data_id' => $locked->id,
+                'nama' => $locked->nomor_pengajuan,
+                'dihapus_pada' => now(),
+                'dihapus_oleh' => $penghapus,
+            ]);
+
+            // Soft delete pengajuan
+            $locked->delete();
+
+            return true;
         });
     }
 }

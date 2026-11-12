@@ -104,6 +104,20 @@ class PengajuanPengembalianFeatureTest extends TestCase
         ], $attributes));
     }
 
+    protected function addItem(PengajuanPengembalian $pengajuan, Bmn $bmn, array $attributes = []): PengajuanPengembalianItem
+    {
+        return PengajuanPengembalianItem::create(array_merge([
+            'pengajuan_id' => $pengajuan->id,
+            'bmn_id' => $bmn->id,
+            'kode_barang' => $bmn->kode_barang,
+            'nup' => (int) $bmn->nup,
+            'nama_barang' => $bmn->nama_barang,
+            'lokasi_awal' => $bmn->lokasi ?: 'Ruang TU',
+            'kondisi_awal' => $bmn->kondisi ?: 'Baik',
+            'kondisi' => $bmn->kondisi ?: 'Baik',
+        ], $attributes));
+    }
+
     public function test_guest_is_redirected_to_login(): void
     {
         $response = $this->get(route('pengajuan-pengembalian.index'));
@@ -765,5 +779,163 @@ class PengajuanPengembalianFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Laporkan Rusak Berat');
         $response->assertSee(route('laporan-kerusakan.create'));
+    }
+
+    public function test_user_can_delete_own_diajukan_pengajuan(): void
+    {
+        $bmn = $this->createSampleBmn();
+        $pengajuan = $this->createPengajuan(['status' => 'diajukan']);
+        $this->addItem($pengajuan, $bmn);
+
+        $response = $this->actingAs($this->regularUser)
+            ->delete(route('pengajuan-pengembalian.destroy', $pengajuan));
+
+        $response->assertRedirect(route('pengajuan-pengembalian.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertSoftDeleted('pengajuan_pengembalians', ['id' => $pengajuan->id]);
+        $this->assertDatabaseHas('data_terhapus', [
+            'jenis' => 'Pengajuan Pengembalian',
+            'data_id' => $pengajuan->id,
+            'nama' => $pengajuan->nomor_pengajuan,
+        ]);
+    }
+
+    public function test_user_cannot_delete_other_user_pengajuan(): void
+    {
+        $bmn = $this->createSampleBmn();
+        $pengajuan = $this->createPengajuan(['status' => 'diajukan']);
+        $this->addItem($pengajuan, $bmn);
+
+        $response = $this->actingAs($this->otherUser)
+            ->delete(route('pengajuan-pengembalian.destroy', $pengajuan));
+
+        $response->assertStatus(403);
+        $this->assertNotSoftDeleted('pengajuan_pengembalians', ['id' => $pengajuan->id]);
+    }
+
+    public function test_user_cannot_delete_approved_pengajuan(): void
+    {
+        $bmn = $this->createSampleBmn();
+        $pengajuan = $this->createPengajuan(['status' => 'disetujui']);
+        $this->addItem($pengajuan, $bmn);
+
+        $response = $this->actingAs($this->regularUser)
+            ->delete(route('pengajuan-pengembalian.destroy', $pengajuan));
+
+        $response->assertStatus(403);
+        $this->assertNotSoftDeleted('pengajuan_pengembalians', ['id' => $pengajuan->id]);
+    }
+
+    public function test_operator_can_delete_any_pengajuan(): void
+    {
+        $bmn = $this->createSampleBmn();
+        $pengajuan = $this->createPengajuan(['status' => 'diajukan']);
+        $this->addItem($pengajuan, $bmn);
+
+        $response = $this->actingAs($this->operator)
+            ->delete(route('admin.pengajuan-pengembalian.destroy', $pengajuan));
+
+        $response->assertRedirect(route('admin.pengajuan-pengembalian.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertSoftDeleted('pengajuan_pengembalians', ['id' => $pengajuan->id]);
+        $this->assertDatabaseHas('data_terhapus', [
+            'jenis' => 'Pengajuan Pengembalian',
+            'data_id' => $pengajuan->id,
+            'nama' => $pengajuan->nomor_pengajuan,
+        ]);
+    }
+
+    public function test_operator_deleting_approved_pengajuan_reverts_bmn_and_cleans_up_ba(): void
+    {
+        $bmn = $this->createSampleBmn([
+            'lokasi' => 'Ruang TU',
+            'penanggungjawab' => 'Budi Santoso',
+            'kondisi' => 'Baik',
+        ]);
+        $pengajuan = $this->createPengajuan([
+            'status' => 'diajukan',
+            'alasan' => 'pengembalian_biasa',
+        ]);
+        $this->addItem($pengajuan, $bmn, ['kondisi_awal' => 'Baik', 'lokasi_awal' => 'Ruang TU']);
+
+        // Setujui dulu oleh operator
+        $this->actingAs($this->operator)
+            ->post(route('admin.pengajuan-pengembalian.setujui', $pengajuan));
+
+        $bmn->refresh();
+        $this->assertTrue((bool) $bmn->is_dikembalikan);
+
+        // Hapus oleh operator
+        $response = $this->actingAs($this->operator)
+            ->delete(route('admin.pengajuan-pengembalian.destroy', $pengajuan));
+
+        $response->assertRedirect(route('admin.pengajuan-pengembalian.index'));
+
+        // Cek bahwa BMN dikembalikan ke kondisi dan penanggung jawab asal
+        $bmn->refresh();
+        $this->assertFalse((bool) $bmn->is_dikembalikan);
+        $this->assertEquals('Ruang TU', $bmn->lokasi);
+        $this->assertEquals('Budi Santoso', $bmn->penanggungjawab);
+
+        $this->assertSoftDeleted('pengajuan_pengembalians', ['id' => $pengajuan->id]);
+    }
+
+    public function test_data_terhapus_can_restore_and_force_delete_pengajuan_pengembalian(): void
+    {
+        $bmn = $this->createSampleBmn();
+        $pengajuan = $this->createPengajuan(['status' => 'diajukan']);
+        $this->addItem($pengajuan, $bmn);
+
+        // Hapus
+        $this->actingAs($this->regularUser)
+            ->delete(route('pengajuan-pengembalian.destroy', $pengajuan));
+
+        $dataTerhapus = \App\Models\DataTerhapus::where('jenis', 'Pengajuan Pengembalian')
+            ->where('data_id', $pengajuan->id)
+            ->first();
+
+        $this->assertNotNull($dataTerhapus);
+
+        // Pulihkan (Restore)
+        $dataTerhapusService = app(\App\Services\DataTerhapusService::class);
+        $restoreResult = $dataTerhapusService->restore($dataTerhapus);
+        $this->assertTrue($restoreResult['success']);
+
+        $pengajuan->refresh();
+        $this->assertNull($pengajuan->deleted_at);
+        $this->assertDatabaseMissing('data_terhapus', ['id' => $dataTerhapus->id]);
+
+        // Hapus lagi dan Hapus Permanen (Force Delete)
+        $this->actingAs($this->regularUser)
+            ->delete(route('pengajuan-pengembalian.destroy', $pengajuan));
+
+        $dataTerhapusBaru = \App\Models\DataTerhapus::where('jenis', 'Pengajuan Pengembalian')
+            ->where('data_id', $pengajuan->id)
+            ->first();
+
+        $forceResult = $dataTerhapusService->forceDelete($dataTerhapusBaru);
+        $this->assertTrue($forceResult['success']);
+
+        $this->assertDatabaseMissing('pengajuan_pengembalians', ['id' => $pengajuan->id]);
+        $this->assertDatabaseMissing('data_terhapus', ['id' => $dataTerhapusBaru->id]);
+    }
+
+    public function test_index_view_shows_delete_button_for_operator_and_owner(): void
+    {
+        $bmn = $this->createSampleBmn();
+        $pengajuan = $this->createPengajuan(['status' => 'diajukan']);
+        $this->addItem($pengajuan, $bmn);
+
+        // Regular user melihat tombol hapus pada pengajuan miliknya
+        $resUser = $this->actingAs($this->regularUser)->get(route('pengajuan-pengembalian.index'));
+        $resUser->assertOk();
+        $resUser->assertSee(route('pengajuan-pengembalian.destroy', $pengajuan));
+
+        // Operator juga melihat tombol hapus
+        $resOperator = $this->actingAs($this->operator)->get(route('pengajuan-pengembalian.index'));
+        $resOperator->assertOk();
+        $resOperator->assertSee(route('pengajuan-pengembalian.destroy', $pengajuan));
     }
 }

@@ -92,4 +92,18 @@ class PengajuanPengembalianController extends Controller
             'pengajuan' => $pengajuanPengembalian,
         ]);
     }
+
+    public function destroy(PengajuanPengembalian $pengajuanPengembalian)
+    {
+        try {
+            $nomorPengajuan = $pengajuanPengembalian->nomor_pengajuan;
+            $this->service->delete($pengajuanPengembalian, auth()->user());
+
+            return redirect()
+                ->route('admin.pengajuan-pengembalian.index')
+                ->with('success', "Pengajuan pengembalian {$nomorPengajuan} berhasil dihapus dan dipindahkan ke Data Terhapus.");
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
 }

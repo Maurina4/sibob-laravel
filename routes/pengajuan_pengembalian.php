@@ -14,6 +14,7 @@ if (config('fitur.pengajuan_pengembalian', true)) {
         Route::get('/{pengajuanPengembalian}', [PengajuanPengembalianController::class, 'show'])->name('show');
         Route::post('/{pengajuanPengembalian}/batalkan', [PengajuanPengembalianController::class, 'batalkan'])->name('batalkan');
         Route::get('/{pengajuanPengembalian}/cetak-ba', [PengajuanPengembalianController::class, 'cetakBa'])->name('cetak-ba');
+        Route::delete('/{pengajuanPengembalian}', [PengajuanPengembalianController::class, 'destroy'])->name('destroy');
     });
 
     // 2. Rute Admin / Pengelola BMN (Khusus Operator)
@@ -24,5 +25,6 @@ if (config('fitur.pengajuan_pengembalian', true)) {
         Route::post('/{pengajuanPengembalian}/tolak', [AdminPengajuanPengembalianController::class, 'tolak'])->name('tolak');
         Route::post('/{pengajuanPengembalian}/batalkan', [AdminPengajuanPengembalianController::class, 'batalkan'])->name('batalkan');
         Route::get('/{pengajuanPengembalian}/cetak-ba', [AdminPengajuanPengembalianController::class, 'cetakBa'])->name('cetak-ba');
+        Route::delete('/{pengajuanPengembalian}', [AdminPengajuanPengembalianController::class, 'destroy'])->name('destroy');
     });
 }
